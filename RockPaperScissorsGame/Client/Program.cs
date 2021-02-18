@@ -1,12 +1,22 @@
 ﻿using System;
+using System.Threading.Tasks;
+using RockPaperScissors;
 
 namespace Client
 {
-    internal static class Program
+    internal class Program
     {
-        private static void Main()
+        static async Task<int> Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            try
+            {
+                var emulator = new ClientAppEmulator();
+                return await emulator.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
         }
     }
 }
