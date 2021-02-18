@@ -4,13 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace RockPaperScissors.Models
 {
-    class Account : IAccount
+    internal class Account : IAccount
     {
-        public Account()
-        {
-        }
-        [JsonPropertyName("id")]
-        public Guid Id { get; private set; }
+        
+        public string Id { get; private set; }
         [JsonPropertyName("login")]
         public string Login { get; private set; }
         [JsonPropertyName("email")]

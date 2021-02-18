@@ -9,6 +9,7 @@ namespace RockPaperScissors
     {
         public ClientAppEmulator()
         {
+        
         }
         //For currently player on the platform //developing
         private Account _playerAccount;
