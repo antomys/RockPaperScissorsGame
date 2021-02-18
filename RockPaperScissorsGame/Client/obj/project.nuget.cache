@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "MR8OgkZZdlE8YjDcPC1qAt8VIwxHmpP56REwICC80B0Z1UV0P0u8PV+ryvNTeeLGDY9rrn/1OvkDZ3ZD/LuLLg==",
+  "dgSpecHash": "03ee3fpNA5EYGFdobIQojV7s05cBX00rmG5QxhcHfOn/keTsgq3/+1oSKh6Mxz6DEayyOlhZJp/ktykg3Pe4yQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Михаил\\.nuget\\packages\\system.text.json\\5.0.1\\system.text.json.5.0.1.nupkg.sha512"
+  ],
   "logs": []
 }
