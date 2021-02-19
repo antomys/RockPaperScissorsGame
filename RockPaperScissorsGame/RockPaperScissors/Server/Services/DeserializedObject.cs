@@ -165,26 +165,22 @@ namespace RockPaperScissors.Server.Services
         {
             var streamManager = new RecyclableMemoryStreamManager();
 
-            using (var file = File.Open(_fileName, FileMode.OpenOrCreate))
-            {
-                using (var memoryStream = streamManager.GetStream()) // RecyclableMemoryStream will be returned, it inherits MemoryStream, however prevents data allocation into the LOH
-                {
-                    using (var writer = new StreamWriter(memoryStream))
-                    {
-                        var serializer = JsonSerializer.CreateDefault();
+            using var file = File.Open(_fileName, FileMode.OpenOrCreate);
+            using var memoryStream = streamManager.GetStream();
+            using var writer = new StreamWriter(memoryStream);
+            
+            var serializer = JsonSerializer.CreateDefault();
+                
+            serializer.Serialize(writer, ConcurrentDictionary);      // FROM STACKOVERFLOW
+                
+            await writer.FlushAsync().ConfigureAwait(false);
+                
+            memoryStream.Seek(0, SeekOrigin.Begin);
+                
+            await memoryStream.CopyToAsync(file).ConfigureAwait(false);
 
-                        serializer.Serialize(writer, ConcurrentDictionary);
-
-                        await writer.FlushAsync().ConfigureAwait(false);
-
-                        memoryStream.Seek(0, SeekOrigin.Begin);
-
-                        await memoryStream.CopyToAsync(file).ConfigureAwait(false);
-                    }
-                }
-
-                await file.FlushAsync().ConfigureAwait(false);
-            }
+            await file.FlushAsync().ConfigureAwait(false);
+            
             /*var unicodeEncoding = new ASCIIEncoding();
             try
             {

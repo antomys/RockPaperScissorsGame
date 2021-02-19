@@ -8,8 +8,8 @@ namespace RockPaperScissors.Server.Models.Interfaces
         [JsonPropertyName("Id")]
         string Id { get; set; }
         
-        [JsonPropertyName("UserId")]
-        string Userid { get; set; }
+        [JsonPropertyName("UserLogin")]
+        string Login { get; set; }
         
         [JsonPropertyName("Wins")]
         int Wins { get; set; }

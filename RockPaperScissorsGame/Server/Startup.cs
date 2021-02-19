@@ -97,8 +97,7 @@ namespace Server
 
                     var stat = new Statistics
                     {
-                        Id = Guid.NewGuid().ToString(),
-                        Userid = user.Id,
+                        Id = user.Id,
                         Wins = 43,
                         Loss = 4354,
                         WinLossRatio = 21.4,
@@ -107,6 +106,7 @@ namespace Server
                         UsedPaper = 0,
                         UsedScissors = 0,
                         Points = 0,
+                        Login = user.Login
                     };
 
                     accStorage.Add(user);
@@ -120,7 +120,7 @@ namespace Server
                     var dictionary2 = listOfStats.ConcurrentDictionary;
                     foreach (var value in dictionary2.Values)
                     {
-                        await context.Response.WriteAsync($"STATS: {value.Id};{value.Userid}\n");
+                        await context.Response.WriteAsync($"STATS: {value.Id};{value.Id}\n");
                     }
 
                     await service.UpdateData();

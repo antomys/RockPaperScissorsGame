@@ -38,8 +38,7 @@ namespace Client
             };
             var stats = new Statistics
             {
-                Id = Guid.NewGuid().ToString(),
-                Userid = account.Id,
+                Id = account.Id,
                 Wins = 46,
                 Loss = 13,
                 WinLossRatio = 3,

@@ -47,16 +47,19 @@ namespace RockPaperScissors.Server.Services
            // var guid = item.GetType().GetField("Id", BindingFlags.NonPublic | BindingFlags.Instance); //fix from stackoverflow
 
            var guid = GetGuidFromT(item);
+
+           var check = GetLoginString(item);
            
-           if(_deserializedObject.ConcurrentDictionary.TryGetValue(guid.ToString(),out _))
+           if (CheckIfExists(item))
+               return 400;
+           
+           /*if(_deserializedObject.ConcurrentDictionary.TryGetValue(guid.ToString(),out _))
            {
                return 404;
-           }
+           }*/
+           
 
-           /*if (_deserializedObject.ConcurrentDictionary.ContainsKey((Guid) guid))
-               return 404;*/
-
-           //var guid = item.GetType().GUID; //TODO: CHTO ETO TAKOE BLYAT
+           //var guid = item.GetType().GUID; //TODO: CHTO ETO TAKOE
            return _deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item) ? 200 : 404; //todo: redo
         }
 
@@ -68,6 +71,17 @@ namespace RockPaperScissors.Server.Services
             var prop = t.GetProperty("Id");
             return prop?.GetValue(item); //TODO: CONDITIONAL ACCESS????
             // *************************************
+        }
+
+        private object GetLoginString(T item)
+        {
+            return item.GetType().GetProperty("Login") != null ? item.GetType().GetProperty("Login")?.GetValue(item) : null;
+        }
+
+        private bool CheckIfExists(T item)
+        {
+            var flattenList = _deserializedObject.ConcurrentDictionary.Values;           //THIS IS NOT ASYNC
+            return GetLoginString(item) != null && flattenList.Any(T => GetLoginString(T).Equals(GetLoginString(item)));
         }
 
         public Task<int> AddAsync(T item)

@@ -5,7 +5,7 @@ namespace RockPaperScissors.Server.Models.Interfaces
 {
     public interface IAccount
     {
-        [JsonPropertyName("Id")] 
+        [JsonPropertyName("Id")]
         string Id { get; }
         
         [JsonPropertyName("Login")]
