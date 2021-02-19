@@ -12,7 +12,7 @@ namespace RockPaperScissors
         {
         }
         //For currently player on the platform //developing
-        private Account _playerAccount;
+        private AccountDto _playerAccountDto;
         public async Task<int> StartAsync()
         {
             try
@@ -65,7 +65,7 @@ namespace RockPaperScissors
                     case 1:
                         Registration();
                         ColorTextWriterService.PrintLineMessageWithSpecialColor("Account succesfully created", ConsoleColor.Green);
-                        ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccount.ToString(), ConsoleColor.Green);
+                        ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccountDto.ToString(), ConsoleColor.Green);
                         ColorTextWriterService.PrintLineMessageWithSpecialColor("\n\nPress any key to back to the start up menu list!"
                     , ConsoleColor.Cyan);
                         Console.ReadKey();
@@ -90,12 +90,12 @@ namespace RockPaperScissors
             ColorTextWriterService.PrintLineMessageWithSpecialColor("\nWe are glad to welcome you in the registration form!\n" +
                 "Please enter the required details\n" +
                 "to register an account on the platform", ConsoleColor.Magenta);
-            _playerAccount = new Account(
+            /*_playerAccountDto = new AccountDto(
                 new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
                 new StringPlaceholder(StringDestination.Email).BuildNewSpecialDestinationString("Email"),
                 new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password"),
                 new StringPlaceholder(StringDestination.PassportType).BuildNewSpecialDestinationString("FirstName"),
-                new StringPlaceholder(StringDestination.PassportType).BuildNewSpecialDestinationString("LastName"));
+                new StringPlaceholder(StringDestination.PassportType).BuildNewSpecialDestinationString("LastName"));*/
             Console.Clear();
         }
     }

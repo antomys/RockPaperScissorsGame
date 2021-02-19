@@ -1,38 +1,33 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj": {}
+    "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj": {
+    "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
+        "projectUniqueName": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
         "projectName": "Client",
-        "projectPath": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
-        "packagesPath": "C:\\Users\\Михаил\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\obj\\",
+        "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
+        "packagesPath": "C:\\Users\\deqqu\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Михаил\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\deqqu\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
-                "projectPath": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj"
+              "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
+                "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj"
               }
             }
           }
@@ -61,31 +56,26 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
+    "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj",
+        "projectUniqueName": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj",
         "projectName": "RockPaperScissors",
-        "projectPath": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj",
-        "packagesPath": "C:\\Users\\Михаил\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\obj\\",
+        "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj",
+        "packagesPath": "C:\\Users\\deqqu\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Михаил\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\deqqu\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netstandard2.1"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -104,6 +94,10 @@
         "netstandard2.1": {
           "targetAlias": "netstandard2.1",
           "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
             "System.Text.Json": {
               "target": "Package",
               "version": "[5.0.1, )"
@@ -124,7 +118,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     }

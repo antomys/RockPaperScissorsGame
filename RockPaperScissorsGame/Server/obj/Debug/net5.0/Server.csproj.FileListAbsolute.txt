@@ -27,3 +27,7 @@ C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Serv
 C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Server\obj\Debug\net5.0\ref\Server.dll
 C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Server\obj\Debug\net5.0\Server.pdb
 C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Server\obj\Debug\net5.0\Server.genruntimeconfig.cache
+C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Server\bin\Debug\net5.0\Serilog.dll
+C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Server\bin\Debug\net5.0\Serilog.Extensions.Logging.dll
+C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Server\bin\Debug\net5.0\Serilog.Sinks.Console.dll
+C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Server\bin\Debug\net5.0\Serilog.Sinks.File.dll

@@ -4,11 +4,11 @@ using System.Text;
 
 namespace RockPaperScissors.Models.Interfaces
 {
-    interface IAccount
+    internal interface IAccountDto
     {
-        Guid Id { get; }
+        //Guid Id { get; }
         string Login { get; }
-        string Email { get; }
+        //string Email { get; }
         string Password { get; }
     }
 }

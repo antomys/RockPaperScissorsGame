@@ -2,6 +2,15 @@
   "version": 3,
   "targets": {
     "net5.0": {
+      "Newtonsoft.Json/12.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {}
+        }
+      },
       "System.Text.Json/5.0.1": {
         "type": "package",
         "compile": {
@@ -15,6 +24,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.1",
         "dependencies": {
+          "Newtonsoft.Json": "12.0.1",
           "System.Text.Json": "5.0.1"
         },
         "compile": {
@@ -27,6 +37,45 @@
     }
   },
   "libraries": {
+    "Newtonsoft.Json/12.0.1": {
+      "sha512": "pBR3wCgYWZGiaZDYP+HHYnalVnPJlpP1q55qvVb+adrDHmFMDc1NAKio61xTwftK3Pw5h7TZJPJEEVMd6ty8rg==",
+      "type": "package",
+      "path": "newtonsoft.json/12.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "lib/net20/Newtonsoft.Json.dll",
+        "lib/net20/Newtonsoft.Json.pdb",
+        "lib/net20/Newtonsoft.Json.xml",
+        "lib/net35/Newtonsoft.Json.dll",
+        "lib/net35/Newtonsoft.Json.pdb",
+        "lib/net35/Newtonsoft.Json.xml",
+        "lib/net40/Newtonsoft.Json.dll",
+        "lib/net40/Newtonsoft.Json.pdb",
+        "lib/net40/Newtonsoft.Json.xml",
+        "lib/net45/Newtonsoft.Json.dll",
+        "lib/net45/Newtonsoft.Json.pdb",
+        "lib/net45/Newtonsoft.Json.xml",
+        "lib/netstandard1.0/Newtonsoft.Json.dll",
+        "lib/netstandard1.0/Newtonsoft.Json.pdb",
+        "lib/netstandard1.0/Newtonsoft.Json.xml",
+        "lib/netstandard1.3/Newtonsoft.Json.dll",
+        "lib/netstandard1.3/Newtonsoft.Json.pdb",
+        "lib/netstandard1.3/Newtonsoft.Json.xml",
+        "lib/netstandard2.0/Newtonsoft.Json.dll",
+        "lib/netstandard2.0/Newtonsoft.Json.pdb",
+        "lib/netstandard2.0/Newtonsoft.Json.xml",
+        "lib/portable-net40+sl5+win8+wp8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net40+sl5+win8+wp8+wpa81/Newtonsoft.Json.pdb",
+        "lib/portable-net40+sl5+win8+wp8+wpa81/Newtonsoft.Json.xml",
+        "lib/portable-net45+win8+wp8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net45+win8+wp8+wpa81/Newtonsoft.Json.pdb",
+        "lib/portable-net45+win8+wp8+wpa81/Newtonsoft.Json.xml",
+        "newtonsoft.json.12.0.1.nupkg.sha512",
+        "newtonsoft.json.nuspec"
+      ]
+    },
     "System.Text.Json/5.0.1": {
       "sha512": "/UM3UK1dXKl8Ybysg/21gM4S8DJgkR+yLU8JwqCVbuNqQNImelntgYFAN5QxR8sJJ1kMx//hOUdf0lltosi8cQ==",
       "type": "package",
@@ -61,38 +110,32 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Михаил\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\deqqu\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
+      "projectUniqueName": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
       "projectName": "Client",
-      "projectPath": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
-      "packagesPath": "C:\\Users\\Михаил\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\obj\\",
+      "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
+      "packagesPath": "C:\\Users\\deqqu\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Михаил\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\deqqu\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
-              "projectPath": "C:\\Users\\Михаил\\Desktop\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj"
+            "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
+              "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj"
             }
           }
         }
@@ -121,7 +164,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
       }
     }
   }
