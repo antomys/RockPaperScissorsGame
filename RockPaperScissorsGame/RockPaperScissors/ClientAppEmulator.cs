@@ -1,5 +1,6 @@
 ﻿using RockPaperScissors.Models;
 using RockPaperScissors.Services;
+using RockPaperScissors.Validations;
 using System;
 using System.Threading.Tasks;
 
@@ -9,7 +10,6 @@ namespace RockPaperScissors
     {
         public ClientAppEmulator()
         {
-        
         }
         //For currently player on the platform //developing
         private Account _playerAccount;
@@ -23,6 +23,7 @@ namespace RockPaperScissors
                 Console.ReadKey();
                 Console.Clear();
                 //Here we ` ll try to connect with server on the background and show smth to the user
+                //smth like await TaskFactory (Connection + Menu StartUP)
                 StartMenu();
                 return 1;
             }
@@ -42,15 +43,16 @@ namespace RockPaperScissors
         }
         private void StartMenu()
         {
-            ColorTextWriterService.PrintLineMessageWithSpecialColor("" +
+            while (true)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("" +
                 "Please auth to proceed:\n" +
                 "1.\tSign up\n" +
                 "2.\tLog in\n" +
                 "3.\tSee Leaderboard\n" +       //This part will be available after we figure out the statistics
                 "4.\tExit", ConsoleColor.DarkYellow);
-            ColorTextWriterService.PrintLineMessageWithSpecialColor("\nPlease select an item from the list", ConsoleColor.Green);
-            while (true)
-            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("\nPlease select an item from the list", ConsoleColor.Green);
+
                 Console.Write("Select -> ");
                 var passed = int.TryParse(Console.ReadLine(), out int startMenuInput);
                 if (!passed)
@@ -61,6 +63,13 @@ namespace RockPaperScissors
                 switch (startMenuInput)
                 {
                     case 1:
+                        Registration();
+                        ColorTextWriterService.PrintLineMessageWithSpecialColor("Account succesfully created", ConsoleColor.Green);
+                        ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccount.ToString(), ConsoleColor.Green);
+                        ColorTextWriterService.PrintLineMessageWithSpecialColor("\n\nPress any key to back to the start up menu list!"
+                    , ConsoleColor.Cyan);
+                        Console.ReadKey();
+                        Console.Clear();
                         break;
                     case 2:
                         break;
@@ -72,8 +81,22 @@ namespace RockPaperScissors
                         ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
                         continue;
                 }
+            
             }
 
+        }
+        private void Registration()
+        {
+            ColorTextWriterService.PrintLineMessageWithSpecialColor("\nWe are glad to welcome you in the registration form!\n" +
+                "Please enter the required details\n" +
+                "to register an account on the platform", ConsoleColor.Magenta);
+            _playerAccount = new Account(
+                new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
+                new StringPlaceholder(StringDestination.Email).BuildNewSpecialDestinationString("Email"),
+                new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password"),
+                new StringPlaceholder(StringDestination.PassportType).BuildNewSpecialDestinationString("FirstName"),
+                new StringPlaceholder(StringDestination.PassportType).BuildNewSpecialDestinationString("LastName"));
+            Console.Clear();
         }
     }
 }

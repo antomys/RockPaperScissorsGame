@@ -34,7 +34,3 @@ C:\Users\Михаил\Desktop\RockPaperScissorsGame\RockPaperScissorsGame\Client
 C:\Users\Михаил\Desktop\RockPaperScissorsGame\RockPaperScissorsGame\Client\obj\Debug\net5.0\ref\Client.dll
 C:\Users\Михаил\Desktop\RockPaperScissorsGame\RockPaperScissorsGame\Client\obj\Debug\net5.0\Client.pdb
 C:\Users\Михаил\Desktop\RockPaperScissorsGame\RockPaperScissorsGame\Client\obj\Debug\net5.0\Client.genruntimeconfig.cache
-C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Client\bin\Debug\net5.0\System.Text.Json.dll
-C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Client\bin\Debug\net5.0\RockPaperScissors.dll
-C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Client\bin\Debug\net5.0\RockPaperScissors.pdb
-C:\Users\deqqu\Documents\GitHub\RockPaperScissorsGame\RockPaperScissorsGame\Client\obj\Debug\net5.0\Client.csproj.CopyComplete
