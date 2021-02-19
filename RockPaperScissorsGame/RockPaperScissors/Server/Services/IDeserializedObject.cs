@@ -6,12 +6,14 @@ using RockPaperScissors.Server.Models.Interfaces;
 
 namespace RockPaperScissors.Server.Services
 {
-    public interface IDeserializedObject
+    public interface IDeserializedObject<T>
     {
-        ConcurrentDictionary<Guid, Account> ConcurrentDictionary { get; set; }
+        ConcurrentDictionary<Guid, T> ConcurrentDictionary { get; set; } //Just to debug. DELETE!
+
+        Task UpdateData();
 
 
         //Task<ConcurrentDictionary<Guid, Account>> GetData();
-        
+
     }
 }

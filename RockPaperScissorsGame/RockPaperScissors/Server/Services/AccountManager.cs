@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace RockPaperScissors.Server.Services
             _deserializedObject = deserializedObject;
         }
         
-        public IEnumerable<ItemWithId<TAccount>> GetAll()
+        public ICollection<TAccount> GetAll()
         {
             throw new NotImplementedException();
         }
@@ -62,7 +62,9 @@ namespace RockPaperScissors.Server.Services
             }
 
             _deserializedObject.ConcurrentDictionary.TryAdd(thisItem.Id, (Account) thisItem);  //todo: solve this cast problem 
+            
             return 200;
+            
         }
 
         public Task<int> AddAsync(TAccount item)
@@ -90,4 +92,4 @@ namespace RockPaperScissors.Server.Services
             throw new NotImplementedException();
         }
     }
-}
+}*/

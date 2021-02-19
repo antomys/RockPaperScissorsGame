@@ -33,10 +33,14 @@ namespace Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IDeserializedObject, DeserializedObject>(); // to dynamically change everytime. TODO
+            
+            // to dynamically change everytime. TODO
+            
             services.AddTransient<IAccount, Account>();
             services.AddTransient<IStatistics, Statistics>();
-            services.AddSingleton<IStorage<IAccount>,AccountManager<IAccount>>();
+            //services.AddSingleton<IStorage<IAccount>,AccountManager<IAccount>>();
+            services.AddSingleton(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
+            services.AddSingleton(typeof(IStorage<>), typeof(Storage<>));
             
             services.AddControllers();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"}); });
@@ -64,7 +68,7 @@ namespace Server
 
                 endpoints.Map("/", async context =>
                 {
-                    var service = context.RequestServices.GetRequiredService<IDeserializedObject>();  //todo: remove
+                    var service = context.RequestServices.GetRequiredService<IDeserializedObject<Account>>();  //todo: remove
 
                     var dictionary = service.ConcurrentDictionary;
                     foreach (var value in dictionary.Values)
@@ -74,8 +78,13 @@ namespace Server
                 });
                 endpoints.Map("/name", async context =>
                 {
-                    var service = context.RequestServices.GetRequiredService<IDeserializedObject>();  //todo: remove
-                    var dd = context.RequestServices.GetRequiredService <IStorage<IAccount>>();
+                    var service = context.RequestServices.GetRequiredService<IDeserializedObject<Account>>();  //todo: remove
+                    
+                    var listOfStats =
+                        context.RequestServices.GetRequiredService<IDeserializedObject<Statistics>>(); //todo: remove
+                    
+                    var accStorage = context.RequestServices.GetRequiredService <IStorage<Account>>();
+                    var statStorage = context.RequestServices.GetRequiredService<IStorage<Statistics>>();
                    
                     var login = context.Request.Query["from"].FirstOrDefault();
                     var pass = context.Request.Query["to"].FirstOrDefault();
@@ -86,13 +95,36 @@ namespace Server
                         Password = pass
                     }.ToUser();
 
-                    dd.Add(user);
+                    var stat = new Statistics
+                    {
+                        Id = Guid.NewGuid(),
+                        Userid = user.Id,
+                        Wins = 43,
+                        Loss = 4354,
+                        WinLossRatio = 21.4,
+                        TimeSpent = default,
+                        UsedRock = 0,
+                        UsedPaper = 0,
+                        UsedScissors = 0,
+                        Points = 0,
+                    };
+
+                    accStorage.Add(user);
+                    statStorage.Add(stat);
                     
                     var dictionary = service.ConcurrentDictionary;
                     foreach (var value in dictionary.Values)
                     {
-                        await context.Response.WriteAsync($"{value.Login};{value.Password}\n");
+                        await context.Response.WriteAsync($"LOGIN: {value.Login};{value.Password}\n");
                     }
+                    var dictionary2 = listOfStats.ConcurrentDictionary;
+                    foreach (var value in dictionary2.Values)
+                    {
+                        await context.Response.WriteAsync($"STATS: {value.Id};{value.Userid}\n");
+                    }
+
+                    await service.UpdateData();
+                    await listOfStats.UpdateData();
                 });
             });
         }

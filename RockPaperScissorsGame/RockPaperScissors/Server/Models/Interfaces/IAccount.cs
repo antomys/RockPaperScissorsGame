@@ -15,7 +15,7 @@ namespace RockPaperScissors.Server.Models.Interfaces
         
         string Password { get; set; }
 
-        Statistics Statistics { get; }
+        //Statistics Statistics { get; }
         
         //Guid StatId { get; }
 

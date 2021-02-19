@@ -15,13 +15,7 @@ namespace RockPaperScissors.Server.Mappings
                 {
                     Id = guid,
                     Login = dto.Login,
-                    Password = dto.Password,
-                    Statistics = new Statistics
-                    {
-                        Id = Guid.NewGuid(),
-                        Userid = guid
-                        
-                    }
+                    Password = dto.Password
                 };
             
         }

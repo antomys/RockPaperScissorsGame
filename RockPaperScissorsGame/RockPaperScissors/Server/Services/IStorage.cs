@@ -7,19 +7,19 @@ namespace RockPaperScissors.Server.Services
 {
     public interface IStorage<T> where T: class
     {
-        IEnumerable<ItemWithId<T>> GetAll();
+        ICollection<T> GetAll();
         Task<IEnumerable<ItemWithId<T>>> GetAllAsync();
 
-        T Get(string login, string password);
+        T Get(Guid id);
         Task<T> GetAsync(Guid id);
 
         int Add(T item);
         Task<int> AddAsync(T item);
 
-        void AddOrUpdate(int id, T item);
-        Task AddOrUpdateAsync(int id, T item);
+        void AddOrUpdate(Guid id, T item);
+        Task AddOrUpdateAsync(Guid id, T item);
 
-        bool Delete(int id);
-        Task<bool> DeleteAsync(int id);
+        bool Delete(Guid id);
+        Task<bool> DeleteAsync(Guid id);
     }
 }

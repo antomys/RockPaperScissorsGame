@@ -24,28 +24,37 @@ namespace Client
             }
         }*/
 
-        /*public static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            var deserialize = JsonConvert.DeserializeObject<ConcurrentDictionary<Guid,Account>>(File.ReadAllText("Accounts.bin"));
+            //var deserialize = JsonConvert.DeserializeObject<ConcurrentDictionary<Guid,Account>>(File.ReadAllText("Accounts.bin"));
             var guid = Guid.NewGuid();
-            //var dictionary = new ConcurrentDictionary<Guid, Account>();
+            var deserialize = new ConcurrentDictionary<Guid, Account>();
             
             var account = new Account
             {
                 Id = guid,
                 Login = "xcvbbb",
                 Password = "dsfgccg",
-                Statistics = new Statistics()
-                {
-                    Id = Guid.NewGuid(),
-                    Userid = guid
-                }
+            };
+            var stats = new Statistics
+            {
+                Id = Guid.NewGuid(),
+                Userid = account.Id,
+                Wins = 46,
+                Loss = 13,
+                WinLossRatio = 3,
+                TimeSpent = default,
+                UsedRock = 0,
+                UsedPaper = 0,
+                UsedScissors = 0,
+                Points = 0,
+
             };
             deserialize.TryAdd(account.Id, account);
             //deserialize.Add(account);
             var serialize = JsonConvert.SerializeObject(deserialize, Formatting.Indented);
             
-            File.WriteAllText("Accounts.bin",serialize);
-        }*/
+            File.WriteAllText("Statistics.bin",serialize);
+        }
     }
 }
