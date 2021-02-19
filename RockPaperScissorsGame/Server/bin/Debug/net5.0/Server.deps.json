@@ -25,6 +25,7 @@
     ".NETCoreApp,Version=v5.0": {
       "Server/1.0.0": {
         "dependencies": {
+          "Microsoft.IO.RecyclableMemoryStream": "1.4.0",
           "RockPaperScissors": "1.0.0",
           "Serilog.Extensions.Logging": "3.0.1",
           "Serilog.Sinks.Console": "3.1.0",
@@ -341,6 +342,17 @@
           "System.Runtime.CompilerServices.Unsafe": "4.4.0"
         }
       },
+      "Microsoft.IO.RecyclableMemoryStream/1.4.0": {
+        "runtime": {
+          "lib/netcoreapp2.1/Microsoft.IO.RecyclableMemoryStream.dll": {
+            "assemblyVersion": "1.4.0.0",
+            "fileVersion": "1.4.0.0"
+          }
+        },
+        "compile": {
+          "lib/netcoreapp2.1/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        }
+      },
       "Microsoft.NETCore.Platforms/1.1.0": {},
       "Microsoft.NETCore.Targets/1.1.0": {},
       "Microsoft.OpenApi/1.2.3": {
@@ -354,11 +366,11 @@
           "lib/netstandard2.0/Microsoft.OpenApi.dll": {}
         }
       },
-      "Newtonsoft.Json/12.0.1": {
+      "Newtonsoft.Json/12.0.3": {
         "runtime": {
           "lib/netstandard2.0/Newtonsoft.Json.dll": {
             "assemblyVersion": "12.0.0.0",
-            "fileVersion": "12.0.1.22727"
+            "fileVersion": "12.0.3.23909"
           }
         },
         "compile": {
@@ -665,7 +677,8 @@
       },
       "RockPaperScissors/1.0.0": {
         "dependencies": {
-          "Newtonsoft.Json": "12.0.1",
+          "Microsoft.IO.RecyclableMemoryStream": "1.4.0",
+          "Newtonsoft.Json": "12.0.3",
           "System.Text.Json": "5.0.1"
         },
         "runtime": {
@@ -2417,6 +2430,13 @@
       "path": "microsoft.extensions.primitives/2.0.0",
       "hashPath": "microsoft.extensions.primitives.2.0.0.nupkg.sha512"
     },
+    "Microsoft.IO.RecyclableMemoryStream/1.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-nyIMLK5l817HX2kURSanT+5ney8ja47FLlkjHHHq+fTb1EW3cS1C223pkSDkeGrjqhPYWwPZf63CcUam35hpCQ==",
+      "path": "microsoft.io.recyclablememorystream/1.4.0",
+      "hashPath": "microsoft.io.recyclablememorystream.1.4.0.nupkg.sha512"
+    },
     "Microsoft.NETCore.Platforms/1.1.0": {
       "type": "package",
       "serviceable": true,
@@ -2438,12 +2458,12 @@
       "path": "microsoft.openapi/1.2.3",
       "hashPath": "microsoft.openapi.1.2.3.nupkg.sha512"
     },
-    "Newtonsoft.Json/12.0.1": {
+    "Newtonsoft.Json/12.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pBR3wCgYWZGiaZDYP+HHYnalVnPJlpP1q55qvVb+adrDHmFMDc1NAKio61xTwftK3Pw5h7TZJPJEEVMd6ty8rg==",
-      "path": "newtonsoft.json/12.0.1",
-      "hashPath": "newtonsoft.json.12.0.1.nupkg.sha512"
+      "sha512": "sha512-6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg==",
+      "path": "newtonsoft.json/12.0.3",
+      "hashPath": "newtonsoft.json.12.0.3.nupkg.sha512"
     },
     "runtime.native.System/4.3.0": {
       "type": "package",

@@ -8,7 +8,7 @@ namespace RockPaperScissors.Server.Services
 {
     public interface IDeserializedObject<T>
     {
-        ConcurrentDictionary<Guid, T> ConcurrentDictionary { get; set; } //Just to debug. DELETE!
+        ConcurrentDictionary<string, T> ConcurrentDictionary { get; set; } //Just to debug. DELETE!
 
         Task UpdateData();
 

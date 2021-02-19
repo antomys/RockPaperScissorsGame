@@ -34,7 +34,7 @@ namespace RockPaperScissors.Server.Services
 
         public T Get(Guid id)
         {
-            return _deserializedObject.ConcurrentDictionary.TryGetValue(id, out var account) ? account : default;
+            return _deserializedObject.ConcurrentDictionary.TryGetValue(id.ToString(), out var account) ? account : default;
         }
 
         public Task<T> GetAsync(Guid id)
@@ -48,7 +48,7 @@ namespace RockPaperScissors.Server.Services
 
            var guid = GetGuidFromT(item);
            
-           if(_deserializedObject.ConcurrentDictionary.TryGetValue((Guid) guid,out _))
+           if(_deserializedObject.ConcurrentDictionary.TryGetValue(guid.ToString(),out _))
            {
                return 404;
            }
@@ -57,7 +57,7 @@ namespace RockPaperScissors.Server.Services
                return 404;*/
 
            //var guid = item.GetType().GUID; //TODO: CHTO ETO TAKOE BLYAT
-           return _deserializedObject.ConcurrentDictionary.TryAdd((Guid) guid, item) ? 200 : 404; //todo: redo
+           return _deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item) ? 200 : 404; //todo: redo
         }
 
         private object GetGuidFromT(T item)
@@ -78,7 +78,7 @@ namespace RockPaperScissors.Server.Services
         public void AddOrUpdate(Guid id, T item)
         {
             //_deserializedObject.ConcurrentDictionary.TryGetValue(id, out var thisItem);
-            _deserializedObject.ConcurrentDictionary[id] = item;
+            _deserializedObject.ConcurrentDictionary[id.ToString()] = item;
         }
 
         public Task AddOrUpdateAsync(Guid id, T item)
@@ -88,7 +88,7 @@ namespace RockPaperScissors.Server.Services
 
         public bool Delete(Guid id)
         {
-            if (!_deserializedObject.ConcurrentDictionary.TryRemove(id, out var value)) return false;
+            if (!_deserializedObject.ConcurrentDictionary.TryRemove(id.ToString(), out var value)) return false;
             _logger.LogWarning($"This deleted item: {value}");
             return true;
 

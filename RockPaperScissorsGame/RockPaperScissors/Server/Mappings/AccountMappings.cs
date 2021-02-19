@@ -13,7 +13,7 @@ namespace RockPaperScissors.Server.Mappings
                 ? null
                 : new Account
                 {
-                    Id = guid,
+                    Id = guid.ToString(),
                     Login = dto.Login,
                     Password = dto.Password
                 };

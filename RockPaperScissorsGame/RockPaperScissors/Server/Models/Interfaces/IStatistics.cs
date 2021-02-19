@@ -5,11 +5,11 @@ namespace RockPaperScissors.Server.Models.Interfaces
 {
     public interface IStatistics
     {
-        //[JsonPropertyName("Id")]
-        //Guid Id { get; set; }
+        [JsonPropertyName("Id")]
+        string Id { get; set; }
         
         [JsonPropertyName("UserId")]
-        Guid Userid { get; set; }
+        string Userid { get; set; }
         
         [JsonPropertyName("Wins")]
         int Wins { get; set; }

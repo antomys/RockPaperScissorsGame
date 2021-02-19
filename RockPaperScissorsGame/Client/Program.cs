@@ -26,19 +26,19 @@ namespace Client
 
         public static void Main(string[] args)
         {
-            //var deserialize = JsonConvert.DeserializeObject<ConcurrentDictionary<Guid,Account>>(File.ReadAllText("Accounts.bin"));
+            var deserialize = JsonConvert.DeserializeObject<ConcurrentDictionary<string,Account>>(File.ReadAllText("Accounts.bin"));
             var guid = Guid.NewGuid();
-            var deserialize = new ConcurrentDictionary<Guid, Account>();
+            //var deserialize = new ConcurrentDictionary<string, Account>();
             
             var account = new Account
             {
-                Id = guid,
-                Login = "xcvbbb",
-                Password = "dsfgccg",
+                Id = guid.ToString(),
+                Login = "xcvbbggb",
+                Password = "dsfgccgh",
             };
             var stats = new Statistics
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Userid = account.Id,
                 Wins = 46,
                 Loss = 13,

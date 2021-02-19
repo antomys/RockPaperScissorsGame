@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "3rD0K1GKvegJR9KnkWoYVrzD9WnBFiK2FvEUGsdkexL+0eUec6oooiJvqoz6VpyxnheCLdGILAzfz/9QDRWOGQ==",
+  "dgSpecHash": "T5Zxn3sW8Tv5XEsNoDY87chhjNAcvVCe8WqnEKp9VvZWp3C5TaPKFXOM/+IVQildsRYvlTYD7ssHTP11KjDcMQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Server\\Server.csproj",
   "expectedPackageFiles": [
@@ -10,10 +10,11 @@
     "C:\\Users\\deqqu\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\2.0.0\\microsoft.extensions.logging.abstractions.2.0.0.nupkg.sha512",
     "C:\\Users\\deqqu\\.nuget\\packages\\microsoft.extensions.options\\2.0.0\\microsoft.extensions.options.2.0.0.nupkg.sha512",
     "C:\\Users\\deqqu\\.nuget\\packages\\microsoft.extensions.primitives\\2.0.0\\microsoft.extensions.primitives.2.0.0.nupkg.sha512",
+    "C:\\Users\\deqqu\\.nuget\\packages\\microsoft.io.recyclablememorystream\\1.4.0\\microsoft.io.recyclablememorystream.1.4.0.nupkg.sha512",
     "C:\\Users\\deqqu\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Users\\deqqu\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
     "C:\\Users\\deqqu\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
-    "C:\\Users\\deqqu\\.nuget\\packages\\newtonsoft.json\\12.0.1\\newtonsoft.json.12.0.1.nupkg.sha512",
+    "C:\\Users\\deqqu\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
     "C:\\Users\\deqqu\\.nuget\\packages\\runtime.native.system\\4.3.0\\runtime.native.system.4.3.0.nupkg.sha512",
     "C:\\Users\\deqqu\\.nuget\\packages\\serilog\\2.8.0\\serilog.2.8.0.nupkg.sha512",
     "C:\\Users\\deqqu\\.nuget\\packages\\serilog.extensions.logging\\3.0.1\\serilog.extensions.logging.3.0.1.nupkg.sha512",

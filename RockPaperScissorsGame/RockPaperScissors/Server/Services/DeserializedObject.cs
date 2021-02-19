@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.IO;
 using Newtonsoft.Json;
 using RockPaperScissors.Server.Models;
 using RockPaperScissors.Server.Models.Interfaces;
@@ -17,7 +18,7 @@ namespace RockPaperScissors.Server.Services
         private static ILogger<IDeserializedObject<T>> _logger;
         //private bool IsBusy = false;
         
-        public ConcurrentDictionary<Guid, T> ConcurrentDictionary { get; set; }
+        public ConcurrentDictionary<string, T> ConcurrentDictionary { get; set; }
 
         public DeserializedObject(ILogger<IDeserializedObject<T>> logger)
         {
@@ -25,7 +26,7 @@ namespace RockPaperScissors.Server.Services
             ConcurrentDictionary = GetData().Result;
         }
 
-        private async Task<ConcurrentDictionary<Guid, T>> GetData()
+        private async Task<ConcurrentDictionary<string, T>> GetData()
         {
             //var result = Deserialize().Result;
             return await Deserialize();
@@ -79,7 +80,7 @@ namespace RockPaperScissors.Server.Services
             });
         }
 
-        /*private async Task<ConcurrentDictionary<Guid, T>> Deserialize()
+        /*private async Task<ConcurrentDictionary<string, T>> Deserialize()
         {
             if (typeof(T) == typeof(Account)) //dumb check for type
             {
@@ -106,16 +107,16 @@ namespace RockPaperScissors.Server.Services
                 {
                     _logger.LogWarning($"{exception.Message}");  //todo:remove crap
                     File.Create(_fileName);
-                    return new ConcurrentDictionary<Guid, T>();
+                    return new ConcurrentDictionary<string, T>();
                 }
             else
             {
                 File.Create(_fileName);
-                return new ConcurrentDictionary<Guid, T>();;
+                return new ConcurrentDictionary<string, T>();;
             }
         }*/
         
-        private async Task<ConcurrentDictionary<Guid, T>> Deserialize()
+        private async Task<ConcurrentDictionary<string, T>> Deserialize()
         {
             if (typeof(T) == typeof(Account)) //dumb check for type
             {
@@ -128,42 +129,68 @@ namespace RockPaperScissors.Server.Services
             }
             
             var exists = IsNeededFilesAvailable().Result;
-            
+
+            FileStream reader;
             if (exists && File.ReadAllTextAsync(_fileName).Result != "")  //todo*/
                 try
                 {
                     byte[] fileText;
-                    await using (var reader = File.Open(_fileName, FileMode.Open))
+                    await using (reader = File.Open(_fileName, FileMode.Open))
                     {
                         fileText = new byte[reader.Length];
                         await reader.ReadAsync(fileText, 0, (int)reader.Length);
                     }
+
+                    var decoded = Encoding.ASCII.GetString(fileText);
+                    
+                    //_logger.LogInformation($"{decoded}");
+                    
                     var list = await Task.Run(() => 
-                        JsonConvert.DeserializeObject<ConcurrentDictionary<Guid,T>>(System.Text.Encoding.ASCII.GetString(fileText))); //(typeof(List<Zajecia>));
+                        JsonConvert.DeserializeObject<ConcurrentDictionary<string,T>>(decoded)); //(typeof(List<Zajecia>));
                     return list;
                 }
                 catch (FileNotFoundException exception)
                 {
                     _logger.LogWarning($"{exception.Message}");  //todo:remove crap
                     File.Create(_fileName);
-                    return new ConcurrentDictionary<Guid, T>();
+                    return new ConcurrentDictionary<string, T>();
                 }
-            else
-            {
-                File.Create(_fileName);
-                return new ConcurrentDictionary<Guid, T>();;
-            }
+            reader = File.Open(_fileName, FileMode.OpenOrCreate);
+            reader.Close();
+            return new ConcurrentDictionary<string, T>();;
+            
         }
 
         private async Task Serialize()
         {
-            var unicodeEncoding = new UnicodeEncoding();
+            var streamManager = new RecyclableMemoryStreamManager();
+
+            using (var file = File.Open(_fileName, FileMode.OpenOrCreate))
+            {
+                using (var memoryStream = streamManager.GetStream()) // RecyclableMemoryStream will be returned, it inherits MemoryStream, however prevents data allocation into the LOH
+                {
+                    using (var writer = new StreamWriter(memoryStream))
+                    {
+                        var serializer = JsonSerializer.CreateDefault();
+
+                        serializer.Serialize(writer, ConcurrentDictionary);
+
+                        await writer.FlushAsync().ConfigureAwait(false);
+
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+
+                        await memoryStream.CopyToAsync(file).ConfigureAwait(false);
+                    }
+                }
+
+                await file.FlushAsync().ConfigureAwait(false);
+            }
+            /*var unicodeEncoding = new ASCIIEncoding();
             try
             {
-                
                 var list = await Task.Run(() => 
-                    JsonConvert.SerializeObject(this.ConcurrentDictionary));
-                
+                    JsonConvert.SerializeObject(ConcurrentDictionary,Formatting.Indented));
+                await File.WriteAllTextAsync("testserialization.json", list);
                 var fileText = unicodeEncoding.GetBytes(list);
 
                 await using var sourceStream = File.Open(_fileName, FileMode.OpenOrCreate);
@@ -176,7 +203,7 @@ namespace RockPaperScissors.Server.Services
             {
                 _logger.LogWarning($"{exception.Message}");  //todo:remove crap
                 File.Create(_fileName);
-            }
+            }*/
         }
     }
 }

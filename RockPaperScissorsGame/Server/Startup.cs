@@ -97,7 +97,7 @@ namespace Server
 
                     var stat = new Statistics
                     {
-                        Id = Guid.NewGuid(),
+                        Id = Guid.NewGuid().ToString(),
                         Userid = user.Id,
                         Wins = 43,
                         Loss = 4354,

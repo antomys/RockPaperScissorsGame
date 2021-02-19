@@ -6,7 +6,7 @@ namespace RockPaperScissors.Server.Models
 {
     public class Account : IAccount
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public string Login { get; set; }
         

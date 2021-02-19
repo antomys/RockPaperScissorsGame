@@ -5,8 +5,8 @@ namespace RockPaperScissors.Server.Models
 {
     public class Statistics : IStatistics
     {
-        public Guid Id { get; set; }
-        public Guid Userid { get; set; }
+        public string Id { get; set; }
+        public string Userid { get; set; }
         public int Wins { get; set; }
         public int Loss { get; set; }
         public double WinLossRatio { get; set; }

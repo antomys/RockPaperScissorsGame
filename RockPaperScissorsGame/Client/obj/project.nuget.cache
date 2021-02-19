@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "KB0E2QWKsnG/JFmkC86RM+tOlL5EkVFSxPaFBkPWLjcPIb3ErYGCL2KWjzdB2YQe/QmPdjoZISWXp5e7f2dM4g==",
+  "dgSpecHash": "rOl3v6ICB06cN8zAdI5ygjE0Xzt670/W1gSg+RGG9hK4Gu4Idju1adT+sqnD2YJ0svnrl7BHv844wVuhP/Vecw==",
   "success": true,
   "projectFilePath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\deqqu\\.nuget\\packages\\newtonsoft.json\\12.0.1\\newtonsoft.json.12.0.1.nupkg.sha512",
+    "C:\\Users\\deqqu\\.nuget\\packages\\microsoft.io.recyclablememorystream\\1.4.0\\microsoft.io.recyclablememorystream.1.4.0.nupkg.sha512",
+    "C:\\Users\\deqqu\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
     "C:\\Users\\deqqu\\.nuget\\packages\\system.text.json\\5.0.1\\system.text.json.5.0.1.nupkg.sha512"
   ],
   "logs": []
