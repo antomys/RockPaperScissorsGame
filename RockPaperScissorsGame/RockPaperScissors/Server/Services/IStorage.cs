@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace RockPaperScissors.Server.Services
 {
-    internal interface IStorage<T> where T: class
+    public interface IStorage<T> where T: class
     {
         IEnumerable<ItemWithId<T>> GetAll();
         Task<IEnumerable<ItemWithId<T>>> GetAllAsync();

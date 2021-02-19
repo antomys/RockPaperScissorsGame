@@ -4,20 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using RockPaperScissors.Server.Models;
 using RockPaperScissors.Server.Models.Interfaces;
 
 namespace RockPaperScissors.Server.Services
 {
-    internal class AccountManager<TAccount> : IStorage<TAccount> where TAccount : class
+    public class AccountManager<TAccount> : IStorage<TAccount> where TAccount : class
     {
         private readonly ILogger<AccountManager<TAccount>> _logger;
         
-        private readonly ConcurrentDictionary<Guid,IAccount> _deserializedObject; //todo: change into something else.
+        private readonly IDeserializedObject _deserializedObject; //todo: change into something else.
         //private readonly IStatistics _statistics;
 
         public AccountManager(
             ILogger<AccountManager<TAccount>> logger,
-            ConcurrentDictionary<Guid,IAccount> deserializedObject) //todo: change into something else
+            IDeserializedObject deserializedObject) //todo: change into something else
         {
             _logger = logger;
             _deserializedObject = deserializedObject;
@@ -35,13 +36,14 @@ namespace RockPaperScissors.Server.Services
 
         public TAccount Get(string login, string password)
         {
-            if (!_deserializedObject.Values.Any(x => x.Login == login && x.Password == password)) return null;
+            
+            if (!_deserializedObject.ConcurrentDictionary.Values.Any(x => x.Login == login && x.Password == password)) return null;
             {
                 var thisAccount = 
-                    _deserializedObject.Values.FirstOrDefault(x => x.Login == login && x.Password == password);
+                    _deserializedObject.ConcurrentDictionary.Values.FirstOrDefault(x => x.Login == login && x.Password == password);
 
                 if (thisAccount == null) return null;
-                _deserializedObject.TryGetValue(thisAccount.Id, out var result);//REDO!
+                _deserializedObject.ConcurrentDictionary.TryGetValue(thisAccount.Id, out var result);//REDO!
                 return result as TAccount; //bullshit
             }
         }
@@ -54,12 +56,12 @@ namespace RockPaperScissors.Server.Services
         public int Add(TAccount item)
         {
             var thisItem = (IAccount) item; //todo:change
-            if (_deserializedObject.Values.Any(x => x.Id == thisItem.Id))
+            if (_deserializedObject.ConcurrentDictionary.Values.Any(x => x.Id == thisItem.Id))
             {
                 return 404;
             }
 
-            _deserializedObject.TryAdd(thisItem.Id, thisItem);
+            _deserializedObject.ConcurrentDictionary.TryAdd(thisItem.Id, (Account) thisItem);  //todo: solve this cast problem 
             return 200;
         }
 

@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using RockPaperScissors.Server.Models;
 using RockPaperScissors.Server.Models.Interfaces;
 
 namespace RockPaperScissors.Server.Services
 {
-    internal interface IDeserializedObject
+    public interface IDeserializedObject
     {
-        ConcurrentDictionary<Guid, IAccount> ConcurrentDictionary { get; set; }
+        ConcurrentDictionary<Guid, Account> ConcurrentDictionary { get; set; }
+
+
+        //Task<ConcurrentDictionary<Guid, Account>> GetData();
+        
     }
 }

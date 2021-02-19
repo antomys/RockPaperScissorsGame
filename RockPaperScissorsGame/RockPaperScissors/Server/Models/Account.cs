@@ -3,7 +3,7 @@ using RockPaperScissors.Server.Models.Interfaces;
 
 namespace RockPaperScissors.Server.Models
 {
-    internal class Account : IAccount
+    public class Account : IAccount
     {
         public Guid Id { get; set; }
 
@@ -11,6 +11,7 @@ namespace RockPaperScissors.Server.Models
         
         public string Password { get; set; }
 
-        public IStatistics Statistics { get; set; }
+       // public Guid StatId { get; set; }
+       public Statistics Statistics { get; set; }
     }
 }

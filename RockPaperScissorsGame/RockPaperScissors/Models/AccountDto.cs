@@ -5,7 +5,7 @@ using RockPaperScissors.Server.Models;
 
 namespace RockPaperScissors.Models
 {
-    internal class AccountDto : IAccountDto
+    public class AccountDto : IAccountDto
     {
         /*public Account(string login,string email, string password, string firstName, string lastName )
         {

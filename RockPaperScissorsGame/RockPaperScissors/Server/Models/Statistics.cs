@@ -3,7 +3,7 @@ using RockPaperScissors.Server.Models.Interfaces;
 
 namespace RockPaperScissors.Server.Models
 {
-    internal class Statistics : IStatistics
+    public class Statistics : IStatistics
     {
         public Guid Id { get; set; }
         public Guid Userid { get; set; }
@@ -15,6 +15,6 @@ namespace RockPaperScissors.Server.Models
         public int UsedPaper { get; set; }
         public int UsedScissors { get; set; }
         public int Points { get; set; }
-        public IAccount Account { get; set; }
+        //public IAccount Account { get; set; }
     }
 }

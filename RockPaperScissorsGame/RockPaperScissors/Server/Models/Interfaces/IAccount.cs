@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace RockPaperScissors.Server.Models.Interfaces
 {
-    internal interface IAccount
+    public interface IAccount
     {
         [JsonPropertyName("Id")] 
         Guid Id { get; }
@@ -15,7 +15,9 @@ namespace RockPaperScissors.Server.Models.Interfaces
         
         string Password { get; set; }
 
-        IStatistics Statistics { get; }
+        Statistics Statistics { get; }
+        
+        //Guid StatId { get; }
 
 
 

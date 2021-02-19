@@ -3,10 +3,10 @@ using System.Text.Json.Serialization;
 
 namespace RockPaperScissors.Server.Models.Interfaces
 {
-    internal interface IStatistics
+    public interface IStatistics
     {
-        [JsonPropertyName("Id")]
-        Guid Id { get; set; }
+        //[JsonPropertyName("Id")]
+        //Guid Id { get; set; }
         
         [JsonPropertyName("UserId")]
         Guid Userid { get; set; }
@@ -35,6 +35,6 @@ namespace RockPaperScissors.Server.Models.Interfaces
         [JsonPropertyName("Points")]
         int Points { get; set; }
 
-        IAccount Account { get; }
+        //IAccount Account { get; }
     }
 }
