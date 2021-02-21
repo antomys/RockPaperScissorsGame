@@ -15,10 +15,12 @@ namespace RockPaperScissors
 {
     public class ClientAppEmulator
     {
-        static HttpClient client = new HttpClient();
+        private static readonly HttpClient Client = new HttpClient();
+        private readonly string _sessionId;
         public ClientAppEmulator()
         {
-            client.BaseAddress = new Uri("https://localhost:5001/");
+            Client.BaseAddress = new Uri("https://localhost:5001/");
+            _sessionId = Guid.NewGuid().ToString();
         }
         //For currently player on the platform //developing
         private AccountDto _playerAccountDto;
@@ -122,12 +124,14 @@ namespace RockPaperScissors
                 "to register an account on the platform", ConsoleColor.Magenta);
             _playerAccountDto = new AccountDto
             {
+                SessionId = _sessionId,
                 Login = new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
                 Password =
-                    new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password")
+                    new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password"),
+                LastRequest = DateTime.Now
             };
             var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccountDto), Encoding.UTF8, "application/json");
-            var responseMessage = await client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
+            var responseMessage = await Client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
 
             return (int)responseMessage.StatusCode;
         }
@@ -136,9 +140,11 @@ namespace RockPaperScissors
         {
             var inputAccount = new AccountDto
             {
+                SessionId = _sessionId,
                 Login = new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
                 Password =
-                    new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password")
+                    new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password"),
+                LastRequest = DateTime.Now
             };
             
             //var stringContent = new StringContent(JsonConvert.SerializeObject(inputAccount), Encoding.UTF8, "application/json");
@@ -146,11 +152,11 @@ namespace RockPaperScissors
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(client.BaseAddress+"user/login"),
+                RequestUri = new Uri(Client.BaseAddress+"user/login"),
                 Content = new StringContent(JsonConvert.SerializeObject(inputAccount), Encoding.UTF8, "application/json")
             };
             
-            var response = await client.SendAsync(request).ConfigureAwait(false); //TODO: Cancellation token
+            var response = await Client.SendAsync(request).ConfigureAwait(false); //TODO: Cancellation token
             if (!response.IsSuccessStatusCode) return 404;
             var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 

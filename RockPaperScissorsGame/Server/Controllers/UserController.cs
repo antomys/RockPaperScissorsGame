@@ -53,7 +53,7 @@ namespace Server.Controllers
 
             var requestedAccount = JsonConvert.DeserializeObject<AccountDto>(body);
 
-            var result = _accountManager.LogInAsync(requestedAccount.Login, requestedAccount.Password).Result;
+            var result = _accountManager.LogInAsync(requestedAccount).Result;
             
             if (result == null)
             {

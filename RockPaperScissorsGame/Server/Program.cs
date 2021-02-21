@@ -22,7 +22,7 @@ namespace Server
                 .ConfigureLogging(loggingBuilder =>
                 {
                     loggingBuilder.ClearProviders();
-                    loggingBuilder.SetMinimumLevel(LogLevel.Information);
+                    loggingBuilder.SetMinimumLevel(LogLevel.Trace);
                     loggingBuilder.AddSerilog(new LoggerConfiguration()
                         .WriteTo.Console()
                         .WriteTo.File("app.log")

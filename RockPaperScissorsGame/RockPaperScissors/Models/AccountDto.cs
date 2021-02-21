@@ -1,4 +1,5 @@
-﻿using RockPaperScissors.Models.Interfaces;
+﻿using System;
+using RockPaperScissors.Models.Interfaces;
 using Newtonsoft.Json;
 
 namespace RockPaperScissors.Models
@@ -15,8 +16,8 @@ namespace RockPaperScissors.Models
             LastName = lastName;
         }*/
 
-        //[JsonPropertyName("id")]
-        //public Guid Id { get; private set; }
+        [JsonProperty("SessionId")]
+        public string SessionId { get; set; }
         //[JsonPropertyName("firstName")]
         //public string FirstName { get; private set; }
         //[JsonPropertyName("lastName")]
@@ -28,6 +29,10 @@ namespace RockPaperScissors.Models
         
         [JsonProperty("Password")]
         public string Password { get; set; }
+        
+        [JsonProperty("LastRequest")]
+        
+        public DateTime LastRequest { get; set; }
         
         
         //Soon will be deleted(for testing mode!)
