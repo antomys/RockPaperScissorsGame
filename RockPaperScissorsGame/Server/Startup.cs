@@ -33,7 +33,7 @@ namespace Server
             services.AddTransient<IAccount, Account>();
             services.AddTransient<IStatistics, Statistics>();
             //services.AddSingleton<IStorage<IAccount>,AccountManager<IAccount>>();
-            services.AddTransient(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
+            services.AddSingleton(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
             services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
            
             services.AddSingleton<IAccountManager, AccountManager>();

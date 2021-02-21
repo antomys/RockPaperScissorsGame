@@ -153,6 +153,7 @@ namespace Server.Services
                     File.Create(_fileName);
                     return new ConcurrentDictionary<string, T>();
                 }
+
             reader = File.Open(_fileName, FileMode.OpenOrCreate);
             reader.Close();
             return new ConcurrentDictionary<string, T>();;
