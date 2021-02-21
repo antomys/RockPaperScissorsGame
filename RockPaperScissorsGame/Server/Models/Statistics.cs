@@ -1,7 +1,7 @@
 ﻿using System;
-using RockPaperScissors.Server.Models.Interfaces;
+using Server.Models.Interfaces;
 
-namespace RockPaperScissors.Server.Models
+namespace Server.Models
 {
     public class Statistics : IStatistics
     {

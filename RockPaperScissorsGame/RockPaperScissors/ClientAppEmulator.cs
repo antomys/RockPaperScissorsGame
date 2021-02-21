@@ -2,14 +2,23 @@
 using RockPaperScissors.Services;
 using RockPaperScissors.Validations;
 using System;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace RockPaperScissors
 {
     public class ClientAppEmulator
     {
+        static HttpClient client = new HttpClient();
         public ClientAppEmulator()
         {
+            client.BaseAddress = new Uri("https://localhost:5001/");
         }
         //For currently player on the platform //developing
         private AccountDto _playerAccountDto;
@@ -24,7 +33,7 @@ namespace RockPaperScissors
                 Console.Clear();
                 //Here we ` ll try to connect with server on the background and show smth to the user
                 //smth like await TaskFactory (Connection + Menu StartUP)
-                StartMenu();
+                await StartMenu();
                 return 1;
             }
             catch (Exception exception)
@@ -41,7 +50,7 @@ namespace RockPaperScissors
                     "you can find a random player or just try your skill with a bot.", ConsoleColor.Yellow);
             ColorTextWriterService.PrintLineMessageWithSpecialColor("(c)Ihor Volokhovych & Michael Terekhov", ConsoleColor.Cyan);
         }
-        private void StartMenu()
+        private async Task StartMenu()
         {
             while (true)
             {
@@ -63,15 +72,36 @@ namespace RockPaperScissors
                 switch (startMenuInput)
                 {
                     case 1:
-                        Registration();
-                        ColorTextWriterService.PrintLineMessageWithSpecialColor("Account succesfully created", ConsoleColor.Green);
-                        ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccountDto.ToString(), ConsoleColor.Green);
-                        ColorTextWriterService.PrintLineMessageWithSpecialColor("\n\nPress any key to back to the start up menu list!"
-                    , ConsoleColor.Cyan);
+                        var registrationResponse = await Registration();
+                        if (registrationResponse.Equals((int)HttpStatusCode.BadRequest))
+                        {
+                            Console.WriteLine("Unable to create account. Already exists?");
+                        }
+                        else
+                        {
+                            ColorTextWriterService.PrintLineMessageWithSpecialColor("Account successfully created", ConsoleColor.Green);
+                            ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccountDto.ToString(), ConsoleColor.Green); 
+                        }
+                        ColorTextWriterService.PrintLineMessageWithSpecialColor(
+                            "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case 2:
+                        var loginResponse = await LogIn();
+                        if (loginResponse != 404) //todo: change to HttpStatusCode
+                        {
+                            Console.WriteLine($"Successfully signed in!\nHello,{_playerAccountDto.Login}!");
+                            //Transfer to another menu
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unable to sign in. Please check login or password");
+                        }
+                        ColorTextWriterService.PrintLineMessageWithSpecialColor(
+                            "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
+                        Console.ReadKey();
+                        Console.Clear();
                         break;
                     case 3:
                         break;
@@ -85,18 +115,48 @@ namespace RockPaperScissors
             }
 
         }
-        private void Registration()
+        private async Task<int> Registration()
         {
             ColorTextWriterService.PrintLineMessageWithSpecialColor("\nWe are glad to welcome you in the registration form!\n" +
                 "Please enter the required details\n" +
                 "to register an account on the platform", ConsoleColor.Magenta);
-            /*_playerAccountDto = new AccountDto(
-                new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
-                new StringPlaceholder(StringDestination.Email).BuildNewSpecialDestinationString("Email"),
-                new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password"),
-                new StringPlaceholder(StringDestination.PassportType).BuildNewSpecialDestinationString("FirstName"),
-                new StringPlaceholder(StringDestination.PassportType).BuildNewSpecialDestinationString("LastName"));*/
-            Console.Clear();
+            _playerAccountDto = new AccountDto
+            {
+                Login = new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
+                Password =
+                    new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password")
+            };
+            var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccountDto), Encoding.UTF8, "application/json");
+            var responseMessage = await client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
+
+            return (int)responseMessage.StatusCode;
+        }
+
+        private async Task<int> LogIn() //For now Int. Dunno what to make
+        {
+            var inputAccount = new AccountDto
+            {
+                Login = new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
+                Password =
+                    new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password")
+            };
+            
+            //var stringContent = new StringContent(JsonConvert.SerializeObject(inputAccount), Encoding.UTF8, "application/json");
+            
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(client.BaseAddress+"user/login"),
+                Content = new StringContent(JsonConvert.SerializeObject(inputAccount), Encoding.UTF8, "application/json")
+            };
+            
+            var response = await client.SendAsync(request).ConfigureAwait(false); //TODO: Cancellation token
+            if (!response.IsSuccessStatusCode) return 404;
+            var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            _playerAccountDto = JsonConvert.DeserializeObject<AccountDto>(responseBody);
+            return 200; //Maybe another code?
+            
         }
     }
 }

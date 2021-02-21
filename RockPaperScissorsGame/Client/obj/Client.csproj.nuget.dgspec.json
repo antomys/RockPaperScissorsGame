@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj": {}
+    "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj": {}
   },
   "projects": {
-    "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj": {
+    "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
+        "projectUniqueName": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
         "projectName": "Client",
-        "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
+        "projectPath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
         "packagesPath": "C:\\Users\\deqqu\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\obj\\",
+        "outputPath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\deqqu\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -26,8 +26,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
-                "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj"
+              "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
+                "projectPath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj"
               }
             }
           }
@@ -60,14 +60,14 @@
         }
       }
     },
-    "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
+    "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj",
+        "projectUniqueName": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj",
         "projectName": "RockPaperScissors",
-        "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj",
+        "projectPath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj",
         "packagesPath": "C:\\Users\\deqqu\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\obj\\",
+        "outputPath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\deqqu\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -94,17 +94,9 @@
         "netstandard2.1": {
           "targetAlias": "netstandard2.1",
           "dependencies": {
-            "Microsoft.IO.RecyclableMemoryStream": {
-              "target": "Package",
-              "version": "[1.4.0, )"
-            },
             "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[12.0.3, )"
-            },
-            "System.Text.Json": {
-              "target": "Package",
-              "version": "[5.0.1, )"
+              "version": "[11.0.1, )"
             }
           },
           "imports": [

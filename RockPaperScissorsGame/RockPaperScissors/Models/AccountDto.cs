@@ -1,7 +1,5 @@
 ﻿using RockPaperScissors.Models.Interfaces;
-using System;
-using System.Text.Json.Serialization;
-using RockPaperScissors.Server.Models;
+using Newtonsoft.Json;
 
 namespace RockPaperScissors.Models
 {
@@ -23,11 +21,12 @@ namespace RockPaperScissors.Models
         //public string FirstName { get; private set; }
         //[JsonPropertyName("lastName")]
         //public string LastName { get; private set; }
-        [JsonPropertyName("login")]
+        [JsonProperty("Login")]
         public string Login { get; set; }
         //[JsonPropertyName("email")]
         //public string Email { get; private set; }
-        [JsonPropertyName("password")]
+        
+        [JsonProperty("Password")]
         public string Password { get; set; }
         
         

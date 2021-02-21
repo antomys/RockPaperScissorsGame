@@ -1,7 +1,6 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace RockPaperScissors.Server.Models.Interfaces
+namespace Server.Models.Interfaces
 {
     public interface IAccount
     {

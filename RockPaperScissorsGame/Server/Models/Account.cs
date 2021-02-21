@@ -1,8 +1,6 @@
-﻿using System;
-using RockPaperScissors.Server.Models.Interfaces;
-using RockPaperScissors.Server.Services;
+﻿using Server.Models.Interfaces;
 
-namespace RockPaperScissors.Server.Models
+namespace Server.Models
 {
     public class Account : IAccount
     {

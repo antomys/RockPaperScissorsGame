@@ -1,23 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using RockPaperScissors;
-using RockPaperScissors.Models;
-using RockPaperScissors.Server.Mappings;
-using RockPaperScissors.Server.Models;
-using RockPaperScissors.Server.Models.Interfaces;
-using RockPaperScissors.Server.Services;
+using Server.Models;
+using Server.Models.Interfaces;
+using Server.Services;
+using Services;
 
 namespace Server
 {
@@ -28,7 +22,7 @@ namespace Server
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -39,9 +33,11 @@ namespace Server
             services.AddTransient<IAccount, Account>();
             services.AddTransient<IStatistics, Statistics>();
             //services.AddSingleton<IStorage<IAccount>,AccountManager<IAccount>>();
-            services.AddSingleton(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
-            services.AddSingleton(typeof(IStorage<>), typeof(Storage<>));
-            
+            services.AddTransient(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
+            services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
+           
+            services.AddSingleton<IAccountManager, AccountManager>();
+
             services.AddControllers();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"}); });
         }
@@ -89,11 +85,12 @@ namespace Server
                     var login = context.Request.Query["from"].FirstOrDefault();
                     var pass = context.Request.Query["to"].FirstOrDefault();
 
-                    var user = new AccountDto
+                    var user = new Account()
                     {
+                        Id = Guid.NewGuid().ToString(),
                         Login = login,
                         Password = pass
-                    }.ToUser();
+                    };
 
                     var stat = new Statistics
                     {

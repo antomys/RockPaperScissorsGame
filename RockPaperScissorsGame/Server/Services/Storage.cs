@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using RockPaperScissors.Server.Models;
+using Server.Services;
 
-namespace RockPaperScissors.Server.Services
+namespace Services
 {
     public class Storage<T> : IStorage<T> where T: class
     {
@@ -27,10 +26,23 @@ namespace RockPaperScissors.Server.Services
             return _deserializedObject.ConcurrentDictionary.Values; //todo: redo
         }
 
-        public Task<IEnumerable<ItemWithId<T>>> GetAllAsync()
+        public async Task<ICollection<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            //var result = Task.Factory.StartNew(GetAll).Result;
+
+            var result = Task.Run(GetAll);
+
+            await Task.WhenAll(result);
+            return result.Result;
         }
+
+        /*public Task<int> LoginAsync(string name, string password)
+        {
+            var tasks = Task.Factory.StartNew(() =>
+            {
+                if ( _deserializedObject.ConcurrentDictionary.)
+            })
+        }*/
 
         public T Get(Guid id)
         {
@@ -44,7 +56,6 @@ namespace RockPaperScissors.Server.Services
 
         public int Add(T item)
         {
-           // var guid = item.GetType().GetField("Id", BindingFlags.NonPublic | BindingFlags.Instance); //fix from stackoverflow
 
            var guid = GetGuidFromT(item);
 
@@ -53,16 +64,47 @@ namespace RockPaperScissors.Server.Services
            if (CheckIfExists(item))
                return 400;
            
-           /*if(_deserializedObject.ConcurrentDictionary.TryGetValue(guid.ToString(),out _))
-           {
-               return 404;
-           }*/
-           
-
+          
            //var guid = item.GetType().GUID; //TODO: CHTO ETO TAKOE
-           return _deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item) ? 200 : 404; //todo: redo
+           if (!_deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item)) return 400;
+           _deserializedObject.UpdateData();
+           return 200;
         }
 
+        
+
+        public Task<int> AddAsync(T item)
+        {
+            return Task.Factory.StartNew(() => Add(item));
+        }
+
+        public void AddOrUpdate(Guid id, T item)
+        {
+            //_deserializedObject.ConcurrentDictionary.TryGetValue(id, out var thisItem);
+            _deserializedObject.ConcurrentDictionary[id.ToString()] = item;
+        }
+
+        public Task AddOrUpdateAsync(Guid id, T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Delete(Guid id)
+        {
+            if (!_deserializedObject.ConcurrentDictionary.TryRemove(id.ToString(), out var value)) return false;
+            _logger.LogWarning($"This deleted item: {value}"); //todo: delete
+            return true;
+
+        }
+
+        public Task<bool> DeleteAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        #region PrivateMethods
+
+        
         private object GetGuidFromT(T item)
         {
             //METHOD TO GET GUID FROM T
@@ -84,33 +126,6 @@ namespace RockPaperScissors.Server.Services
             return GetLoginString(item) != null && flattenList.Any(T => GetLoginString(T).Equals(GetLoginString(item)));
         }
 
-        public Task<int> AddAsync(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddOrUpdate(Guid id, T item)
-        {
-            //_deserializedObject.ConcurrentDictionary.TryGetValue(id, out var thisItem);
-            _deserializedObject.ConcurrentDictionary[id.ToString()] = item;
-        }
-
-        public Task AddOrUpdateAsync(Guid id, T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Delete(Guid id)
-        {
-            if (!_deserializedObject.ConcurrentDictionary.TryRemove(id.ToString(), out var value)) return false;
-            _logger.LogWarning($"This deleted item: {value}");
-            return true;
-
-        }
-
-        public Task<bool> DeleteAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
     }
 }

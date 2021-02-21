@@ -2,40 +2,20 @@
   "version": 3,
   "targets": {
     "net5.0": {
-      "Microsoft.IO.RecyclableMemoryStream/1.4.0": {
-        "type": "package",
-        "compile": {
-          "lib/netcoreapp2.1/Microsoft.IO.RecyclableMemoryStream.dll": {}
-        },
-        "runtime": {
-          "lib/netcoreapp2.1/Microsoft.IO.RecyclableMemoryStream.dll": {}
-        }
-      },
-      "Newtonsoft.Json/12.0.3": {
+      "Newtonsoft.Json/11.0.1": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         },
         "runtime": {
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
-        }
-      },
-      "System.Text.Json/5.0.1": {
-        "type": "package",
-        "compile": {
-          "lib/netcoreapp3.0/System.Text.Json.dll": {}
-        },
-        "runtime": {
-          "lib/netcoreapp3.0/System.Text.Json.dll": {}
         }
       },
       "RockPaperScissors/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.1",
         "dependencies": {
-          "Microsoft.IO.RecyclableMemoryStream": "1.4.0",
-          "Newtonsoft.Json": "12.0.3",
-          "System.Text.Json": "5.0.1"
+          "Newtonsoft.Json": "11.0.1"
         },
         "compile": {
           "bin/placeholder/RockPaperScissors.dll": {}
@@ -47,35 +27,10 @@
     }
   },
   "libraries": {
-    "Microsoft.IO.RecyclableMemoryStream/1.4.0": {
-      "sha512": "nyIMLK5l817HX2kURSanT+5ney8ja47FLlkjHHHq+fTb1EW3cS1C223pkSDkeGrjqhPYWwPZf63CcUam35hpCQ==",
+    "Newtonsoft.Json/11.0.1": {
+      "sha512": "pNN4l+J6LlpIvHOeNdXlwxv39NPJ2B5klz+Rd2UQZIx30Squ5oND1Yy3wEAUoKn0GPUj6Yxt9lxlYWQqfZcvKg==",
       "type": "package",
-      "path": "microsoft.io.recyclablememorystream/1.4.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net40/Microsoft.IO.RecyclableMemoryStream.dll",
-        "lib/net40/Microsoft.IO.RecyclableMemoryStream.xml",
-        "lib/net45/Microsoft.IO.RecyclableMemoryStream.dll",
-        "lib/net45/Microsoft.IO.RecyclableMemoryStream.xml",
-        "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll",
-        "lib/net46/Microsoft.IO.RecyclableMemoryStream.xml",
-        "lib/netcoreapp2.1/Microsoft.IO.RecyclableMemoryStream.dll",
-        "lib/netcoreapp2.1/Microsoft.IO.RecyclableMemoryStream.xml",
-        "lib/netstandard1.4/Microsoft.IO.RecyclableMemoryStream.dll",
-        "lib/netstandard1.4/Microsoft.IO.RecyclableMemoryStream.xml",
-        "lib/netstandard2.0/Microsoft.IO.RecyclableMemoryStream.dll",
-        "lib/netstandard2.0/Microsoft.IO.RecyclableMemoryStream.xml",
-        "lib/netstandard2.1/Microsoft.IO.RecyclableMemoryStream.dll",
-        "lib/netstandard2.1/Microsoft.IO.RecyclableMemoryStream.xml",
-        "microsoft.io.recyclablememorystream.1.4.0.nupkg.sha512",
-        "microsoft.io.recyclablememorystream.nuspec"
-      ]
-    },
-    "Newtonsoft.Json/12.0.3": {
-      "sha512": "6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg==",
-      "type": "package",
-      "path": "newtonsoft.json/12.0.3",
+      "path": "newtonsoft.json/11.0.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -98,31 +53,8 @@
         "lib/portable-net40+sl5+win8+wp8+wpa81/Newtonsoft.Json.xml",
         "lib/portable-net45+win8+wp8+wpa81/Newtonsoft.Json.dll",
         "lib/portable-net45+win8+wp8+wpa81/Newtonsoft.Json.xml",
-        "newtonsoft.json.12.0.3.nupkg.sha512",
-        "newtonsoft.json.nuspec",
-        "packageIcon.png"
-      ]
-    },
-    "System.Text.Json/5.0.1": {
-      "sha512": "/UM3UK1dXKl8Ybysg/21gM4S8DJgkR+yLU8JwqCVbuNqQNImelntgYFAN5QxR8sJJ1kMx//hOUdf0lltosi8cQ==",
-      "type": "package",
-      "path": "system.text.json/5.0.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "THIRD-PARTY-NOTICES.TXT",
-        "lib/net461/System.Text.Json.dll",
-        "lib/net461/System.Text.Json.xml",
-        "lib/netcoreapp3.0/System.Text.Json.dll",
-        "lib/netcoreapp3.0/System.Text.Json.xml",
-        "lib/netstandard2.0/System.Text.Json.dll",
-        "lib/netstandard2.0/System.Text.Json.xml",
-        "system.text.json.5.0.1.nupkg.sha512",
-        "system.text.json.nuspec",
-        "useSharedDesignerContext.txt",
-        "version.txt"
+        "newtonsoft.json.11.0.1.nupkg.sha512",
+        "newtonsoft.json.nuspec"
       ]
     },
     "RockPaperScissors/1.0.0": {
@@ -142,11 +74,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
+      "projectUniqueName": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
       "projectName": "Client",
-      "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
+      "projectPath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
       "packagesPath": "C:\\Users\\deqqu\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\obj\\",
+      "outputPath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\deqqu\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -161,8 +93,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
-              "projectPath": "C:\\Users\\deqqu\\Documents\\GitHub\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj"
+            "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
+              "projectPath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj"
             }
           }
         }

@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using Newtonsoft.Json;
-using RockPaperScissors.Server.Models;
-using RockPaperScissors.Server.Models.Interfaces;
+using Server.Models;
+using Services;
 
-namespace RockPaperScissors.Server.Services
+namespace Server.Services
 {
     public class DeserializedObject<T> : IDeserializedObject<T> where T: class
     {

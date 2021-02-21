@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RockPaperScissors.Server.Services
+namespace Services
 {
     public abstract class ItemWithId<T> where T: class
     {

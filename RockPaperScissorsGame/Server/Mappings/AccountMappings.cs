@@ -1,8 +1,8 @@
 ﻿using System;
 using RockPaperScissors.Models;
-using RockPaperScissors.Server.Models;
+using Server.Models;
 
-namespace RockPaperScissors.Server.Mappings
+namespace Server.Mappings
 {
     public static class AccountMappings
     {

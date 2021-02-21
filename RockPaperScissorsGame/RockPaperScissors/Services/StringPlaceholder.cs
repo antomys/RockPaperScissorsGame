@@ -29,7 +29,7 @@ namespace RockPaperScissors.Services
                     ColorTextWriterService.PrintLineMessageWithSpecialColor($"Try to сome up with { msg}?", ConsoleColor.Yellow);
                 Console.Write($"{msg}--> ");
                 output = Console.ReadLine()
-                    .Trim()
+                    ?.Trim()
                     .Replace(" ", "");
                 if (String.IsNullOrEmpty(output))
                 {
@@ -54,7 +54,7 @@ namespace RockPaperScissors.Services
                     {
                         Console.Write("Confirmation--> ");
                         confirmationPassword = Console.ReadLine()
-                            .Trim()
+                            ?.Trim()
                             .Replace(" ", "");
                         if (String.IsNullOrEmpty(output))
                         {

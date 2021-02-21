@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace RockPaperScissors.Server.Services
+namespace Services
 {
     public interface IStorage<T> where T: class
     {
         ICollection<T> GetAll();
-        Task<IEnumerable<ItemWithId<T>>> GetAllAsync();
+        Task<ICollection<T>> GetAllAsync();
 
         T Get(Guid id);
         Task<T> GetAsync(Guid id);
