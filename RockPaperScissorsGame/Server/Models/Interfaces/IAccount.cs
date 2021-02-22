@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-
 namespace Server.Models.Interfaces
 {
     public interface IAccount
@@ -13,10 +12,6 @@ namespace Server.Models.Interfaces
         [JsonPropertyName("Password")]
         
         string Password { get; set; }
-
-        //Statistics Statistics { get; }
-        
-        //Guid StatId { get; }
 
 
 

@@ -42,6 +42,11 @@ namespace Server.Controllers
             _logger = logger;
         }
         
+        /// <summary>
+        /// Method to log in an account
+        /// </summary>
+        /// <param name="accountDto">Data Transfer Object of account</param>
+        /// <returns>Status code and response string</returns>
         [HttpPost]
         [Route("login")]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.OK)]
@@ -56,55 +61,64 @@ namespace Server.Controllers
             }
             catch (ValidationException exception)
             {
-                _logger.Log(LogLevel.Error,exception,"Validation error");
+                _logger.Log(LogLevel.Warning,"Validation error");
                 return BadRequest(exception.Message);
             }
             catch (LoginErrorException exception)
             {
-                _logger.Log(LogLevel.Error,exception,exception.Message);
-               // _logger.LogInformation(exception.Message); //todo:change
+                _logger.Log(LogLevel.Error,exception.Message);
                 return BadRequest(exception.Message);
             }
             
         }
         
+        /// <summary>
+        /// Method to register a new account
+        /// </summary>
+        /// <param name="accountDto">Data Transfer Object of account</param>
+        /// <returns>HttpStatusCode and response string</returns>
         [HttpPost]
         [Route("create")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<int>> CreateAccount(AccountDto accountDto)
         {
-            var account = new Account
-            {
-                Id = Guid.NewGuid().ToString(),
-                Login = accountDto.Login,
-                Password = accountDto.Password
-            };
-            var statistics = new Statistics
-            {
-                Id = account.Id,
-                Login = account.Login,
-            };
-            
             try
             {
+                var account = new Account
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Login = accountDto.Login,
+                    Password = accountDto.Password
+                };
+                var statistics = new Statistics
+                {
+                    Id = account.Id,
+                    Login = account.Login,
+                };
+                
                 await _accountStorage.AddAsync(account);
                 await _statisticsStorage.AddAsync(statistics);
-                
-                return Created("Account {0} is created!",account.Login);
+
+                return Created("", $"Account [{account.Login}] successfully created");
             }
             catch (ValidationException exception)
             {
-                _logger.Log(LogLevel.Error,exception,exception.Message);
+                _logger.Log(LogLevel.Warning,exception.Message);
                 return BadRequest(exception.Message);
             }
             catch (UnknownReasonException exception)
             {
-                _logger.Log(LogLevel.Error,exception,exception.Message);
+                _logger.Log(LogLevel.Warning, exception.Message);
                 return BadRequest(exception.Message);
             }
         }
 
+        /// <summary>
+        /// Method to Log out of account
+        /// </summary>
+        /// <param name="sessionId">Session id of a client</param>
+        /// <returns>HttpStatusCode</returns>
         [Route("logout")]
         [HttpGet("logout/{sessionId}")]
         [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]

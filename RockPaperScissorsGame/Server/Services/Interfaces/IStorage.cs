@@ -9,16 +9,17 @@ namespace Server.Services.Interfaces
         ICollection<T> GetAll();
         Task<ICollection<T>> GetAllAsync();
 
-        T Get(Guid id);
-        Task<T> GetAsync(Guid id);
+        T Get(string id);
+        Task<T> GetAsync(string id);
 
         int Add(T item);
         Task<int> AddAsync(T item);
 
-        void AddOrUpdate(Guid id, T item);
-        Task AddOrUpdateAsync(Guid id, T item);
+        void AddOrUpdate(string id, T item);
+        Task AddOrUpdateAsync(string id, T item);
 
-        bool Delete(Guid id);
-        Task<bool> DeleteAsync(Guid id);
+        bool Delete(string id);
+        Task<bool> DeleteAsync(string id);
+        
     }
 }

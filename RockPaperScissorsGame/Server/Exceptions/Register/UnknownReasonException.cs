@@ -10,7 +10,7 @@ namespace Server.Exceptions.Register
         }
 
         public UnknownReasonException(string message) :
-            base(string.Format($"Unknown reason"))
+            base(message)
         {
             
         }
