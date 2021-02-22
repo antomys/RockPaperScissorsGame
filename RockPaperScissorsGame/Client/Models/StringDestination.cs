@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RockPaperScissors.Models
+namespace Client.Models
 {
     public enum StringDestination
     {

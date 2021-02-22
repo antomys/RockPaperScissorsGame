@@ -1,5 +1,5 @@
 ﻿using System;
-using RockPaperScissors.Models;
+using Server.Contracts;
 using Server.Models;
 
 namespace Server.Mappings

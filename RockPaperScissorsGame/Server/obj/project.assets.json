@@ -521,19 +521,6 @@
         "compile": {
           "ref/netstandard1.2/System.Threading.Timer.dll": {}
         }
-      },
-      "RockPaperScissors/1.0.0": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v2.1",
-        "dependencies": {
-          "Newtonsoft.Json": "11.0.1"
-        },
-        "compile": {
-          "bin/placeholder/RockPaperScissors.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/RockPaperScissors.dll": {}
-        }
       }
     }
   },
@@ -2194,18 +2181,12 @@
         "system.threading.timer.4.0.1.nupkg.sha512",
         "system.threading.timer.nuspec"
       ]
-    },
-    "RockPaperScissors/1.0.0": {
-      "type": "project",
-      "path": "../RockPaperScissors/RockPaperScissors.csproj",
-      "msbuildProject": "../RockPaperScissors/RockPaperScissors.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net5.0": [
       "Microsoft.IO.RecyclableMemoryStream >= 1.4.0",
       "Newtonsoft.Json >= 11.0.1",
-      "RockPaperScissors >= 1.0.0",
       "Serilog.Extensions.Logging >= 3.0.1",
       "Serilog.Sinks.Console >= 3.1.0",
       "Serilog.Sinks.File >= 3.1.0",
@@ -2236,11 +2217,7 @@
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
-          "projectReferences": {
-            "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj": {
-              "projectPath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\RockPaperScissors\\RockPaperScissors.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {

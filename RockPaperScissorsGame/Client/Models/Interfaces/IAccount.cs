@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RockPaperScissors.Models.Interfaces
+namespace Client.Models.Interfaces
 {
-    internal interface IAccountDto
+    internal interface IAccount
     {
-        //Guid Id { get; }
         string Login { get; }
         //string Email { get; }
         string Password { get; }

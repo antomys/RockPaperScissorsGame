@@ -1,5 +1,4 @@
-﻿
-namespace Server.Exceptions.LogIn
+﻿namespace Server.Exceptions.LogIn
 {
     public class LoginCooldownException : LoginErrorException
     {

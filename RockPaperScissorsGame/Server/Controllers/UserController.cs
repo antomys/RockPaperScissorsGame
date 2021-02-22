@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Net.Http;
 using System.Net.Mime;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using RockPaperScissors.Models;
-using Server.Exceptions;
-using Server.Mappings;
+using Server.Contracts;
+using Server.Exceptions.LogIn;
+using Server.Exceptions.Register;
 using Server.Models;
-using Server.Services;
 using Server.Services.Interfaces;
 
 namespace Server.Controllers
@@ -62,9 +54,15 @@ namespace Server.Controllers
                 return Ok($"Signed In as {accountDto.Login}");
 
             }
-            catch (Exception exception)
+            catch (ValidationException exception)
             {
-                _logger.LogInformation(exception.Message); //todo:change
+                _logger.Log(LogLevel.Error,exception,"Validation error");
+                return BadRequest(exception.Message);
+            }
+            catch (LoginErrorException exception)
+            {
+                _logger.Log(LogLevel.Error,exception,exception.Message);
+               // _logger.LogInformation(exception.Message); //todo:change
                 return BadRequest(exception.Message);
             }
             
@@ -85,15 +83,7 @@ namespace Server.Controllers
             var statistics = new Statistics
             {
                 Id = account.Id,
-                Login = null,
-                Wins = 0,
-                Loss = 0,
-                WinLossRatio = 0,
-                TimeSpent = default,
-                UsedRock = 0,
-                UsedPaper = 0,
-                UsedScissors = 0,
-                Points = 0,
+                Login = account.Login,
             };
             
             try
@@ -103,15 +93,20 @@ namespace Server.Controllers
                 
                 return Created("Account {0} is created!",account.Login);
             }
-            catch (Exception exception)
+            catch (ValidationException exception)
             {
-                _logger.LogError(exception.Message);
+                _logger.Log(LogLevel.Error,exception,exception.Message);
+                return BadRequest(exception.Message);
+            }
+            catch (UnknownReasonException exception)
+            {
+                _logger.Log(LogLevel.Error,exception,exception.Message);
                 return BadRequest(exception.Message);
             }
         }
 
-        [HttpGet]
         [Route("logout")]
+        [HttpGet("logout/{sessionId}")]
         [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(int), (int) HttpStatusCode.BadRequest)]
         public async Task<ActionResult<int>> LogOut(string sessionId)

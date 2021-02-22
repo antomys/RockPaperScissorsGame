@@ -27,7 +27,6 @@
         "dependencies": {
           "Microsoft.IO.RecyclableMemoryStream": "1.4.0",
           "Newtonsoft.Json": "11.0.1",
-          "RockPaperScissors": "1.0.0",
           "Serilog.Extensions.Logging": "3.0.1",
           "Serilog.Sinks.Console": "3.1.0",
           "Serilog.Sinks.File": "3.1.0",
@@ -664,17 +663,6 @@
           "Microsoft.NETCore.Platforms": "1.1.0",
           "Microsoft.NETCore.Targets": "1.1.0",
           "System.Runtime": "4.3.0"
-        }
-      },
-      "RockPaperScissors/1.0.0": {
-        "dependencies": {
-          "Newtonsoft.Json": "11.0.1"
-        },
-        "runtime": {
-          "RockPaperScissors.dll": {}
-        },
-        "compile": {
-          "RockPaperScissors.dll": {}
         }
       },
       "Microsoft.AspNetCore.Antiforgery/5.0.0.0": {
@@ -2676,11 +2664,6 @@
       "sha512": "sha512-saGfUV8uqVW6LeURiqxcGhZ24PzuRNaUBtbhVeuUAvky1naH395A/1nY0P2bWvrw/BreRtIB/EzTDkGBpqCwEw==",
       "path": "system.threading.timer/4.0.1",
       "hashPath": "system.threading.timer.4.0.1.nupkg.sha512"
-    },
-    "RockPaperScissors/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
     },
     "Microsoft.AspNetCore.Antiforgery/5.0.0.0": {
       "type": "referenceassembly",

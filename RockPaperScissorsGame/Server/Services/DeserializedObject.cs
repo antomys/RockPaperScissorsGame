@@ -26,39 +26,11 @@ namespace Server.Services
 
         private async Task<ConcurrentDictionary<string, T>> GetData()
         {
-            //var result = Deserialize().Result;
-            return await Deserialize();
-
-            /*if (results == null)
-                return;*/
-
-            /*foreach (var accountList in results)
-            {
-                if(accountList == null)
-                    return;
-                foreach (var account in accountList)  //govno
-                {
-                    ConcurrentDictionary.TryAdd(account., account);
-                }
-            }*/
+           return await Deserialize();
         }
         public async Task UpdateData()
         {
-            //var result = Deserialize().Result;
             await Serialize();
-
-            /*if (results == null)
-                return;*/
-
-            /*foreach (var accountList in results)
-            {
-                if(accountList == null)
-                    return;
-                foreach (var account in accountList)  //govno
-                {
-                    ConcurrentDictionary.TryAdd(account., account);
-                }
-            }*/
         }
         
         private Task<bool> IsNeededFilesAvailable()
@@ -66,62 +38,23 @@ namespace Server.Services
             return Task.Run(()=>{   
                 try
                 {
-                    //IsBusy = true;
                     return File.Exists(_fileName);
-                    /*if (!File.Exists("PARSGREEN.dll"))
-                        return false;*/
                 }
                 finally
                 {
-                    //IsBusy = false;
                 }
             });
         }
-
-        /*private async Task<ConcurrentDictionary<string, T>> Deserialize()
-        {
-            if (typeof(T) == typeof(Account)) //dumb check for type
-            {
-                _fileName = "Account.bin";
-            }
-
-            if (typeof(T) == typeof(Statistics))
-            {
-                _fileName = "Statistics.bin";
-            }
-            
-            var exists = IsNeededFilesAvailable().Result;
-            
-            if (exists && File.ReadAllTextAsync(_fileName).Result != "")  //todo#1#
-                try
-                {
-                    using var reader = File.OpenText(_fileName);
-                    var fileText = await reader.ReadToEndAsync();
-                    var list = await Task.Run(() => 
-                        JsonConvert.DeserializeObject<ConcurrentDictionary<Guid,T>>(fileText)); //(typeof(List<Zajecia>));
-                    return list;
-                }
-                catch (FileNotFoundException exception)
-                {
-                    _logger.LogWarning($"{exception.Message}");  //todo:remove crap
-                    File.Create(_fileName);
-                    return new ConcurrentDictionary<string, T>();
-                }
-            else
-            {
-                File.Create(_fileName);
-                return new ConcurrentDictionary<string, T>();;
-            }
-        }*/
+        
         
         private async Task<ConcurrentDictionary<string, T>> Deserialize()
         {
-            if (typeof(T) == typeof(Account)) //dumb check for type
+            if (typeof(T).Name.Contains("Account")) //dumb check for type 'HARDCODE' //typeof(T) == typeof(Account)
             {
                 _fileName = "Accounts.bin";
             }
 
-            if (typeof(T) == typeof(Statistics))
+            if (typeof(T).Name.Contains("Statistics"))  //typeof(T) == typeof(Statistics) |
             {
                 _fileName = "Statistics.bin";
             }
@@ -141,10 +74,9 @@ namespace Server.Services
 
                     var decoded = Encoding.ASCII.GetString(fileText);
                     
-                    //_logger.LogInformation($"{decoded}");
                     
                     var list = await Task.Run(() => 
-                        JsonConvert.DeserializeObject<ConcurrentDictionary<string,T>>(decoded)); //(typeof(List<Zajecia>));
+                        JsonConvert.DeserializeObject<ConcurrentDictionary<string,T>>(decoded));
                     return list;
                 }
                 catch (FileNotFoundException exception)
@@ -180,25 +112,6 @@ namespace Server.Services
 
             await file.FlushAsync().ConfigureAwait(false);
             
-            /*var unicodeEncoding = new ASCIIEncoding();
-            try
-            {
-                var list = await Task.Run(() => 
-                    JsonConvert.SerializeObject(ConcurrentDictionary,Formatting.Indented));
-                await File.WriteAllTextAsync("testserialization.json", list);
-                var fileText = unicodeEncoding.GetBytes(list);
-
-                await using var sourceStream = File.Open(_fileName, FileMode.OpenOrCreate);
-                
-                sourceStream.Seek(0, SeekOrigin.End);
-                
-                await sourceStream.WriteAsync(fileText, 0, fileText.Length);
-            }
-            catch (FileNotFoundException exception)
-            {
-                _logger.LogWarning($"{exception.Message}");  //todo:remove crap
-                File.Create(_fileName);
-            }*/
         }
     }
 }

@@ -48,8 +48,6 @@ C:\Users\deqqu\RiderProjects\RockPaperScissorsGame\RockPaperScissorsGame\Client\
 C:\Users\deqqu\RiderProjects\RockPaperScissorsGame\RockPaperScissorsGame\Client\bin\Debug\net5.0\Client.dll
 C:\Users\deqqu\RiderProjects\RockPaperScissorsGame\RockPaperScissorsGame\Client\bin\Debug\net5.0\ref\Client.dll
 C:\Users\deqqu\RiderProjects\RockPaperScissorsGame\RockPaperScissorsGame\Client\bin\Debug\net5.0\Client.pdb
-C:\Users\deqqu\RiderProjects\RockPaperScissorsGame\RockPaperScissorsGame\Client\bin\Debug\net5.0\RockPaperScissors.dll
-C:\Users\deqqu\RiderProjects\RockPaperScissorsGame\RockPaperScissorsGame\Client\bin\Debug\net5.0\RockPaperScissors.pdb
 C:\Users\deqqu\RiderProjects\RockPaperScissorsGame\RockPaperScissorsGame\Client\obj\Debug\net5.0\Client.csprojAssemblyReference.cache
 C:\Users\deqqu\RiderProjects\RockPaperScissorsGame\RockPaperScissorsGame\Client\obj\Debug\net5.0\Client.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\deqqu\RiderProjects\RockPaperScissorsGame\RockPaperScissorsGame\Client\obj\Debug\net5.0\Client.AssemblyInfoInputs.cache

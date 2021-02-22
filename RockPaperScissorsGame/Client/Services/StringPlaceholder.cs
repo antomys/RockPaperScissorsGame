@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using RockPaperScissors.Models;
-using RockPaperScissors.Validations;
+using Client.Models;
+using Client.Validations;
 
-namespace RockPaperScissors.Services
+namespace Client.Services
 {
     class StringPlaceholder
     {

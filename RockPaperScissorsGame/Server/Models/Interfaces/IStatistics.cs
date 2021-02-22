@@ -32,8 +32,8 @@ namespace Server.Models.Interfaces
         [JsonPropertyName("UsedScissors")]
         int UsedScissors { get; set; }
         
-        [JsonPropertyName("Points")]
-        int Points { get; set; }
+        [JsonPropertyName("Score")]
+        int Score { get; set; }
 
         //IAccount Account { get; }
     }

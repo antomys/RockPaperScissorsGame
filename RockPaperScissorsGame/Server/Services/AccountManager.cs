@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using RockPaperScissors.Models;
+using Server.Contracts;
 using Server.Exceptions.LogIn;
 using Server.Models;
 using Server.Services.Interfaces;
@@ -16,7 +16,7 @@ namespace Server.Services
         
 
         private readonly ConcurrentDictionary<string, int> _invalidTries = new();
-        private readonly ConcurrentDictionary<string, DateTime> _lastTimes = new(); //todo: panic
+        private readonly ConcurrentDictionary<string, DateTime> _lastTimes = new(); //What am i doing? so stupid
         
         private readonly IDeserializedObject<Account> _deserializedObject;
         private const int CoolDownTime = 45;
@@ -51,7 +51,9 @@ namespace Server.Services
                     else
                     {
                         // ReSharper disable once RedundantAssignment
+                        
                         _lastTimes.AddOrUpdate(accountDto.SessionId, accountDto.LastRequest, ((s, time) => time = accountDto.LastRequest));
+                        
                         throw new LoginCooldownException("CoolDown", CoolDownTime);
                     }
                 }
@@ -61,8 +63,10 @@ namespace Server.Services
                 if (login == null)
                 {
                     _invalidTries.AddOrUpdate(accountDto.SessionId, 1, (s, i) => i+1);
-                    // ReSharper disable once RedundantAssignment
+                    
                     _lastTimes.AddOrUpdate(accountDto.SessionId, accountDto.LastRequest, ((s, time) => time = accountDto.LastRequest));
+                    
+                    
                     throw new InvalidCredentialsException($"{accountDto.Login}");
                 }
                 if (AccountsActive.Any(x => x.Value == login)
@@ -89,6 +93,12 @@ namespace Server.Services
 
         }
 
+        public async Task<bool> IsActive(string sessionId)
+        {
+            var tasks = Task.Factory.StartNew(() => AccountsActive.ContainsKey(sessionId));
+
+            return await tasks;
+        }
 
 
         /*public async Task<int> LogOutAsync()

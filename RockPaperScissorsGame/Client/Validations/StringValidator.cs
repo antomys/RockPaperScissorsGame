@@ -4,7 +4,7 @@ using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace RockPaperScissors.Validations
+namespace Client.Validations
 {
     public static class StringValidator
     {

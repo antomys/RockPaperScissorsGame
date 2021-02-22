@@ -1,21 +1,13 @@
-﻿using RockPaperScissors.Models;
-using RockPaperScissors.Services;
-using RockPaperScissors.Validations;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
-using System.Reflection;
-using System.Runtime.Serialization.Json;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
+using Client.Models;
+using Client.Services;
 using Newtonsoft.Json;
 
-namespace RockPaperScissors
+namespace Client
 {
     public class ClientAppEmulator
     {
@@ -27,14 +19,14 @@ namespace RockPaperScissors
         
         public ClientAppEmulator()
         {
-            Client.BaseAddress = new Uri("https://localhost:5001/");
+            Client.BaseAddress = new Uri("http://localhost:5000/");
             _sessionId = Guid.NewGuid().ToString();
         }
 
         
 
         //For currently player on the platform //developing
-        private AccountDto _playerAccountDto;
+        private Account _playerAccount;
         public async Task<int> StartAsync()
         {
             try
@@ -93,7 +85,7 @@ namespace RockPaperScissors
                         else
                         {
                             ColorTextWriterService.PrintLineMessageWithSpecialColor("Account successfully created", ConsoleColor.Green);
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccountDto.ToString(), ConsoleColor.Green); 
+                            ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccount.ToString(), ConsoleColor.Green); 
                         }*/
                         ColorTextWriterService.PrintLineMessageWithSpecialColor(
                             "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
@@ -108,6 +100,9 @@ namespace RockPaperScissors
                         Console.Clear();
                         break;
                     case 3:
+                        var statistics = await OverallStatistics();
+                        PrintStats(statistics);
+                        //await Logout(); //todo: REMOVE
                         break;
                     case 4:
                         return;
@@ -124,7 +119,7 @@ namespace RockPaperScissors
             ColorTextWriterService.PrintLineMessageWithSpecialColor("\nWe are glad to welcome you in the registration form!\n" +
                 "Please enter the required details\n" +
                 "to register an account on the platform", ConsoleColor.Magenta);
-            _playerAccountDto = new AccountDto
+            var registrationAccount = new Account
             {
                 SessionId = _sessionId,
                 Login = new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
@@ -132,7 +127,7 @@ namespace RockPaperScissors
                     new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password"),
                 LastRequest = DateTime.Now
             };
-            var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccountDto), Encoding.UTF8, "application/json");
+            var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccount), Encoding.UTF8, "application/json");
             var responseMessage = await Client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
             
             
@@ -148,7 +143,7 @@ namespace RockPaperScissors
 
         private async Task LogIn() //For now Int. Dunno what to make
         {
-            var inputAccount = new AccountDto
+            var inputAccount = new Account
             {
                 SessionId = _sessionId,
                 Login = new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
@@ -164,9 +159,9 @@ namespace RockPaperScissors
             var responseBody = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
-                _playerAccountDto = JsonConvert.DeserializeObject<AccountDto>(responseBody);
-                Console.WriteLine($"Successfully signed in!\nHello,{_playerAccountDto.Login}!");
-                Console.WriteLine($"{_playerAccountDto.SessionId}");
+                _playerAccount = inputAccount;
+                Console.WriteLine(responseBody);
+                Console.WriteLine($"{_playerAccount.SessionId}");
                 //SetUpTimer();
             }
             else
@@ -177,28 +172,39 @@ namespace RockPaperScissors
 
         private async Task Logout()
         {
-            if (_playerAccountDto == null) //todo: exception.
+            if (_playerAccount == null) //todo: exception.
                 return ;
+            var response = await Client.GetAsync($"user/logout/{_sessionId}");//TODO: Cancellation token
             
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(Client.BaseAddress+"user/logout"),
-                Content = new StringContent(JsonConvert.SerializeObject(_playerAccountDto), Encoding.UTF8, "application/json")
-            };
-            
-            var response = await Client.SendAsync(request).ConfigureAwait(false); //TODO: Cancellation token
-            
-            var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
-                //_playerAccountDto = JsonConvert.DeserializeObject<AccountDto>(responseBody);
                 Console.WriteLine($"Successfully signed out!\n");
-                _playerAccountDto = null;
+                _playerAccount = null;
             }
             else
             {
-                Console.WriteLine(responseBody);
+                Console.WriteLine("Error");
+            }
+        }
+
+        private async Task<IEnumerable<Statistics>> OverallStatistics()
+        {
+            var response = await Client.GetAsync($"overallStatistics");//TODO: Cancellation token
+            if (!response.IsSuccessStatusCode)
+                throw new Exception();
+            
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            var deserialized = JsonConvert.DeserializeObject<List<Statistics>>(responseBody);
+
+            return deserialized;
+        }
+
+        private void PrintStats(IEnumerable<Statistics> statisticsEnumerable)
+        {
+            foreach (var statistics in statisticsEnumerable)
+            {
+                Console.WriteLine(statistics);
             }
         }
     }

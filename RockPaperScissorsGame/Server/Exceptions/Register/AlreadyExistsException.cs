@@ -7,7 +7,7 @@
             
         }
 
-        public AlreadyExistsException(string message) : base(string.Format($"This account already exists, {message}"))
+        public AlreadyExistsException(string message) : base(string.Format($"This account already exists"))
         {
             
         }

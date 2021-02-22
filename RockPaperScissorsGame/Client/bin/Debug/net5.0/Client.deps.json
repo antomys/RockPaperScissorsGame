@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v5.0": {
       "Client/1.0.0": {
         "dependencies": {
-          "RockPaperScissors": "1.0.0"
+          "Newtonsoft.Json": "11.0.1"
         },
         "runtime": {
           "Client.dll": {}
@@ -20,14 +20,6 @@
             "assemblyVersion": "11.0.0.0",
             "fileVersion": "11.0.1.21818"
           }
-        }
-      },
-      "RockPaperScissors/1.0.0": {
-        "dependencies": {
-          "Newtonsoft.Json": "11.0.1"
-        },
-        "runtime": {
-          "RockPaperScissors.dll": {}
         }
       }
     }
@@ -44,11 +36,6 @@
       "sha512": "sha512-pNN4l+J6LlpIvHOeNdXlwxv39NPJ2B5klz+Rd2UQZIx30Squ5oND1Yy3wEAUoKn0GPUj6Yxt9lxlYWQqfZcvKg==",
       "path": "newtonsoft.json/11.0.1",
       "hashPath": "newtonsoft.json.11.0.1.nupkg.sha512"
-    },
-    "RockPaperScissors/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
     }
   }
 }

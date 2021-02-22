@@ -1,11 +1,9 @@
-using System;
-using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Server.Models;
@@ -28,15 +26,9 @@ namespace Server
         public void ConfigureServices(IServiceCollection services)
         {
             
-            // to dynamically change everytime. TODO
-            
-            services.AddTransient<IAccount, Account>();
-            services.AddTransient<IStatistics, Statistics>();
-            //services.AddSingleton<IStorage<IAccount>,AccountManager<IAccount>>();
             services.AddSingleton(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
             services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
-            
-           
+
             services.AddSingleton<IAccountManager, AccountManager>();
 
             services.AddControllers();
@@ -61,19 +53,28 @@ namespace Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
-
-                endpoints.Map("/", async context =>
+                endpoints.Map("/status/{sessionId}", async context =>
                 {
-                    var service = context.RequestServices.GetRequiredService<IDeserializedObject<Account>>();  //todo: remove
+                    var service = context.RequestServices.GetRequiredService<IAccountManager>();  //todo: remove
+                    
+                    var sessionId = (string) context.Request.RouteValues["sessionId"];
 
-
-                    var dictionary = service.ConcurrentDictionary;
-                    foreach (var value in dictionary.Values)
+                    if (sessionId == null)
                     {
-                        await context.Response.WriteAsync($"{value.Login};{value.Password}\n");
+                        context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    }
+                    else  if (await service.IsActive(sessionId))
+                    {
+                        context.Response.StatusCode = (int) HttpStatusCode.OK;
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = (int) HttpStatusCode.Forbidden;
                     }
                 });
+                
+                endpoints.MapControllers();
+                
             });
         }
     }
