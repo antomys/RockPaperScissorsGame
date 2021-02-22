@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Services
+namespace Server.Services
 {
     public abstract class ItemWithId<T> where T: class
     {

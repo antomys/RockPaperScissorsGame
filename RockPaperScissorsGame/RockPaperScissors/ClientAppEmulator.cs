@@ -2,13 +2,17 @@
 using RockPaperScissors.Services;
 using RockPaperScissors.Validations;
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using Newtonsoft.Json;
 
 namespace RockPaperScissors
@@ -17,11 +21,18 @@ namespace RockPaperScissors
     {
         private static readonly HttpClient Client = new HttpClient();
         private readonly string _sessionId;
+
+        //private Timer _updateTimer;
+        //private bool _isAlive = true;
+        
         public ClientAppEmulator()
         {
             Client.BaseAddress = new Uri("https://localhost:5001/");
             _sessionId = Guid.NewGuid().ToString();
         }
+
+        
+
         //For currently player on the platform //developing
         private AccountDto _playerAccountDto;
         public async Task<int> StartAsync()
@@ -75,7 +86,7 @@ namespace RockPaperScissors
                 {
                     case 1:
                         var registrationResponse = await Registration();
-                        if (registrationResponse.Equals((int)HttpStatusCode.BadRequest))
+                        /*if (registrationResponse.Equals((int)HttpStatusCode.BadRequest))
                         {
                             Console.WriteLine("Unable to create account. Already exists?");
                         }
@@ -83,23 +94,14 @@ namespace RockPaperScissors
                         {
                             ColorTextWriterService.PrintLineMessageWithSpecialColor("Account successfully created", ConsoleColor.Green);
                             ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccountDto.ToString(), ConsoleColor.Green); 
-                        }
+                        }*/
                         ColorTextWriterService.PrintLineMessageWithSpecialColor(
                             "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case 2:
-                        var loginResponse = await LogIn();
-                        if (loginResponse != 404) //todo: change to HttpStatusCode
-                        {
-                            Console.WriteLine($"Successfully signed in!\nHello,{_playerAccountDto.Login}!");
-                            //Transfer to another menu
-                        }
-                        else
-                        {
-                            Console.WriteLine("Unable to sign in. Please check login or password");
-                        }
+                        await LogIn();
                         ColorTextWriterService.PrintLineMessageWithSpecialColor(
                             "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
                         Console.ReadKey();
@@ -132,11 +134,19 @@ namespace RockPaperScissors
             };
             var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccountDto), Encoding.UTF8, "application/json");
             var responseMessage = await Client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
+            
+            
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                return (int)responseMessage.StatusCode;
+            }
 
-            return (int)responseMessage.StatusCode;
+            Console.WriteLine("This account already exists!");
+            return (int) responseMessage.StatusCode;
+
         }
 
-        private async Task<int> LogIn() //For now Int. Dunno what to make
+        private async Task LogIn() //For now Int. Dunno what to make
         {
             var inputAccount = new AccountDto
             {
@@ -147,22 +157,49 @@ namespace RockPaperScissors
                 LastRequest = DateTime.Now
             };
             
-            //var stringContent = new StringContent(JsonConvert.SerializeObject(inputAccount), Encoding.UTF8, "application/json");
+            var stringContent = new StringContent(JsonConvert.SerializeObject(inputAccount), Encoding.UTF8, "application/json");
+
+            var response = await Client.PostAsync("user/login", stringContent);
+            
+            var responseBody = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                _playerAccountDto = JsonConvert.DeserializeObject<AccountDto>(responseBody);
+                Console.WriteLine($"Successfully signed in!\nHello,{_playerAccountDto.Login}!");
+                Console.WriteLine($"{_playerAccountDto.SessionId}");
+                //SetUpTimer();
+            }
+            else
+            {
+                Console.WriteLine(responseBody);
+            }
+        }
+
+        private async Task Logout()
+        {
+            if (_playerAccountDto == null) //todo: exception.
+                return ;
             
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(Client.BaseAddress+"user/login"),
-                Content = new StringContent(JsonConvert.SerializeObject(inputAccount), Encoding.UTF8, "application/json")
+                RequestUri = new Uri(Client.BaseAddress+"user/logout"),
+                Content = new StringContent(JsonConvert.SerializeObject(_playerAccountDto), Encoding.UTF8, "application/json")
             };
             
             var response = await Client.SendAsync(request).ConfigureAwait(false); //TODO: Cancellation token
-            if (!response.IsSuccessStatusCode) return 404;
-            var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            _playerAccountDto = JsonConvert.DeserializeObject<AccountDto>(responseBody);
-            return 200; //Maybe another code?
             
+            var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
+            {
+                //_playerAccountDto = JsonConvert.DeserializeObject<AccountDto>(responseBody);
+                Console.WriteLine($"Successfully signed out!\n");
+                _playerAccountDto = null;
+            }
+            else
+            {
+                Console.WriteLine(responseBody);
+            }
         }
     }
 }

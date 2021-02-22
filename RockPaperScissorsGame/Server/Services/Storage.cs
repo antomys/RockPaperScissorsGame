@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Server.Services;
+using Server.Exceptions.Register;
+using Server.Services.Interfaces;
 
-namespace Services
+namespace Server.Services
 {
     public class Storage<T> : IStorage<T> where T: class
     {
@@ -35,15 +37,7 @@ namespace Services
             await Task.WhenAll(result);
             return result.Result;
         }
-
-        /*public Task<int> LoginAsync(string name, string password)
-        {
-            var tasks = Task.Factory.StartNew(() =>
-            {
-                if ( _deserializedObject.ConcurrentDictionary.)
-            })
-        }*/
-
+        
         public T Get(Guid id)
         {
             return _deserializedObject.ConcurrentDictionary.TryGetValue(id.ToString(), out var account) ? account : default;
@@ -62,13 +56,13 @@ namespace Services
            var check = GetLoginString(item);
            
            if (CheckIfExists(item))
-               return 400;
+               throw new AlreadyExistsException(item.GetType().ToString());
            
           
            //var guid = item.GetType().GUID; //TODO: CHTO ETO TAKOE
-           if (!_deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item)) return 400;
+           if (!_deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item)) throw new UnknownReasonException(item.GetType().ToString());
            _deserializedObject.UpdateData();
-           return 200;
+           return (int)HttpStatusCode.OK;
         }
 
         
@@ -92,7 +86,7 @@ namespace Services
         public bool Delete(Guid id)
         {
             if (!_deserializedObject.ConcurrentDictionary.TryRemove(id.ToString(), out var value)) return false;
-            _logger.LogWarning($"This deleted item: {value}"); //todo: delete
+            _logger.LogWarning($"This deleted item" + $": {value}"); //todo: delete
             return true;
 
         }

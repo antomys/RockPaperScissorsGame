@@ -10,12 +10,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RockPaperScissors.Models;
+using Server.Exceptions;
 using Server.Mappings;
 using Server.Models;
 using Server.Services;
-using Services;
+using Server.Services.Interfaces;
 
 namespace Server.Controllers
 {
@@ -28,68 +30,96 @@ namespace Server.Controllers
     {
         private readonly IStorage<Account> _accountStorage;
 
+        private readonly IStorage<Statistics> _statisticsStorage; //Just to write new statistics field into file along with account
+
+        private readonly ILogger<UserController> _logger;
+
         private readonly IAccountManager _accountManager;
 
 
         public UserController(
             IStorage<Account> users,
-            IAccountManager accountManager
+            IStorage<Statistics> statisticsStorage,
+            IAccountManager accountManager,
+            ILogger<UserController> logger
             )
         {
             _accountStorage = users;
+            _statisticsStorage = statisticsStorage;
             _accountManager = accountManager;
+            _logger = logger;
         }
         
-        [HttpGet]
+        [HttpPost]
         [Route("login")]
-        [ProducesResponseType(typeof(Account),(int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string),(int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<AccountDto>> Login()
+        public async Task<ActionResult<int>> Login(AccountDto accountDto)
         {
-            using var reader = new StreamReader(Request.Body, Encoding.UTF8);
-            var body = await reader.ReadToEndAsync();
-            if (string.IsNullOrEmpty(body))
-                return BadRequest("Bad request");
-
-            var requestedAccount = JsonConvert.DeserializeObject<AccountDto>(body);
-
-            var result = _accountManager.LogInAsync(requestedAccount).Result;
-            
-            if (result == null)
+            try
             {
-                return BadRequest("No account like this or account is already used"); //todo: redo or leave like this
-            }
+                await _accountManager.LogInAsync(accountDto);
+                return Ok($"Signed In as {accountDto.Login}");
 
-            return result.ToUserDto();
+            }
+            catch (Exception exception)
+            {
+                _logger.LogInformation(exception.Message); //todo:change
+                return BadRequest(exception.Message);
+            }
+            
         }
         
         [HttpPost]
         [Route("create")]
-        [ProducesResponseType(typeof(Account), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Account>> CreateAccount() //some shit
+        public async Task<ActionResult<int>> CreateAccount(AccountDto accountDto)
         {
-            using StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8);
-            var body = await reader.ReadToEndAsync();
-            if (string.IsNullOrEmpty(body))
-                return BadRequest("Bad request");
-
-            var requestedAccount = JsonConvert.DeserializeObject<AccountDto>(body);
             var account = new Account
             {
                 Id = Guid.NewGuid().ToString(),
-                Login = requestedAccount.Login,
-                Password = requestedAccount.Password
+                Login = accountDto.Login,
+                Password = accountDto.Password
             };
-
-            //var returned = _accountStorage.Add(account);
-            var returned = await _accountStorage.AddAsync(account);
-            if (returned != 400)
+            var statistics = new Statistics
             {
-                return account;
+                Id = account.Id,
+                Login = null,
+                Wins = 0,
+                Loss = 0,
+                WinLossRatio = 0,
+                TimeSpent = default,
+                UsedRock = 0,
+                UsedPaper = 0,
+                UsedScissors = 0,
+                Points = 0,
+            };
+            
+            try
+            {
+                await _accountStorage.AddAsync(account);
+                await _statisticsStorage.AddAsync(statistics);
+                
+                return Created("Account {0} is created!",account.Login);
             }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.Message);
+                return BadRequest(exception.Message);
+            }
+        }
 
-            return BadRequest("This account already exists");
+        [HttpGet]
+        [Route("logout")]
+        [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(int), (int) HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<int>> LogOut(string sessionId)
+        {
+            var result = await _accountManager.LogOutAsync(sessionId);
+            if (result)
+                return (int) HttpStatusCode.OK;
+            return (int) HttpStatusCode.Forbidden;
         }
     }
 }

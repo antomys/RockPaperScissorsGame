@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Server.Services
+namespace Server.Services.Interfaces
 {
     public interface IDeserializedObject<T>
     {

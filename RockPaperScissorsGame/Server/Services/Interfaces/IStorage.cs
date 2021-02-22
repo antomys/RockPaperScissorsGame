@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Services
+namespace Server.Services.Interfaces
 {
     public interface IStorage<T> where T: class
     {

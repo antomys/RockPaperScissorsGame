@@ -21,7 +21,7 @@ namespace Server.Models.Interfaces
         double WinLossRatio { get; set; }
         
         [JsonPropertyName("TimeSpent")]
-        TimeSpan TimeSpent { get; set; }
+        string TimeSpent { get; set; }
         
         [JsonPropertyName("UsedRock")]
         int UsedRock { get; set; }

@@ -11,7 +11,7 @@ using Microsoft.OpenApi.Models;
 using Server.Models;
 using Server.Models.Interfaces;
 using Server.Services;
-using Services;
+using Server.Services.Interfaces;
 
 namespace Server
 {
@@ -35,6 +35,7 @@ namespace Server
             //services.AddSingleton<IStorage<IAccount>,AccountManager<IAccount>>();
             services.AddSingleton(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
             services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
+            
            
             services.AddSingleton<IAccountManager, AccountManager>();
 
@@ -66,62 +67,12 @@ namespace Server
                 {
                     var service = context.RequestServices.GetRequiredService<IDeserializedObject<Account>>();  //todo: remove
 
+
                     var dictionary = service.ConcurrentDictionary;
                     foreach (var value in dictionary.Values)
                     {
                         await context.Response.WriteAsync($"{value.Login};{value.Password}\n");
                     }
-                });
-                endpoints.Map("/name", async context =>
-                {
-                    var service = context.RequestServices.GetRequiredService<IDeserializedObject<Account>>();  //todo: remove
-                    
-                    var listOfStats =
-                        context.RequestServices.GetRequiredService<IDeserializedObject<Statistics>>(); //todo: remove
-                    
-                    var accStorage = context.RequestServices.GetRequiredService <IStorage<Account>>();
-                    var statStorage = context.RequestServices.GetRequiredService<IStorage<Statistics>>();
-                   
-                    var login = context.Request.Query["from"].FirstOrDefault();
-                    var pass = context.Request.Query["to"].FirstOrDefault();
-
-                    var user = new Account()
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Login = login,
-                        Password = pass
-                    };
-
-                    var stat = new Statistics
-                    {
-                        Id = user.Id,
-                        Wins = 43,
-                        Loss = 4354,
-                        WinLossRatio = 21.4,
-                        TimeSpent = default,
-                        UsedRock = 0,
-                        UsedPaper = 0,
-                        UsedScissors = 0,
-                        Points = 0,
-                        Login = user.Login
-                    };
-
-                    accStorage.Add(user);
-                    statStorage.Add(stat);
-                    
-                    var dictionary = service.ConcurrentDictionary;
-                    foreach (var value in dictionary.Values)
-                    {
-                        await context.Response.WriteAsync($"LOGIN: {value.Login};{value.Password}\n");
-                    }
-                    var dictionary2 = listOfStats.ConcurrentDictionary;
-                    foreach (var value in dictionary2.Values)
-                    {
-                        await context.Response.WriteAsync($"STATS: {value.Id};{value.Id}\n");
-                    }
-
-                    await service.UpdateData();
-                    await listOfStats.UpdateData();
                 });
             });
         }
