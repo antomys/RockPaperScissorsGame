@@ -9,10 +9,6 @@ namespace Client.Services.RequestProcessor.RequestModels.Impl
 {
     public class RequestOptions : IRequestOptions
     {
-        public RequestOptions()
-        {
-            Address = "http://localhost:5000/";
-        }
         public string Name { get; set; }
 
         public string Address { get; set; }

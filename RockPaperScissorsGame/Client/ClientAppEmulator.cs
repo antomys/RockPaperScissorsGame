@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Client.Models;
 using Client.Services;
+using Client.Services.RequestProcessor;
+using Client.Services.RequestProcessor.RequestModels.Impl;
 using Newtonsoft.Json;
 
 namespace Client
@@ -13,17 +15,17 @@ namespace Client
     {
         private static readonly HttpClient Client = new HttpClient();
         private readonly string _sessionId;
-
+        private const string BaseAddress = "http://localhost:5000/";
         //private Timer _updateTimer;
         //private bool _isAlive = true;
-        
-        public ClientAppEmulator()
+
+        public ClientAppEmulator(IRequestPerformer performer)
         {
-            Client.BaseAddress = new Uri("http://localhost:5000/");
+            _performer = performer;
             _sessionId = Guid.NewGuid().ToString();
         }
+        private IRequestPerformer _performer;
 
-        
 
         //For currently player on the platform //developing
         private Account _playerAccount;
@@ -78,15 +80,6 @@ namespace Client
                 {
                     case 1:
                         var registrationResponse = await Registration();
-                        /*if (registrationResponse.Equals((int)HttpStatusCode.BadRequest))
-                        {
-                            Console.WriteLine("Unable to create account. Already exists?");
-                        }
-                        else
-                        {
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor("Account successfully created", ConsoleColor.Green);
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccount.ToString(), ConsoleColor.Green); 
-                        }*/
                         ColorTextWriterService.PrintLineMessageWithSpecialColor(
                             "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
                         Console.ReadKey();
@@ -127,18 +120,34 @@ namespace Client
                     new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password"),
                 LastRequest = DateTime.Now
             };
-            var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccount), Encoding.UTF8, "application/json");
-            var responseMessage = await Client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
-            
-            
-            if (responseMessage.IsSuccessStatusCode)
+            _playerAccount = registrationAccount;
+            // var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccount), Encoding.UTF8, "application/json");
+            //var responseMessage = await Client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
+            var options = new RequestOptions
             {
-                return (int)responseMessage.StatusCode;
+                ContentType = "application/json",
+                Body = JsonConvert.SerializeObject(_playerAccount),
+                Address = BaseAddress + "user/create",
+                IsValid = true,
+                Method = Services.RequestModels.RequestMethod.Post,
+                Name = "Registration"
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+            if (reachedResponse.Code == 201)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content,ConsoleColor.Green);
+                return 1;
             }
-
-            Console.WriteLine("This account already exists!");
-            return (int) responseMessage.StatusCode;
-
+            if (reachedResponse.Code == 500)
+            {
+                Console.WriteLine("Service is unvavailable");
+                return -1;
+            }
+            else
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
+                return -1;
+            }
         }
 
         private async Task LogIn() //For now Int. Dunno what to make

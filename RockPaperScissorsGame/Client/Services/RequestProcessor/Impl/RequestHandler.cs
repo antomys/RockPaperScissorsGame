@@ -3,6 +3,7 @@ using Client.Services.RequestProcessor.RequestModels.Impl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,9 +12,12 @@ namespace Client.Services.RequestProcessor.Impl
 {
     public class RequestHandler : IRequestHandler
     {
-        private HttpClient client = new HttpClient();
+        private HttpClient _client;
         public async Task<IResponse> HandleRequestAsync(IRequestOptions requestOptions)
         {
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => { return true; };
+            _client = new HttpClient(handler);
             if (requestOptions == null) throw new ArgumentNullException(nameof(requestOptions));
             if (!requestOptions.IsValid) throw new ArgumentOutOfRangeException(nameof(requestOptions));
 
@@ -43,8 +47,6 @@ namespace Client.Services.RequestProcessor.Impl
                     return HttpMethod.Put;
                 case RequestMethod.Patch:
                     return HttpMethod.Patch;
-                case RequestMethod.Delete:
-                    return HttpMethod.Delete;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(method), method, "Invalid request method");
             }

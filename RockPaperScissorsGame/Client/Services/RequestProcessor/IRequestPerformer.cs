@@ -1,4 +1,5 @@
 ﻿using Client.Services.RequestModels;
+using Client.Services.RequestProcessor.RequestModels.Impl;
 using System;
 using System.Threading.Tasks;
 
@@ -6,6 +7,6 @@ namespace Client.Services.RequestProcessor
 {
     public interface IRequestPerformer
     {
-        Task<bool> PerformRequestAsync(IRequestOptions requestOptions, IResponseOptions responseOptions);
+        Task<IResponse> PerformRequestAsync(IRequestOptions requestOptions);
     }
 }
