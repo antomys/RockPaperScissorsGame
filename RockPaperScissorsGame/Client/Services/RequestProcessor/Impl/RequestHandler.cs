@@ -22,17 +22,24 @@ namespace Client.Services.RequestProcessor.Impl
             if (!requestOptions.IsValid) throw new ArgumentOutOfRangeException(nameof(requestOptions));
 
             using var msg = new HttpRequestMessage(MapMethod(requestOptions.Method), new Uri(requestOptions.Address));
-
-            if (MapMethod(requestOptions.Method) != HttpMethod.Get)
+            try
             {
-                msg.Content = new StringContent(requestOptions.Body, Encoding.UTF8, requestOptions.ContentType);
-                using var responseForPushingData = await _client.SendAsync(msg);
-                var bodyForPushing = await responseForPushingData.Content.ReadAsStringAsync();
-                return new Response(true, (int)responseForPushingData.StatusCode, "Pushed:\n" + bodyForPushing);
+
+                if (MapMethod(requestOptions.Method) != HttpMethod.Get)
+                {
+                    msg.Content = new StringContent(requestOptions.Body, Encoding.UTF8, requestOptions.ContentType);
+                    using var responseForPushingData = await _client.SendAsync(msg);
+                    var bodyForPushing = await responseForPushingData.Content.ReadAsStringAsync();
+                    return new Response(true, (int)responseForPushingData.StatusCode, "Pushed:\n" + bodyForPushing);
+                }
+                using var response = await _client.SendAsync(msg);
+                var body = await response.Content.ReadAsStringAsync();
+                return new Response(true, (int)response.StatusCode, body);
             }
-            using var response = await _client.SendAsync(msg);
-            var body = await response.Content.ReadAsStringAsync();
-            return new Response(true, (int)response.StatusCode, body);
+            catch (HttpRequestException ex)
+            {
+                return new Response(false, 500, "Server is not responding!");
+            }
         }
         private static HttpMethod MapMethod(RequestMethod method)
         {

@@ -13,7 +13,6 @@ namespace Client
 {
     public class ClientAppEmulator
     {
-        private static readonly HttpClient Client = new HttpClient();
         private readonly string _sessionId;
         private const string BaseAddress = "http://localhost:5000/";
         //private Timer _updateTimer;
@@ -93,8 +92,8 @@ namespace Client
                         Console.Clear();
                         break;
                     case 3:
-                        var statistics = await OverallStatistics();
-                        PrintStats(statistics);
+                      /*  var statistics = await OverallStatistics();
+                        PrintStats(statistics);*/
                         //await Logout(); //todo: REMOVE
                         break;
                     case 4:
@@ -138,11 +137,6 @@ namespace Client
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content,ConsoleColor.Green);
                 return 1;
             }
-            if (reachedResponse.Code == 500)
-            {
-                Console.WriteLine("Service is unvavailable");
-                return -1;
-            }
             else
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
@@ -152,7 +146,7 @@ namespace Client
 
         private async Task LogIn() //For now Int. Dunno what to make
         {
-            var inputAccount = new Account
+           /* var inputAccount = new Account
             {
                 SessionId = _sessionId,
                 Login = new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
@@ -176,11 +170,12 @@ namespace Client
             else
             {
                 Console.WriteLine(responseBody);
-            }
+            }*/
         }
 
         private async Task Logout()
         {
+            /*
             if (_playerAccount == null) //todo: exception.
                 return ;
             var response = await Client.GetAsync($"user/logout/{_sessionId}");//TODO: Cancellation token
@@ -194,9 +189,10 @@ namespace Client
             {
                 Console.WriteLine("Error");
             }
+            */
         }
 
-        private async Task<IEnumerable<Statistics>> OverallStatistics()
+       /* private async Task<IEnumerable<Statistics>> OverallStatistics()
         {
             var response = await Client.GetAsync($"overallStatistics");//TODO: Cancellation token
             if (!response.IsSuccessStatusCode)
@@ -207,7 +203,8 @@ namespace Client
             var deserialized = JsonConvert.DeserializeObject<List<Statistics>>(responseBody);
 
             return deserialized;
-        }
+            
+        }*/
 
         private void PrintStats(IEnumerable<Statistics> statisticsEnumerable)
         {
