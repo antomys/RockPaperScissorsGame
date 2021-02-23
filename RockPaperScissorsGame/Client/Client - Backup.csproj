@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Services\RequestProcessor\" />
+      <Folder Include="Services\Новая папка\" />
     </ItemGroup>
 
 
