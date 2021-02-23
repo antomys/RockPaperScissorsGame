@@ -10,11 +10,10 @@ using Server.Services.Interfaces;
 
 namespace Server.Services
 {
-    public class AccountManager : IAccountManager
+    public class AccountManager : IAccountManager  //this needs to be Singleton
     {
         private readonly ILogger<AccountManager> _logger;
         
-
         private readonly ConcurrentDictionary<string, int> _invalidTries = new();
         private readonly ConcurrentDictionary<string, DateTime> _lastTimes = new(); //What am i doing? so stupid
         
@@ -32,10 +31,7 @@ namespace Server.Services
             _deserializedObject = deserializedObject;
             AccountsActive = new ConcurrentDictionary<string, Account>();
         }
-
-
         
-
         public async Task<Account> LogInAsync(AccountDto accountDto)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -99,11 +95,5 @@ namespace Server.Services
 
             return await tasks;
         }
-
-
-        /*public async Task<int> LogOutAsync()
-        {
-            
-        }*/
     }
 }

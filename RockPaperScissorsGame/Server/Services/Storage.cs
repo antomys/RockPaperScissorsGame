@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Server.Exceptions.Register;
+using Server.Game.Models;
 using Server.Services.Interfaces;
 
 namespace Server.Services
@@ -70,15 +71,23 @@ namespace Server.Services
         /// <exception cref="UnknownReasonException"></exception>
         public int Add(T item)
         {
-
-           var guid = GetGuidFromT(item);
-
-           if (CheckIfExists(item))
-               throw new AlreadyExistsException(item.GetType().ToString());
+            var guid = GetGuidFromT(item);
+            
+            if (typeof(T) == typeof(Round))
+            {
+                if (item.GetType().GetProperty("IsFinished").GetValue(item, null).Equals(true))
+                {
+                    if (!_deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item)) throw new UnknownReasonException(item.GetType().ToString());
+                    _deserializedObject.UpdateData();
+                }
+            }
+            
+            if (CheckIfExists(item))
+                throw new AlreadyExistsException(item.GetType().ToString());
            
-           if (!_deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item)) throw new UnknownReasonException(item.GetType().ToString());
-           _deserializedObject.UpdateData();
-           return (int)HttpStatusCode.OK;
+            if (!_deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item)) throw new UnknownReasonException(item.GetType().ToString());
+            _deserializedObject.UpdateData();
+            return (int)HttpStatusCode.OK;
         }
 
         /// <summary>

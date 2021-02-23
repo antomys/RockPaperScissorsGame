@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "wuqTeRHxdyRr2RgCOM4jM0V8Nl4Pd9Xz+UQ3d2BA+IaANqC68FKWgltJ9iCsKypnMLfHKrZkVXWR5QyTMF2Fdg==",
+  "dgSpecHash": "PATnwF49iKUIuVNlXIcISd2ik9K2k+tBLTu15HrGt6R1bKdUX5oHbmyjtA9TVjugFKeGKJS4vZ/P9RE4YZPv0g==",
   "success": true,
   "projectFilePath": "C:\\Users\\deqqu\\RiderProjects\\RockPaperScissorsGame\\RockPaperScissorsGame\\Client\\Client.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\deqqu\\.nuget\\packages\\newtonsoft.json\\11.0.1\\newtonsoft.json.11.0.1.nupkg.sha512"
+    "C:\\Users\\deqqu\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
   ],
   "logs": []
 }

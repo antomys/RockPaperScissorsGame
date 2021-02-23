@@ -4,7 +4,7 @@ namespace Server.Contracts
 {
     public class StatisticsDto
     {
-        [JsonProperty("Login")]
+        [JsonProperty("UserLogin")]
         public string Login { get; set; }
         
         [JsonProperty("Score")]

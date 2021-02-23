@@ -1,16 +1,16 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+
 namespace Server.Models.Interfaces
 {
     public interface IAccount
     {
-        [JsonPropertyName("Id")]
+        [JsonProperty("Id")]
         string Id { get; }
         
-        [JsonPropertyName("Login")]
+        [JsonProperty("Login")]
         string Login { get; set; }
         
-        [JsonPropertyName("Password")]
-        
+        [JsonProperty("Password")]
         string Password { get; set; }
 
 

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -5,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Server.Game.Models;
+using Server.Game.Services;
 using Server.Services;
 using Server.Services.Interfaces;
 
@@ -27,12 +30,15 @@ namespace Server
             services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
 
             services.AddSingleton<IAccountManager, AccountManager>();
+            services.AddSingleton<IRoomManager, RoomManager>();  //Just Added
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"});
+                
             });
+            //services.AddSwaggerGenNewtonsoftSupport();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,7 +78,6 @@ namespace Server
                         context.Response.StatusCode = (int) HttpStatusCode.Forbidden;
                     }
                 });
-                
                 endpoints.MapControllers();
                 
             });

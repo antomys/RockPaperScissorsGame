@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -8,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Server.Contracts;
 using Server.Exceptions.LogIn;
 using Server.Exceptions.Register;
+using Server.Mappings;
 using Server.Models;
 using Server.Services.Interfaces;
 
@@ -15,7 +15,6 @@ namespace Server.Controllers
 {
     [ApiController]
     [Route ("/user")]
-    
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     public class UserController : ControllerBase
@@ -85,12 +84,7 @@ namespace Server.Controllers
         {
             try
             {
-                var account = new Account
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Login = accountDto.Login,
-                    Password = accountDto.Password
-                };
+                var account = accountDto.ToUser();
                 var statistics = new Statistics
                 {
                     Id = account.Id,

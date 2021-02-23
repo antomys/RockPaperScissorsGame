@@ -1,40 +1,38 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Server.Models.Interfaces
 {
     public interface IStatistics
     {
-        [JsonPropertyName("Id")]
+        [JsonProperty("Id")]
         string Id { get; set; }
         
-        [JsonPropertyName("UserLogin")]
+        [JsonProperty("UserLogin")]
         string Login { get; set; }
         
-        [JsonPropertyName("Wins")]
+        [JsonProperty("Wins")]
         int Wins { get; set; }
         
-        [JsonPropertyName("Loss")]
+        [JsonProperty("Loss")]
         int Loss { get; set; }
         
-        [JsonPropertyName("WinToLossRatio")]
+        [JsonProperty("WinToLossRatio")]
         double WinLossRatio { get; set; }
         
-        [JsonPropertyName("TimeSpent")]
-        string TimeSpent { get; set; }
+        [JsonProperty("TimeSpent")]
+        string TimeSpent { get; set; }  //This has to get statistics of games from last 7 days.
         
-        [JsonPropertyName("UsedRock")]
+        [JsonProperty("UsedRock")]
         int UsedRock { get; set; }
         
-        [JsonPropertyName("UsedPaper")]
+        [JsonProperty("UsedPaper")]
         int UsedPaper { get; set; }
         
-        [JsonPropertyName("UsedScissors")]
+        [JsonProperty("UsedScissors")]
         int UsedScissors { get; set; }
         
-        [JsonPropertyName("Score")]
+        [JsonProperty("Score")]
         int Score { get; set; }
-
-        //IAccount Account { get; }
+        
     }
 }
