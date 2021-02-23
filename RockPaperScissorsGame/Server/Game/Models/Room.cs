@@ -7,10 +7,8 @@ namespace Server.Game.Models
     public class Room : IRoom
     {
         public string RoomId { get; set; }
-        
-        public string NextMove { get; set; }   //Idea to store SessionId of user, that has to make move.
-        
-        public ConcurrentDictionary<Tuple<string,string>,object> Players { get; set; } //Where string - sessionId or login of player, bool - is he ready to play
+
+        public ConcurrentDictionary<Tuple<string,string>,bool> Players { get; set; } //Where string - sessionId or login of player, bool - is he ready to play
                                                                         //Temporary made tuple to store sessionId and login.
         public Round CurrentRound { get; set; }
         
@@ -19,6 +17,8 @@ namespace Server.Game.Models
         public bool IsReady { get; set; }  //To start game
 
         public bool IsFull { get; set; }
+        
+        public DateTime CreationTime { get; set; }  //this to check 5 minutes and then delete room
         
         public bool IsRoundEnded { get; set; }
     }

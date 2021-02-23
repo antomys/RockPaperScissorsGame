@@ -36,8 +36,8 @@ namespace Server.Services
 
         private async Task<ConcurrentDictionary<string, T>> Deserialize()
         {
-            _fileName = typeof(T).Name; //Smart decision;
-
+            _fileName = typeof(T).Name.Contains("Statistics") ? "Statistics" : typeof(T).Name;
+            
             var exists = IsNeededFilesAvailable().Result;
 
             FileStream reader;

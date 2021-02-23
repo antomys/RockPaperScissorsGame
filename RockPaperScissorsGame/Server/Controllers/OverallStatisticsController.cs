@@ -38,7 +38,7 @@ namespace Server.Controllers
 
                 var resultList = deserialized.Where(x => x.Score > 10).AsParallel().ToArray();
                 if (resultList.Length < 1)
-                    return NotFound();
+                    return BadRequest("No statistics with points > 10");
                 return Ok(resultList);
             }
             catch (Exception exceptions) //todo: custom exception

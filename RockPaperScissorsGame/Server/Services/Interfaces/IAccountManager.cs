@@ -7,7 +7,7 @@ namespace Server.Services.Interfaces
 {
     public interface IAccountManager
     {
-        ConcurrentDictionary<string, Account> AccountsActive { get; set; }
+        ConcurrentDictionary<string, Account> AccountsActive { get;}
         Task<Account> LogInAsync(AccountDto accountDto);
         Task<bool> LogOutAsync(string sessionId);
 

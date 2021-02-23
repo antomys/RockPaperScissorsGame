@@ -20,7 +20,7 @@ namespace Server.Services
         private readonly IDeserializedObject<Account> _deserializedObject;
         private const int CoolDownTime = 45;
         
-        public ConcurrentDictionary<string, Account> AccountsActive { get; set; }
+        public ConcurrentDictionary<string, Account> AccountsActive { get;}
         
         
         public AccountManager(

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -17,107 +18,148 @@ namespace Server.Controllers
     public class RoomController :ControllerBase
     {
         private readonly IRoomManager _roomManager;
-
-        private readonly IStorage<Room> _roomStorage;
-
+        
         private readonly ILogger<RoomController> _logger;
-
-        private readonly IAccountManager _accountManager;
+        
 
 
         public RoomController(
             IRoomManager roomManager,
-            ILogger<RoomController> logger,
-            IAccountManager accountManager,
-            IStorage<Room> roomStorage)
+            ILogger<RoomController> logger)
         {
             _roomManager = roomManager;
             _logger = logger;
-            _accountManager = accountManager;
-            _roomStorage = roomStorage;
         }
 
         [HttpPost]
-        [Route("create")]
+        [Route("create/{sessionId}&{isPrivate}")]
         [ProducesResponseType(typeof(Room), (int) HttpStatusCode.OK)]
         [ProducesResponseType( (int) HttpStatusCode.BadRequest)]
 
         public async Task<ActionResult<Room>> CreateRoom(string sessionId, bool isPrivate)
         {
-            if (!_accountManager.AccountsActive.TryGetValue(sessionId, out var thisAccount))
+            try
             {
-                return BadRequest();  //todo: return exception;
+                var resultRoom = await _roomManager.CreateRoom(sessionId, isPrivate);
+
+                if (resultRoom != null)
+                {
+                    return resultRoom;
+                }
+
+                return BadRequest();
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
             }
             
-            var resultRoom = await  _roomManager.CreateRoom(thisAccount, sessionId, isPrivate);
-
-            if (resultRoom != null)
-            {
-                return resultRoom;
-            }
-            return BadRequest();
         }
         
         [HttpPost]
-        [Route("join/private")]
+        [Route("create/training/{sessionId}")]
+        [ProducesResponseType(typeof(Room), (int) HttpStatusCode.OK)]
+        [ProducesResponseType( (int) HttpStatusCode.BadRequest)]
+
+        public async Task<ActionResult<Room>> CreateTrainingRoom(string sessionId)
+        {
+            try
+            {
+                var resultRoom = await _roomManager.CreateTrainingRoom(sessionId);
+
+                if (resultRoom != null)
+                {
+                    return resultRoom;
+                }
+
+                return BadRequest();
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
+            
+        }
+        
+        [HttpPost]
+        [Route("join/private/{sessionId}&{roomId}")]
         [ProducesResponseType(typeof(Room), (int) HttpStatusCode.OK)]
         [ProducesResponseType( (int) HttpStatusCode.BadRequest)]
 
         public async Task<ActionResult<Room>> JoinRoom(string sessionId, string roomId)
         {
-            if (!_accountManager.AccountsActive.TryGetValue(sessionId, out var thisAccount))
+            try
             {
-                return BadRequest();  //todo: return exception;
+                var resultRoom = await _roomManager.JoinPrivateRoom( sessionId, roomId);
+
+                if (resultRoom != null)
+                {
+                    return resultRoom;
+                }
+                return BadRequest();
             }
-
-
-            var resultRoom = await _roomManager.JoinPrivateRoom(thisAccount, sessionId, roomId);
-
-            if (resultRoom != null)
+            catch (Exception exception)
             {
-                return resultRoom;
+                return BadRequest(exception.Message);
             }
-            return BadRequest();
         }
         
         [HttpPost]
-        [Route("updateState")]
+        [Route("updateState/{sessionId}&{state}")]
         [ProducesResponseType(typeof(Room), (int) HttpStatusCode.OK)]
         [ProducesResponseType( (int) HttpStatusCode.BadRequest)]
 
         public async Task<ActionResult<Room>> UpdatePlayerState(string sessionId, bool state)
         {
-            if (!_accountManager.AccountsActive.TryGetValue(sessionId, out var thisAccount))
+            try
             {
-                return BadRequest();  //todo: return exception;
+                var resultRound = await _roomManager.UpdatePlayerState(sessionId, state);
+
+                if (resultRound != null)
+                {
+                    return resultRound;
+                }
+
+                return BadRequest();
             }
-
-
-            var resultRoom = await _roomManager.UpdatePlayerState(thisAccount, state);
-
-            if (resultRoom != null)
+            catch (Exception exception)
             {
-                return resultRoom;
+                return BadRequest(exception.Message);
             }
-            return BadRequest();
+            
         }
         
-        [HttpGet]
-        [Route("update")]
+        [HttpPut]
+        [Route("update/{sessionId}")]
         [ProducesResponseType(typeof(Room), (int) HttpStatusCode.OK)]
         [ProducesResponseType( (int) HttpStatusCode.BadRequest)]
 
         public async Task<ActionResult<Room>> UpdateRoom(string sessionId)
         {
-            if (!_accountManager.AccountsActive.TryGetValue(sessionId, out var thisAccount))
+            try
             {
-                return BadRequest();  //todo: return exception;
+                var resultRoom = await _roomManager.UpdateRoom(sessionId);
+
+                return resultRoom;
             }
-
-            var resultRoom = await _roomManager.UpdateRoom(thisAccount.Login);
-
-            return resultRoom;
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
+            
         }
-        
+
+        [HttpDelete]
+        [Route("delete/{roomId}")]
+        [ProducesResponseType(typeof(Room), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+
+        public async Task<IActionResult> DeleteRoom(string roomId)
+        {
+           var result =  await _roomManager.DeleteRoom(roomId);
+           if (result)
+               return Ok();
+           return BadRequest();
+        }
     }
 }

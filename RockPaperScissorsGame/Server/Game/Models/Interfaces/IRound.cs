@@ -8,6 +8,12 @@ namespace Server.Game.Models.Interfaces
     { 
         [JsonProperty("RoundId")]
         string RoundId { get; init; }  //Not to store identical rounds
+       
+        [JsonProperty("SessionIdNextMove")]
+        public string SessionIdNextMove { get; set; }   //Idea to store SessionId of user, that has to make move.
+        
+        [JsonProperty("NextMove")]
+        public int NextMove { get; set; }   //enum
         
         [JsonProperty("IsFinished")]
         bool IsFinished { get; set; }  //Probably not needed.

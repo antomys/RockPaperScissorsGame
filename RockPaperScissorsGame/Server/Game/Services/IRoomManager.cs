@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using Server.Game.Models;
 using Server.Models.Interfaces;
 
@@ -6,12 +7,17 @@ namespace Server.Game.Services
 {
     public interface IRoomManager
     {
-        Task<Room> CreateRoom(IAccount account, string sessionId, bool isPrivate);
+        ConcurrentDictionary<string, Room> ActiveRooms { get; }
+        Task<Room> CreateRoom(string sessionId, bool isPrivate);
 
-        Task<Room> JoinPrivateRoom(IAccount account, string sessionId, string roomId);
+        Task<Room> CreateTrainingRoom(string sessionId);
 
-        Task<Room> UpdatePlayerState(IAccount account, bool state);
+        Task<Room> JoinPrivateRoom(string sessionId, string roomId);
+
+        Task<Room> UpdatePlayerState(string sessionId, bool state);
 
         Task<Room> UpdateRoom(string login);
+
+        Task<bool> DeleteRoom(string roomId);
     }
 }

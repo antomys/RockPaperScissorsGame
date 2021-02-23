@@ -114,7 +114,7 @@ namespace Server.Controllers
         /// <param name="sessionId">Session id of a client</param>
         /// <returns>HttpStatusCode</returns>
         [Route("logout")]
-        [HttpGet("logout/{sessionId}")]
+        [HttpDelete("logout/{sessionId}")]
         [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(int), (int) HttpStatusCode.BadRequest)]
         public async Task<ActionResult<int>> LogOut(string sessionId)
