@@ -17,7 +17,7 @@ namespace Client.Services
         {
             this.destination = destination;
         }
-        public string BuildNewSpecialDestinationString(string msg)
+        public string BuildNewSpecialDestinationString(string msg, bool isNeedConfirmation = false)
         {
             string output;
             while (true)
@@ -48,6 +48,8 @@ namespace Client.Services
                 }
                 if (destination == StringDestination.Password)
                 {
+                    if (isNeedConfirmation == true)
+                        break;
                     ColorTextWriterService.PrintLineMessageWithSpecialColor("You need to confirm password!", ConsoleColor.Yellow);
                     string confirmationPassword;
                     do
