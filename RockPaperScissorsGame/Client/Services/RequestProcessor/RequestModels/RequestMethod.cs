@@ -1,6 +1,6 @@
 ﻿namespace Client.Services.RequestModels
 {
-    internal enum RequestMethod
+    public enum RequestMethod
     {
         Undefined = 0,
         Get = 1,

@@ -1,6 +1,6 @@
 ﻿namespace Client.Services.RequestModels
 {
-    internal interface IResponse
+    public interface IResponse
     {
         public bool Handled { get; }
         public int Code { get; }
