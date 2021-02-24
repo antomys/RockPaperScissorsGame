@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Server.GameLogic.LogicServices.Impl
 {
-    public class RoundCoordinator
+    public class RoundCoordinator : IRoundCoordinator
     {
     }
 }

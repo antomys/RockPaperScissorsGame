@@ -5,7 +5,6 @@ using Server.Models;
 using Server.Services.Interfaces;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +17,7 @@ namespace Server.GameLogic.LogicServices.Impl
         {
             _accountManager = accountManager;
             ActiveRooms = new ConcurrentDictionary<string, Room>();
+            //_timer = new Timer(tm, null, 0, 2000); //todo: implement
             tm = CheckRoomDate;
         }
         public ConcurrentDictionary<string, Room> ActiveRooms { get; }
@@ -47,7 +47,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
                 }
 
-                _timer = new Timer(tm, null, 0, 2000); //todo: implement
+                _timer = new Timer(tm, null, 0, 10000); //todo: implement
                 return newRoom;
             });
             return await tasks;
@@ -76,9 +76,7 @@ namespace Server.GameLogic.LogicServices.Impl
                 newRoom.Players.TryAdd("Bot", true);
                 newRoom.IsFull = true;
                 ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
-                
-                _timer = new Timer(tm, null, 0, 2000); //todo: implement
-                
+
                 return newRoom;
             });
             return await tasks;
@@ -98,7 +96,7 @@ namespace Server.GameLogic.LogicServices.Impl
             {
                 foreach (var room in ActiveRooms)
                 {
-                    if (room.Value.CreationTime.AddMinutes(5) < DateTime.Now && room.Value.CurrentRoundId == null)
+                    if (room.Value.CreationTime.AddMinutes(1) < DateTime.Now && room.Value.CurrentRoundId == null)
                         ActiveRooms.TryRemove(room);
                 }
             });
@@ -107,7 +105,7 @@ namespace Server.GameLogic.LogicServices.Impl
         private static string RandomString()
         {
             const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            return new string(Enumerable.Repeat(chars, 10)
+            return new string(Enumerable.Repeat(chars, 5)
                 .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
         private Account GetAccountById(string sessionId)
@@ -115,8 +113,7 @@ namespace Server.GameLogic.LogicServices.Impl
             _accountManager.AccountsActive.TryGetValue(sessionId, out var account);
             if (account != null) 
                 return account;
-            else 
-                throw new UserNotFoundException(nameof(account));
+            throw new UserNotFoundException(nameof(account));
 
         }
         private readonly IAccountManager _accountManager;
