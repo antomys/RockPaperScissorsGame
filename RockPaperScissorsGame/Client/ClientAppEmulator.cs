@@ -2,43 +2,57 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Client.Models;
 using Client.Services;
+using Client.Services.RequestProcessor;
+using Client.Services.RequestProcessor.RequestModels.Impl;
 using Newtonsoft.Json;
 
 namespace Client
 {
     public class ClientAppEmulator
     {
-        private static readonly HttpClient Client = new HttpClient();
         private readonly string _sessionId;
-
+        private const string BaseAddress = "http://localhost:5000/";
         //private Timer _updateTimer;
         //private bool _isAlive = true;
-        
-        public ClientAppEmulator()
+
+        public ClientAppEmulator(IRequestPerformer performer)
         {
-            Client.BaseAddress = new Uri("http://localhost:5000/");
+            _performer = performer;
             _sessionId = Guid.NewGuid().ToString();
         }
+        private IRequestPerformer _performer;
 
-        
 
         //For currently player on the platform //developing
         private Account _playerAccount;
         public async Task<int> StartAsync()
         {
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
+            CancellationToken token = tokenSource.Token;
             try
             {
                 Greeting();
                 ColorTextWriterService.PrintLineMessageWithSpecialColor("\n\nPress any key to show start up menu list!"
-                    ,ConsoleColor.Green);
+                    , ConsoleColor.Green);
                 Console.ReadKey();
                 Console.Clear();
                 //Here we ` ll try to connect with server on the background and show smth to the user
                 //smth like await TaskFactory (Connection + Menu StartUP)
-                await StartMenu();
+                /*
+                                var task = new Task(async()=> await TryToConnectWithServer());
+                                task.Start();
+                                await StartMenu(token);
+
+                                task.Wait();
+                                if (task.IsCompleted)
+                                {
+                                    tokenSource.Cancel();
+                                }*/
+                await StartMenu(token);
                 return 1;
             }
             catch (Exception exception)
@@ -46,6 +60,23 @@ namespace Client
                 throw exception;
             }
         }
+        /*  private async Task TryToConnectWithServer()
+          {
+              int servrIsAnvailable = 0;
+
+              while (servrIsAnvailable != 500)
+              {
+                  var options = new RequestOptions
+                  {
+                      Address = BaseAddress,
+                      IsValid = true,
+                      Method = Services.RequestModels.RequestMethod.Get,
+                      Name = "Checker isAlive"
+                  };   //Bad on this moment!
+                  servrIsAnvailable = (await _performer.PerformRequestAsync(options)).Code;
+              }
+              return;
+          }*/
         private void Greeting()
         {
             ColorTextWriterService.PrintLineMessageWithSpecialColor(
@@ -55,7 +86,7 @@ namespace Client
                     "you can find a random player or just try your skill with a bot.", ConsoleColor.Yellow);
             ColorTextWriterService.PrintLineMessageWithSpecialColor("(c)Ihor Volokhovych & Michael Terekhov", ConsoleColor.Cyan);
         }
-        private async Task StartMenu()
+        private async Task StartMenu(CancellationToken token)
         {
             while (true)
             {
@@ -65,43 +96,55 @@ namespace Client
                 "2.\tLog in\n" +
                 "3.\tSee Leaderboard\n" +       //This part will be available after we figure out the statistics
                 "4.\tExit", ConsoleColor.DarkYellow);
+
                 ColorTextWriterService.PrintLineMessageWithSpecialColor("\nPlease select an item from the list", ConsoleColor.Green);
 
                 Console.Write("Select -> ");
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
                 var passed = int.TryParse(Console.ReadLine(), out int startMenuInput);
                 if (!passed)
                 {
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input",ConsoleColor.Red);
+                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
                     continue;
                 }
                 switch (startMenuInput)
                 {
                     case 1:
                         var registrationResponse = await Registration();
-                        /*if (registrationResponse.Equals((int)HttpStatusCode.BadRequest))
-                        {
-                            Console.WriteLine("Unable to create account. Already exists?");
-                        }
-                        else
-                        {
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor("Account successfully created", ConsoleColor.Green);
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor(_playerAccount.ToString(), ConsoleColor.Green); 
-                        }*/
                         ColorTextWriterService.PrintLineMessageWithSpecialColor(
                             "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case 2:
-                        await LogIn();
-                        ColorTextWriterService.PrintLineMessageWithSpecialColor(
-                            "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
-                        Console.ReadKey();
-                        Console.Clear();
+                        var status = await LogIn();
+                        if (status == 1)
+                        {
+                            ColorTextWriterService.PrintLineMessageWithSpecialColor(
+                               "\n\nPress any key to go to the players menu", ConsoleColor.Cyan);
+                            Console.ReadKey();
+                            Console.Clear();
+                            await PlayerMenu();
+                            Console.ReadKey();
+                            Console.Clear();
+                        }
+                        else
+                        {
+                            ColorTextWriterService.PrintLineMessageWithSpecialColor(
+                                "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
+                            Console.ReadKey();
+                            Console.Clear();
+                        }
                         break;
                     case 3:
-                        var statistics = await OverallStatistics();
-                        PrintStats(statistics);
+
+                        /*  var statistics = await OverallStatistics();
+
+                          /*  var statistics = await OverallStatistics();
+                          PrintStats(statistics);*/
                         //await Logout(); //todo: REMOVE
                         break;
                     case 4:
@@ -110,10 +153,49 @@ namespace Client
                         ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
                         continue;
                 }
-            
+
             }
 
         }
+
+        private async Task PlayerMenu()
+        {
+            while (true)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("Welcome to the game menu\n" +
+                    "What would you like to do?", ConsoleColor.Cyan);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("1.\tPlay with bot\n" +
+                    "2\tPlay in public pool\n" +
+                    "3\tPlay in private room\n" +
+                    "4\tLogout", ConsoleColor.Yellow);
+
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("\nPlease select an item from the list", ConsoleColor.Green);
+
+                Console.Write("Select -> ");
+                var passed = int.TryParse(Console.ReadLine(), out int playersMenuInput);
+                if (!passed)
+                {
+                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
+                    continue;
+                }
+                switch (playersMenuInput)
+                {
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        await Logout();
+                        return;
+                    default:
+                        ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
+                        continue;
+                }
+            }
+        }
+
         private async Task<int> Registration()
         {
             ColorTextWriterService.PrintLineMessageWithSpecialColor("\nWe are glad to welcome you in the registration form!\n" +
@@ -127,67 +209,86 @@ namespace Client
                     new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password"),
                 LastRequest = DateTime.Now
             };
-            var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccount), Encoding.UTF8, "application/json");
-            var responseMessage = await Client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
-            
-            
-            if (responseMessage.IsSuccessStatusCode)
+            _playerAccount = registrationAccount;
+            // var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccount), Encoding.UTF8, "application/json");
+            //var responseMessage = await Client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
+            var options = new RequestOptions
             {
-                return (int)responseMessage.StatusCode;
+                ContentType = "application/json",
+                Body = JsonConvert.SerializeObject(_playerAccount),
+                Address = BaseAddress + "user/create",
+                IsValid = true,
+                Method = Services.RequestModels.RequestMethod.Post,
+                Name = "Registration"
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+            if (reachedResponse.Code == 201)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
+                return 1;
             }
-
-            Console.WriteLine("This account already exists!");
-            return (int) responseMessage.StatusCode;
-
+            else
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
+                return -1;
+            }
         }
 
-        private async Task LogIn() //For now Int. Dunno what to make
+        private async Task<int> LogIn() //For now Int. Dunno what to make
         {
             var inputAccount = new Account
             {
                 SessionId = _sessionId,
                 Login = new StringPlaceholder().BuildNewSpecialDestinationString("Login"),
                 Password =
-                    new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password"),
+                    new StringPlaceholder(StringDestination.Password).BuildNewSpecialDestinationString("Password", true),
                 LastRequest = DateTime.Now
             };
-            
-            var stringContent = new StringContent(JsonConvert.SerializeObject(inputAccount), Encoding.UTF8, "application/json");
-
-            var response = await Client.PostAsync("user/login", stringContent);
-            
-            var responseBody = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
+            var options = new RequestOptions
             {
+                ContentType = "application/json",
+                Body = JsonConvert.SerializeObject(inputAccount),
+                Address = BaseAddress + "user/login",
+                IsValid = true,
+                Method = Services.RequestModels.RequestMethod.Post,
+                Name = "Registration"
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+            if (reachedResponse.Code == 200)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
                 _playerAccount = inputAccount;
-                Console.WriteLine(responseBody);
-                Console.WriteLine($"{_playerAccount.SessionId}");
-                //SetUpTimer();
+                return 1;
             }
             else
             {
-                Console.WriteLine(responseBody);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
+                return -1;
             }
         }
-
         private async Task Logout()
         {
-            if (_playerAccount == null) //todo: exception.
-                return ;
-            var response = await Client.GetAsync($"user/logout/{_sessionId}");//TODO: Cancellation token
-            
-            if (response.IsSuccessStatusCode)
+            var options = new RequestOptions
             {
-                Console.WriteLine($"Successfully signed out!\n");
+                Address = BaseAddress + $"user/logout/{_sessionId}",
+                IsValid = true,
+                Method = Services.RequestModels.RequestMethod.Get
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+            if (reachedResponse.Code == 200)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("Successfully signed out", ConsoleColor.Green);
                 _playerAccount = null;
             }
             else
             {
-                Console.WriteLine("Error");
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
             }
         }
+    }
+}
 
-        private async Task<IEnumerable<Statistics>> OverallStatistics()
+       /* private async Task<IEnumerable<Statistics>> OverallStatistics()
         {
             var response = await Client.GetAsync($"overallStatistics");//TODO: Cancellation token
             if (!response.IsSuccessStatusCode)
@@ -198,14 +299,6 @@ namespace Client
             var deserialized = JsonConvert.DeserializeObject<List<Statistics>>(responseBody);
 
             return deserialized;
-        }
+            
+        }*/
 
-        private void PrintStats(IEnumerable<Statistics> statisticsEnumerable)
-        {
-            foreach (var statistics in statisticsEnumerable)
-            {
-                Console.WriteLine(statistics);
-            }
-        }
-    }
-}

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.Services.RequestProcessor.Impl;
+using System;
 using System.Threading.Tasks;
 
 namespace Client
@@ -9,7 +10,7 @@ namespace Client
         {
             try
             {
-                var emulator = new ClientAppEmulator();
+                var emulator = new ClientAppEmulator(new RequestPerformer());
                 return await emulator.StartAsync();
             }
             catch (Exception ex)
