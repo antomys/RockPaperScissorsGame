@@ -10,6 +10,7 @@ namespace Server.GameLogic.LogicServices.Impl
     public class RoundCoordinator : IRoundCoordinator
     {
         private readonly IRoomCoordinator _roomCoordinator;
+        
 
         private readonly IDeserializedObject<Round> _deserializedRounds;
 

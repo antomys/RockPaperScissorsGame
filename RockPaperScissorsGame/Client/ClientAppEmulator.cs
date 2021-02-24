@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -28,6 +29,7 @@ namespace Client
 
         //For currently player on the platform //developing
         private Account _playerAccount;
+        private Room _room;
         public async Task<int> StartAsync()
         {
             CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -181,7 +183,7 @@ namespace Client
 
         private async Task<int> CreationRoom()
         {
-            bool isPrivate = true;
+            var isPrivate = true;
             while (true)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor("Welcome to lobby builder!\n" +
@@ -189,7 +191,7 @@ namespace Client
                     "1.\tOpen\n" +
                     "2.\tPrivate\n", ConsoleColor.Magenta);
                 Console.Write("Select--> ");
-                var input = int.TryParse(Console.ReadLine().Trim(), out int creationMenuInput);
+                var input = int.TryParse(Console.ReadLine()?.Trim(), out var creationMenuInput);
                 if (!input)
                 {
                     ColorTextWriterService.PrintLineMessageWithSpecialColor("Bad input", ConsoleColor.Red);
@@ -209,50 +211,50 @@ namespace Client
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
 
-             var room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content); //todo: remove           
+             _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content); //todo: remove           
             if (reachedResponse.Code == (int) HttpStatusCode.OK)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
-                if (room != null)
+                if (_room == null) return 0;
+                var readyToStart = false;
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("Are you ready?", ConsoleColor.Cyan);
+                while (true)
                 {
-                    bool readyToStart = false;
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Are you ready?", ConsoleColor.Cyan);
-                    while (true)
+                    ColorTextWriterService.PrintLineMessageWithSpecialColor(
+                        "1.\tReady\n" +
+                        "2.\tPlease wait...\n", ConsoleColor.Magenta);
+                    Console.Write("Select--> ");
+                    var input = int.TryParse(Console.ReadLine()?.Trim(), out var startListInput);
+                    if (!input)
                     {
-                        ColorTextWriterService.PrintLineMessageWithSpecialColor(
-                            "1.\tReady\n" +
-                            "2.\tPlease wait...\n", ConsoleColor.Magenta);
-                        Console.Write("Select--> ");
-                        var input = int.TryParse(Console.ReadLine().Trim(), out int startListInput);
-                        if (!input)
-                        {
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor("Bad input", ConsoleColor.Red);
-                            continue;
-                        }
-                        if (startListInput == 1)
-                            readyToStart = true;
-                        break;
+                        ColorTextWriterService.PrintLineMessageWithSpecialColor("Bad input", ConsoleColor.Red);
+                        continue;
                     }
-                    var options1 = new RequestOptions
-                    {
-                        Address = BaseAddress + $"room/updateState/{_sessionId}&{readyToStart}",
-                        IsValid = true,
-                        Body = _sessionId,
-                        Method = Services.RequestModels.RequestMethod.Put,
-                        Name = "Creating Room"
-                    };
-                    reachedResponse = await _performer.PerformRequestAsync(options1);
-                    room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content,ConsoleColor.Green);
+                    if (startListInput == 1)
+                        readyToStart = true;
+                    break;
                 }
+                var options1 = new RequestOptions
+                {
+                    Address = BaseAddress + $"room/updateState/{_sessionId}&{readyToStart}",
+                    IsValid = true,
+                    Body = _sessionId,
+                    Method = Services.RequestModels.RequestMethod.Put,
+                    Name = "Putting in Room"
+                };
+                reachedResponse = await _performer.PerformRequestAsync(options1);
+                
+                _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
+
+                Console.WriteLine($"Your status changed to {readyToStart}");
+
+                Console.WriteLine("Here to spam update until round is created");
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content,ConsoleColor.Green);
                 return 0;
             }
-            else
-            {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
-                //await Logout();
-                return -1;
-            }
+            ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
+            //await Logout();
+            return -1;
 
         }
 
@@ -312,11 +314,11 @@ namespace Client
                 Name = "Registration"
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            if (reachedResponse.Code == 200)
+            if (reachedResponse.Code == (int) HttpStatusCode.OK)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
                 _playerAccount = inputAccount;
-                return 1;
+                return 1; //todo: change to 0
             }
             else
             {

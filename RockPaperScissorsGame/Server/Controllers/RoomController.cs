@@ -63,10 +63,25 @@ namespace Server.Controllers
             {
                 var resultRound = await _roomManager.UpdatePlayerStatus(sessionId, state);
                 if (resultRound != null)
-                {
                     return resultRound;
-                }
                 return BadRequest();
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
+        }
+        
+        [HttpGet]
+        [Route("updateState/{roomId}")]
+        [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Room>> Update(string roomId)
+        {
+            try
+            {
+                var resultRound = await _roomManager.UpdateRoom(roomId);
+                return resultRound;
             }
             catch (Exception exception)
             {
