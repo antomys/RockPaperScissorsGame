@@ -1,23 +1,27 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 
 namespace Client.Models
 {
     public class Round
     {
-        [JsonProperty("roundId")]
-        public string RoundId { get; init; }
-        [JsonProperty("isFinished")]
-        public bool IsFinished { get; set; }
-        [JsonProperty("sessionIdNextMove")]
-        public string SessionIdNextMove { get; set; } //For confirmation next game
-        [JsonProperty("nextMove")]
-        public int NextMove { get; set; }             //For confirmation next game
-        [JsonProperty("timeFineshed")]
+        [JsonProperty("Id")]
+        public string Id { get; init; }  //Not to store identical rounds
+        
+        [JsonProperty("Moves")]
+        public ConcurrentDictionary<string, int>  PlayerMoves { get; set; } //where string key is playerId
+        
+        [JsonProperty("IsFinished")]
+        public bool IsFinished { get; set; }  //Probably not needed.
+        
+        [JsonProperty("TimeFinished")]
         public DateTime TimeFinished { get; set; }
-        [JsonProperty("winner")]
-        public Account Winner { get; set; }
-        [JsonProperty("loser")]
-        public Account Loser { get; set; }
+        
+        [JsonProperty("WinnerId")]
+        public string WinnerId { get; set; }
+        
+        [JsonProperty("LoserId")]
+        public string LoserId { get; set; }
     }
 }
