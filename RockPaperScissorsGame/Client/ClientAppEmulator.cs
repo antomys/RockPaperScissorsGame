@@ -209,10 +209,42 @@ namespace Client
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
 
-             var room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content); //todo: remove
+             var room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content); //todo: remove           
             if (reachedResponse.Code == (int) HttpStatusCode.OK)
             {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);               
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
+                if (room != null)
+                {
+                    bool readyToStart = false;
+                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Are you ready?", ConsoleColor.Cyan);
+                    while (true)
+                    {
+                        ColorTextWriterService.PrintLineMessageWithSpecialColor(
+                            "1.\tReady\n" +
+                            "2.\tPlease wait...\n", ConsoleColor.Magenta);
+                        Console.Write("Select--> ");
+                        var input = int.TryParse(Console.ReadLine().Trim(), out int startListInput);
+                        if (!input)
+                        {
+                            ColorTextWriterService.PrintLineMessageWithSpecialColor("Bad input", ConsoleColor.Red);
+                            continue;
+                        }
+                        if (startListInput == 1)
+                            readyToStart = true;
+                        break;
+                    }
+                    var options1 = new RequestOptions
+                    {
+                        Address = BaseAddress + $"room/updateState/{_sessionId}&{readyToStart}",
+                        IsValid = true,
+                        Body = _sessionId,
+                        Method = Services.RequestModels.RequestMethod.Put,
+                        Name = "Creating Room"
+                    };
+                    reachedResponse = await _performer.PerformRequestAsync(options1);
+                    room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
+                    ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content,ConsoleColor.Green);
+                }
                 return 0;
             }
             else
