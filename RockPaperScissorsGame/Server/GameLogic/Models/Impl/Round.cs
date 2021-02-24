@@ -1,19 +1,15 @@
-﻿using Newtonsoft.Json;
-using Server.Models;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Server.GameLogic.Models.Impl
 {
     public class Round : IRound
     {
-        public string RoundId { get; init; }
+        public string Id { get; init; }
         
         public bool IsFinished { get; set; }
         
+        //where string key is playerId
         public ConcurrentDictionary<string, int>  Moves { get; set; }
         
         public DateTime TimeFinished { get; set; }

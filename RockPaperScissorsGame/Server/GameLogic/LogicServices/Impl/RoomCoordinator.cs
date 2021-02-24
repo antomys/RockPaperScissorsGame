@@ -5,7 +5,6 @@ using Server.Models;
 using Server.Services.Interfaces;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +17,7 @@ namespace Server.GameLogic.LogicServices.Impl
         {
             _accountManager = accountManager;
             ActiveRooms = new ConcurrentDictionary<string, Room>();
+            //_timer = new Timer(tm, null, 0, 2000); //todo: implement
             tm = CheckRoomDate;
         }
         public ConcurrentDictionary<string, Room> ActiveRooms { get; }
@@ -27,8 +27,9 @@ namespace Server.GameLogic.LogicServices.Impl
             {
                 var account = GetAccountById(sessionId);
 
-                if (ActiveRooms.Any(x => x.Value.Players.Any(p => p.Key.Item1.Equals(account.Login))))
+                if(ActiveRooms.Any(x=> x.Value.Players.Any(p=> p.Key.Equals(account.Id))))
                     throw new TwinkGameRoomCreationException();
+
                 var newRoom = new Room
                 {
                     RoomId = RandomString(),
@@ -40,51 +41,62 @@ namespace Server.GameLogic.LogicServices.Impl
                     CreationTime = DateTime.Now
                 };
 
-                if (newRoom.Players.TryAdd(sessionId, false) &&
+                if (newRoom.Players.TryAdd(account.Id, false) &&
                    newRoom.IsPrivate)
                 {
                     ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
                 }
 
-                _timer = new Timer(tm, null, 0, 2000);
+                _timer = new Timer(tm, null, 0, 10000); //todo: implement
                 return newRoom;
             });
             return await tasks;
         }
-        public  Task<Room> CreateTrainingRoom(string sessionId)
+        public async Task<Room> CreateTrainingRoom(string sessionId)
+        {
+            var tasks = Task.Factory.StartNew(() =>
+            {
+                var account = GetAccountById(sessionId);
+
+                if (ActiveRooms.Any(x => x.Value.Players.Any(p => p.Key.Equals(account.Id))))
+                    throw new TwinkGameRoomCreationException();
+
+                var newRoom = new Room
+                {
+                    RoomId = RandomString(),
+                    Players = new ConcurrentDictionary<string, bool>(),
+                    IsPrivate = true,
+                    IsReady = false,
+                    IsRoundEnded = false,
+                    IsFull = false,
+                    CreationTime = DateTime.Now
+                };
+
+                newRoom.Players.TryAdd(account.Id, false);
+                newRoom.Players.TryAdd("Bot", true);
+                newRoom.IsFull = true;
+                ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
+
+                return newRoom;
+            });
+            return await tasks;
+
+        }
+        public Task<bool> DeleteRoom(string roomId)
         {
             throw new NotImplementedException();
         }
-        public async Task<bool> DeleteRoom(string roomId)
+        public Task<Room> UpdateRoom(string roomId)
         {
-            var tasks = Task.Factory.StartNew(() =>
-                ActiveRooms.TryRemove(roomId, out _));
-            return await tasks;
+            throw new NotImplementedException();
         }
-        public async Task<Room> UpdateRoom(Room updated)
-        {
-            var thread = Task.Factory.StartNew(() =>
-            {
-                ActiveRooms.TryGetValue(updated.RoomId, out var room);
-                if (room == null)
-                {
-                    return null;
-                }
-                return ActiveRooms.TryUpdate(room.RoomId,
-                    updated,
-                    ActiveRooms.FirstOrDefault(x => x.Key == room.RoomId).Value) ? room : null;
-            });
-            return await thread;
-        } 
-        //update client status
-        
         private async void CheckRoomDate(object state)
         {
             var threads = Task.Factory.StartNew(() =>
             {
                 foreach (var room in ActiveRooms)
                 {
-                    if (room.Value.CreationTime.AddMinutes(5) < DateTime.Now && room.Value.CurrentRoundId == null)
+                    if (room.Value.CreationTime.AddMinutes(1) < DateTime.Now && room.Value.CurrentRoundId == null)
                         ActiveRooms.TryRemove(room);
                 }
             });
@@ -93,7 +105,7 @@ namespace Server.GameLogic.LogicServices.Impl
         private static string RandomString()
         {
             const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            return new string(Enumerable.Repeat(chars, 10)
+            return new string(Enumerable.Repeat(chars, 5)
                 .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
         private Account GetAccountById(string sessionId)
@@ -101,8 +113,7 @@ namespace Server.GameLogic.LogicServices.Impl
             _accountManager.AccountsActive.TryGetValue(sessionId, out var account);
             if (account != null) 
                 return account;
-            else 
-                throw new UserNotFoundException(nameof(account));
+            throw new UserNotFoundException(nameof(account));
 
         }
         private readonly IAccountManager _accountManager;

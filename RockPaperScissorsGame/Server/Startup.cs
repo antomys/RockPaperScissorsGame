@@ -30,6 +30,7 @@ namespace Server
 
             services.AddSingleton<IAccountManager, AccountManager>();
             services.AddSingleton<IRoomCoordinator, RoomCoordinator>();
+            
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

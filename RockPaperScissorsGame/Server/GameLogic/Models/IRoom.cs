@@ -19,8 +19,6 @@ namespace Server.GameLogic.Models
             string CurrentRoundId { get; set; }
             [JsonProperty("CreationTime")]
             DateTime CreationTime { get; set; }
-            [JsonProperty("roundList")]
-            List<Round> rounds { get; set; }
-       }
+        }
     
 }
