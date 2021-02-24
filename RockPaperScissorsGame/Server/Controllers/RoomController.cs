@@ -53,23 +53,21 @@ namespace Server.Controllers
             }
 
         }
-        [HttpPut]
-        [Route("update/{sessionId}")]
-        [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
+        /*[HttpPut]
+        [Route("update/{session}Id{&isReady}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Room>> UpdateRoom(Room room)
+        public async Task<ActionResult<int>> UpdateRoom(string sessionId, bool isPrivate)
         {
             try
             {
                 var resultRoom = await _roomManager.UpdateRoom(room);
-
                 return resultRoom;
             }
             catch (Exception exception)
             {
                 return BadRequest(exception.Message);
             }
-        }
-
+        }*/
     }
 }

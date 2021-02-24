@@ -35,7 +35,7 @@ namespace Server.GameLogic.LogicServices.Impl
             _storageRounds = storageRounds;
         }
 
-        public Task<Round> MakeMove(string roomId, string accountId, int move)
+     /*   public Task<Round> MakeMove(string roomId, string accountId, int move)
         {
             ActiveRound.TryGetValue(roomId, out var thisRound);
 
@@ -46,7 +46,7 @@ namespace Server.GameLogic.LogicServices.Impl
                 
 
         }
-
+     */
 
     }
 }
