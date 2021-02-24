@@ -65,8 +65,7 @@ namespace Server.Services
                     _invalidTries.AddOrUpdate(accountDto.SessionId, 1, (s, i) => i+1);
                     
                     _lastTimes.AddOrUpdate(accountDto.SessionId, accountDto.LastRequest, ((s, time) => time = accountDto.LastRequest));
-                    
-                    
+                         
                     throw new InvalidCredentialsException($"{accountDto.Login}");
                 }
                 if (AccountsActive.Any(x => x.Value == login)

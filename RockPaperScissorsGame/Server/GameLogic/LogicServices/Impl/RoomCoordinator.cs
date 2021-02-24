@@ -94,14 +94,12 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             await Task.WhenAll(threads);
         }
-
         public async Task<bool> DeleteRoom(string roomId)
         {
             var tasks = Task.Factory.StartNew(() =>
                 ActiveRooms.TryRemove(roomId, out _));
             return await tasks;
         }
-
         public async Task<Room> UpdateRoom(Room updated)
         {
             var thread = Task.Factory.StartNew(() =>
@@ -116,7 +114,6 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await thread;
         }
-
         private static string RandomString()
         {
             const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -131,7 +128,6 @@ namespace Server.GameLogic.LogicServices.Impl
             throw new UserNotFoundException(nameof(account));
 
         }
-
         public async Task<Room> UpdatePlayerStatus(string sessionId, bool IsReady)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -153,7 +149,6 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await tasks;
         }
-
         private readonly IAccountManager _accountManager;
         private static readonly Random Random = new();
         private Timer _timer;
