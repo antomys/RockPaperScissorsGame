@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using Server.GameLogic.Models;
 using Server.GameLogic.Models.Impl;
 using Server.Services.Interfaces;
 
@@ -39,7 +40,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
             thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
 
-            if (thisRound.PlayerMoves.Values.Any(x => x != 0))
+            if (thisRound.PlayerMoves.Values.All(x => x != RequiredGameMove.Default))
 
                 throw new NotImplementedException();
         }

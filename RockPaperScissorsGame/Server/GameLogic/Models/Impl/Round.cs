@@ -10,7 +10,7 @@ namespace Server.GameLogic.Models.Impl
         public bool IsFinished { get; set; }
         
         //where string key is playerId
-        public ConcurrentDictionary<string, int>  PlayerMoves { get; set; }
+        public ConcurrentDictionary<string, RequiredGameMove>  PlayerMoves { get; set; }
         
         public DateTime TimeFinished { get; set; }
         

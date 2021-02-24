@@ -28,8 +28,12 @@ namespace Client
 
 
         //For currently player on the platform //developing
+        
         private Account _playerAccount;
+        
         private Room _room;
+        
+        private Round _round;
         public async Task<int> StartAsync()
         {
             CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -124,14 +128,11 @@ namespace Client
                         }
                         break;
                     case 3:
-
-                        /*  var statistics = await OverallStatistics();
-
-                          /*  var statistics = await OverallStatistics();
-                          PrintStats(statistics);*/
-                        //await Logout(); //todo: REMOVE
+                        var statistics = await OverallStatistics();
+                        PrintStatistics(statistics);
                         break;
                     case 4:
+                        await Logout();
                         return;
                     default:
                         ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
@@ -145,12 +146,13 @@ namespace Client
         {
             while (true)
             {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor("Welcome to the game menu\n" +
-                    "What would you like to do?", ConsoleColor.Cyan);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"***\nHello, {_playerAccount.Login}\n" +
+                    "Please choose option", ConsoleColor.Cyan);
                 ColorTextWriterService.PrintLineMessageWithSpecialColor("1.\tPlay with bot\n" +
-                    "2\tPlay in public pool\n" +
-                    "3\tPlay in private room\n" +
-                    "4\tLogout", ConsoleColor.Yellow);
+                    "2\tCreate room\n" +
+                    "3\tJoin Private room\n" +
+                    "4\tJoin Public room" +
+                    "5\tLog out", ConsoleColor.Yellow);
 
                 ColorTextWriterService.PrintLineMessageWithSpecialColor("\nPlease select an item from the list", ConsoleColor.Green);
 
@@ -164,6 +166,7 @@ namespace Client
                 switch (playersMenuInput)
                 {
                     case 1:
+                        //todo: play with bot
                         break;
                     case 2:
                         await CreationRoom();
@@ -180,14 +183,13 @@ namespace Client
                 }
             }
         }
-
-        private async Task<int> CreationRoom()
+        private async Task CreationRoom()
         {
             var isPrivate = true;
             while (true)
             {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor("Welcome to lobby builder!\n" +
-                    "Which type of room would you like to create!\n" +
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("Room builder\n" +
+                    "Please choose room type\n" +
                     "1.\tOpen\n" +
                     "2.\tPrivate\n", ConsoleColor.Magenta);
                 Console.Write("Select--> ");
@@ -214,48 +216,55 @@ namespace Client
              _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content); //todo: remove           
             if (reachedResponse.Code == (int) HttpStatusCode.OK)
             {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
-                if (_room == null) return 0;
-                var readyToStart = false;
-                ColorTextWriterService.PrintLineMessageWithSpecialColor("Are you ready?", ConsoleColor.Cyan);
-                while (true)
-                {
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor(
-                        "1.\tReady\n" +
-                        "2.\tPlease wait...\n", ConsoleColor.Magenta);
-                    Console.Write("Select--> ");
-                    var input = int.TryParse(Console.ReadLine()?.Trim(), out var startListInput);
-                    if (!input)
-                    {
-                        ColorTextWriterService.PrintLineMessageWithSpecialColor("Bad input", ConsoleColor.Red);
-                        continue;
-                    }
-                    if (startListInput == 1)
-                        readyToStart = true;
-                    break;
-                }
-                var options1 = new RequestOptions
-                {
-                    Address = BaseAddress + $"room/updateState/{_sessionId}&{readyToStart}",
-                    IsValid = true,
-                    Body = _sessionId,
-                    Method = Services.RequestModels.RequestMethod.Put,
-                    Name = "Putting in Room"
-                };
-                reachedResponse = await _performer.PerformRequestAsync(options1);
                 
-                _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
-
-                Console.WriteLine($"Your status changed to {readyToStart}");
-
-                Console.WriteLine("Here to spam update until round is created");
-                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content,ConsoleColor.Green);
-                return 0;
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Room created. Room id: {_room.RoomId};" +
+                                                                        $"Private flag : {isPrivate}", ConsoleColor.Green);
+                
+                if (_room == null) return;
+                
             }
-            ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
-            //await Logout();
-            return -1;
 
+            await ChangePlayerStatus();
+            ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
+        }
+
+        private async Task ChangePlayerStatus()
+        {
+            var readyToStart = false;
+                
+            ColorTextWriterService.PrintLineMessageWithSpecialColor("Ready to start game?", ConsoleColor.Cyan);
+                
+            while (true)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(
+                    "1.\tReady\n" +
+                    "2.\tNot ready\n", ConsoleColor.Magenta);
+                Console.Write("Select--> ");
+                var input = int.TryParse(Console.ReadLine()?.Trim(), out var startListInput);
+                if (!input)
+                {
+                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Bad input", ConsoleColor.Red);
+                    continue;
+                }
+                if (startListInput == 1)
+                    readyToStart = true;
+                break;
+            }
+            var options = new RequestOptions
+            {
+                Address = BaseAddress + $"room/updateState/{_sessionId}&{readyToStart}",
+                IsValid = true,
+                Body = _sessionId,
+                Method = Services.RequestModels.RequestMethod.Put,
+                Name = "Change Player Status"
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+                
+            _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
+
+            Console.WriteLine($"Your status changed to {readyToStart}");
+
+            Console.WriteLine("Here to spam update until round is created");
         }
 
         private async Task<int> Registration()
@@ -294,7 +303,7 @@ namespace Client
             return -1;
         }
 
-        private async Task<int> LogIn() //For now Int. Dunno what to make
+        private async Task<int> LogIn()
         {
             var inputAccount = new Account
             {
@@ -344,6 +353,23 @@ namespace Client
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
             }
+        }
+        private async Task<IEnumerable<Statistics>> OverallStatistics()
+        {
+            var options = new RequestOptions
+            {
+                Address = BaseAddress + "overallStatistics",
+                IsValid = true,
+                Method = Services.RequestModels.RequestMethod.Get
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+            
+            return JsonConvert.DeserializeObject<IEnumerable<Statistics>>(reachedResponse.Content);
+            
+        }
+        private static void PrintStatistics(IEnumerable<Statistics> statisticsEnumerable)
+        {
+            Console.WriteLine(statisticsEnumerable.Select(x=> x.ToString()).ToArray());
         }
     }
 }
