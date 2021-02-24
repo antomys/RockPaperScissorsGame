@@ -7,12 +7,12 @@ namespace Server.GameLogic
 {
     public static class RockPaperScissors
     {
-        public static ConcurrentDictionary<string, int> UpdateMove(
-            ConcurrentDictionary<string,int> playerMoves, string accountId, int move)
+        public static ConcurrentDictionary<string, RequiredGameMove> UpdateMove(
+            ConcurrentDictionary<string,RequiredGameMove> playerMoves, string accountId, int move)
         {
             //
             
-            playerMoves.TryUpdate(accountId, move, 
+            playerMoves.TryUpdate(accountId, (RequiredGameMove)move, 
                 playerMoves.FirstOrDefault(x=> x.Key.Equals(accountId)).Value);
 
             return playerMoves;

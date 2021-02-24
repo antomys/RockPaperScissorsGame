@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Server.GameLogic.Models;
 
 namespace Server.GameLogic.LogicServices.Impl
 {
@@ -153,7 +154,6 @@ namespace Server.GameLogic.LogicServices.Impl
             
             return await tasks;
         }
-        
         public async Task<Room> UpdateRoom(string roomId)
         {
             var thread = Task.Factory.StartNew(() =>
@@ -172,16 +172,20 @@ namespace Server.GameLogic.LogicServices.Impl
                         Id = Guid.NewGuid()
                             .ToString(),
                         IsFinished = false,
-                        PlayerMoves = new ConcurrentDictionary<string, int>(),
+                        PlayerMoves = new ConcurrentDictionary<string, RequiredGameMove>(),
                         TimeFinished = default,
                         WinnerId = null,
                         LoserId = null,
                     };
 
-                    var accounts = room.Players.Keys.ToList();
-                    
+                    foreach (var value in room.Players.Keys.ToList())
+                    {
+                        round.PlayerMoves.TryAdd(value, RequiredGameMove.Default);
+                    }
+
+                    room.CurrentRoundId = round.Id;
                 }
-                    return ActiveRooms.TryUpdate(room.RoomId,
+                return ActiveRooms.TryUpdate(room.RoomId,
                     room,
                     ActiveRooms.FirstOrDefault(x => x.Key == room.RoomId).Value) ? room : null;
             });
