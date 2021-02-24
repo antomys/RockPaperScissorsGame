@@ -29,6 +29,7 @@ namespace Server
             services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
 
             services.AddSingleton<IAccountManager, AccountManager>();
+            services.AddSingleton<IRoundCoordinator, RoundCoordinator>();
             services.AddSingleton<IRoomCoordinator, RoomCoordinator>();
             
             services.AddControllers();

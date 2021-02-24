@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
-
 namespace Client.Models
 {
     public class Room 

@@ -184,6 +184,9 @@ namespace Server.GameLogic.LogicServices.Impl
                     }
 
                     room.CurrentRoundId = round.Id;
+
+                    _roundCoordinator.ActiveRound.TryAdd(roomId, round);
+                    
                 }
                 return ActiveRooms.TryUpdate(room.RoomId,
                     room,
