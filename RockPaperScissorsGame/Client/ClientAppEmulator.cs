@@ -16,8 +16,6 @@ namespace Client
     {
         private readonly string _sessionId;
         private const string BaseAddress = "http://localhost:5000/";
-        //private Timer _updateTimer;
-        //private bool _isAlive = true;
 
         public ClientAppEmulator(IRequestPerformer performer)
         {
@@ -60,23 +58,6 @@ namespace Client
                 throw exception;
             }
         }
-        /*  private async Task TryToConnectWithServer()
-          {
-              int servrIsAnvailable = 0;
-
-              while (servrIsAnvailable != 500)
-              {
-                  var options = new RequestOptions
-                  {
-                      Address = BaseAddress,
-                      IsValid = true,
-                      Method = Services.RequestModels.RequestMethod.Get,
-                      Name = "Checker isAlive"
-                  };   //Bad on this moment!
-                  servrIsAnvailable = (await _performer.PerformRequestAsync(options)).Code;
-              }
-              return;
-          }*/
         private void Greeting()
         {
             ColorTextWriterService.PrintLineMessageWithSpecialColor(
@@ -157,7 +138,6 @@ namespace Client
             }
 
         }
-
         private async Task PlayerMenu()
         {
             while (true)
