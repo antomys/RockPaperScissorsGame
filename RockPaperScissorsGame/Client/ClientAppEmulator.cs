@@ -164,19 +164,55 @@ namespace Client
                         break;
                     case 2:
                         await CreationRoom();
-                        await RoomMenu();
                         break;
                     case 3:
+                        await JoinPrivateRoom();
                         break;
                     case 4:
-                        await Logout();
+                        //todo: JoinPublicRoom();
                         return;
+                    case 5:
+                        await Logout();
+                        break;
                     default:
                         ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
                         continue;
                 }
             }
         }
+
+        private async Task JoinPrivateRoom()
+        {
+            Console.Write("Please enter room token: ");
+            var roomId = Console.ReadLine();
+            if (string.IsNullOrEmpty(roomId))
+            {
+                Console.WriteLine("Invalid input!");
+                //todo: something
+            }
+
+            roomId = roomId?.Trim().ToLower();
+            
+            var options = new RequestOptions
+            {
+                Address = BaseAddress + $"room/create/{_sessionId}&{roomId}",
+                IsValid = true,
+                Body = _sessionId,
+                Method = Services.RequestModels.RequestMethod.Post,
+                Name = "Creating Room"
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+
+            if (reachedResponse.Content != null)
+            {
+                _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
+                Console.WriteLine("Found room! Entering room lobby");
+                await ChangePlayerStatus();
+                await RoomMenu();
+            }
+            //todo: if this is null
+        }
+
         private async Task CreationRoom()
         {
             var isPrivate = true;
@@ -256,6 +292,10 @@ namespace Client
 
             Console.WriteLine($"Your status changed to {readyToStart}");
 
+            if (readyToStart)
+            {
+                await RoomMenu();
+            }
             //Console.WriteLine("Here to spam update until round is created");
         }
 
@@ -267,7 +307,7 @@ namespace Client
             await UpdateRoom();
 
             if (_room.IsReady)
-            {
+            { //todo: add redirection;
                 Console.WriteLine("Opponent has joined and is ready.");
                 Console.WriteLine("Redirecting to round game:");
             }
