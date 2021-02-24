@@ -256,7 +256,7 @@ namespace Client
 
             Console.WriteLine($"Your status changed to {readyToStart}");
 
-            Console.WriteLine("Here to spam update until round is created");
+            //Console.WriteLine("Here to spam update until round is created");
         }
 
         private async Task RoomMenu()
@@ -268,12 +268,13 @@ namespace Client
 
             if (_room.IsReady)
             {
+                Console.WriteLine("Opponent has joined and is ready.");
                 Console.WriteLine("Redirecting to round game:");
             }
         }
         private async Task UpdateRoom()
         {
-            while (_room.IsReady != true || _room != null)
+            while (!_room.IsReady)
             {
                 await Task.Run(async () =>
                 {
@@ -291,7 +292,7 @@ namespace Client
                     _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
                     
                 });
-                await Task.Delay(TimeSpan.FromSeconds(10));
+                await Task.Delay(TimeSpan.FromSeconds(1));
             }
         }
         private async Task<int> Registration()
