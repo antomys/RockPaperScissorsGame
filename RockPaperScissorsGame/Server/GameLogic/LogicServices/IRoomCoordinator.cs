@@ -9,7 +9,8 @@ namespace Server.GameLogic.LogicServices
         ConcurrentDictionary<string, Room> ActiveRooms { get; }
         Task<Room> CreateRoom(string sessionId, bool isPrivate);
         Task<Room> CreateTrainingRoom(string sessionId);
-        Task<Room> UpdateRoom(string login);
+        Task<Room> UpdateRoom(Room updated);
+        Task<Room> UpdatePlayerStatus(string sessionId, bool IsReady);
         Task<bool> DeleteRoom(string roomId);
     }
 }
