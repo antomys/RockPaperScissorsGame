@@ -98,7 +98,7 @@ namespace Server.GameLogic.LogicServices.Impl
             {
                 foreach (var room in ActiveRooms)
                 {
-                    if (room.Value.CreationTime.AddMinutes(1) < DateTime.Now && room.Value.CurrentRoundId == null)
+                    if (room.Value.CreationTime.AddMinutes(5) < DateTime.Now && room.Value.CurrentRoundId == null)
                         ActiveRooms.TryRemove(room);
                 }
             });

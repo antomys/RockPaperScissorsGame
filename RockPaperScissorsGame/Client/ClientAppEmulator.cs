@@ -109,15 +109,9 @@ namespace Client
                         break;
                     case 2:
                         var status = await LogIn();
-                        if (status == 1)
+                        if (status == 0)
                         {
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor(
-                               "\n\nPress any key to go to the players menu", ConsoleColor.Cyan);
-                            Console.ReadKey();
-                            Console.Clear();
                             await PlayerMenu();
-                            Console.ReadKey();
-                            Console.Clear();
                         }
                         else
                         {
@@ -151,7 +145,7 @@ namespace Client
                 ColorTextWriterService.PrintLineMessageWithSpecialColor("1.\tPlay with bot\n" +
                     "2\tCreate room\n" +
                     "3\tJoin Private room\n" +
-                    "4\tJoin Public room" +
+                    "4\tJoin Public room\n" +
                     "5\tLog out", ConsoleColor.Yellow);
 
                 ColorTextWriterService.PrintLineMessageWithSpecialColor("\nPlease select an item from the list", ConsoleColor.Green);
@@ -170,7 +164,6 @@ namespace Client
                         break;
                     case 2:
                         await CreationRoom();
-                        Console.ReadKey();
                         break;
                     case 3:
                         break;
@@ -225,9 +218,8 @@ namespace Client
             }
 
             await ChangePlayerStatus();
-            ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
+            //ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
         }
-
         private async Task ChangePlayerStatus()
         {
             var readyToStart = false;
@@ -266,7 +258,6 @@ namespace Client
 
             Console.WriteLine("Here to spam update until round is created");
         }
-
         private async Task<int> Registration()
         {
             ColorTextWriterService.PrintLineMessageWithSpecialColor("\nWe are glad to welcome you in the registration form!\n" +
@@ -302,7 +293,6 @@ namespace Client
             ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
             return -1;
         }
-
         private async Task<int> LogIn()
         {
             var inputAccount = new Account
@@ -327,13 +317,11 @@ namespace Client
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
                 _playerAccount = inputAccount;
-                return 1; //todo: change to 0
+                return 0; //todo: change to 0
             }
-            else
-            {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
-                return -1;
-            }
+
+            ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
+            return -1;
         }
         private async Task Logout()
         {
