@@ -82,14 +82,6 @@ namespace Server.GameLogic.LogicServices.Impl
             return await tasks;
 
         }
-        public Task<bool> DeleteRoom(string roomId)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<Room> UpdateRoom(string roomId)
-        {
-            throw new NotImplementedException();
-        }
         private async void CheckRoomDate(object state)
         {
             var threads = Task.Factory.StartNew(() =>
@@ -102,6 +94,29 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             await Task.WhenAll(threads);
         }
+
+        public async Task<bool> DeleteRoom(string roomId)
+        {
+            var tasks = Task.Factory.StartNew(() =>
+                ActiveRooms.TryRemove(roomId, out _));
+            return await tasks;
+        }
+
+        public async Task<Room> UpdateRoom(Room updated)
+        {
+            var thread = Task.Factory.StartNew(() =>
+            {
+                ActiveRooms.TryGetValue(updated.RoomId, out var room);
+                if (room == null)
+                {
+                    return null;
+                }
+                return ActiveRooms.TryUpdate(room.RoomId,
+                    updated, room) ? room : null;
+            });
+            return await thread;
+        }
+
         private static string RandomString()
         {
             const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -116,6 +131,29 @@ namespace Server.GameLogic.LogicServices.Impl
             throw new UserNotFoundException(nameof(account));
 
         }
+
+        public async Task<Room> UpdatePlayerStatus(string sessionId, bool IsReady)
+        {
+            var tasks = Task.Factory.StartNew(() =>
+            {
+                var account = GetAccountById(sessionId);
+                var room = ActiveRooms.Values
+                    .FirstOrDefault(x => x.Players.Keys
+                        .Any(p => p
+                            .Equals(sessionId)));
+                if (!ActiveRooms.TryGetValue(room.RoomId, out var thisRoom))
+                    return null; 
+                var newRoom = thisRoom;
+                var (key, oldValue) = newRoom.Players.FirstOrDefault(x => x.Key == account.Login);
+                newRoom.Players.TryUpdate(key, IsReady, oldValue);
+
+                if (newRoom.Players.Count != 2 || !newRoom.Players.Values.All(x => x))
+                    return null;
+                return newRoom;
+            });
+            return await tasks;
+        }
+
         private readonly IAccountManager _accountManager;
         private static readonly Random Random = new();
         private Timer _timer;
