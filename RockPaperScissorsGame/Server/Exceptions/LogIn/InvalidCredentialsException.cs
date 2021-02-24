@@ -9,8 +9,7 @@
 
         public InvalidCredentialsException(string message) :
             base($"Invalid username of password!")
-        {
-            
+        {          
         }
         
     }

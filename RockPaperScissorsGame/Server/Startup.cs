@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Server.GameLogic.LogicServices;
+using Server.GameLogic.LogicServices.Impl;
 using Server.Services;
 using Server.Services.Interfaces;
 
@@ -27,7 +29,7 @@ namespace Server
             services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
 
             services.AddSingleton<IAccountManager, AccountManager>();
-
+            services.AddSingleton<IRoomCoordinator, RoomCoordinator>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

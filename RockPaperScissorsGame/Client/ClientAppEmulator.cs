@@ -183,6 +183,8 @@ namespace Client
                     case 1:
                         break;
                     case 2:
+                        await CreationRoom();
+                        Console.ReadKey();
                         break;
                     case 3:
                         break;
@@ -194,6 +196,49 @@ namespace Client
                         continue;
                 }
             }
+        }
+
+        private async Task<int> CreationRoom()
+        {
+            bool isPrivate = true;
+            while (true)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("Welcome to lobby builder!\n" +
+                    "Which type of room would you like to create!\n" +
+                    "1.\tOpen\n" +
+                    "2.\tPrivate\n", ConsoleColor.Magenta);
+                Console.Write("Select--> ");
+                var input = int.TryParse(Console.ReadLine().Trim(), out int creationMenuInput);
+                if (!input)
+                {
+                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Bad input", ConsoleColor.Red);
+                    continue;
+                }
+                if (creationMenuInput == 1)
+                    isPrivate = false;
+                break;
+            }
+            var options = new RequestOptions
+            {
+                ContentType = "application/json",
+                Address = BaseAddress + $"room/create/{_sessionId}&{isPrivate}",
+                IsValid = true,
+                Method = Services.RequestModels.RequestMethod.Post,
+                Name = "Registration"
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+            if (reachedResponse.Code == 201)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);               
+                return 1;
+            }
+            else
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
+                await Logout();
+                return -1;
+            }
+
         }
 
         private async Task<int> Registration()
