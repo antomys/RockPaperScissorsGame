@@ -29,12 +29,13 @@ namespace Server.GameLogic.LogicServices.Impl
             _deserializedRounds = deserializedRounds;
             //_roomCoordinator = roomCoordinator;
             _storageRounds = storageRounds;
+            ActiveRounds = new ConcurrentDictionary<string, Round>();
         }
-        public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string id)
+        public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string roundId)
         {
             var tasks = Task.Factory.StartNew(() =>
             {
-                if (ActiveRounds.TryGetValue(id, out var thisRound))
+                if (ActiveRounds.TryGetValue(roundId, out var thisRound))
                     return thisRound;
                 return null; //ToDo: exception
             });

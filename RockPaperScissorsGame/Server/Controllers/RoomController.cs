@@ -53,6 +53,30 @@ namespace Server.Controllers
             }
 
         }
+        
+        [HttpPost]
+        [Route("join/{sessionId}&{roomId}")]
+        [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Room>> JoinPrivateRoom(string sessionId, string roomId)
+        {
+            try
+            {
+                var resultRoom = await _roomManager.JoinPrivateRoom(sessionId, roomId);
+                
+                if (resultRoom != null)
+                {
+                    return resultRoom;
+                }
+                return BadRequest();
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
+
+        }
+        
         [HttpPut]
         [Route("updateState/{sessionId}&{state}")]
         [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]

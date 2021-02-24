@@ -17,7 +17,6 @@ namespace Server.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class RoundController:ControllerBase
     {
-
         public RoundController(
                IRoundCoordinator roundManager,
                ILogger<RoundController> logger)
@@ -26,7 +25,7 @@ namespace Server.Controllers
             _logger = logger;
         }
         [HttpGet]
-        [Route("get/{id}")]
+        [Route("get/{roundId}")]
         [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<Round>> GetActualActiveRoundForCurrentRoom(string id)

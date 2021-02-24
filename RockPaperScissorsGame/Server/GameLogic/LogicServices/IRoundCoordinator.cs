@@ -8,6 +8,6 @@ namespace Server.GameLogic.LogicServices
     {
         Task<Round> MakeMove(string sessionId, int move);
         ConcurrentDictionary<string, Round> ActiveRounds { get; set; }
-        Task<Round> GetCurrentActiveRoundForSpecialRoom(string id);
+        Task<Round> GetCurrentActiveRoundForSpecialRoom(string roundId);
     }
 }

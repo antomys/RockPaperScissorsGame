@@ -164,6 +164,7 @@ namespace Client
                         break;
                     case 2:
                         await CreationRoom();
+                        await RoomMenu();
                         break;
                     case 3:
                         break;
@@ -216,7 +217,6 @@ namespace Client
                 if (_room == null) return;
                 
             }
-
             await ChangePlayerStatus();
             //ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
         }
@@ -258,6 +258,42 @@ namespace Client
 
             Console.WriteLine("Here to spam update until round is created");
         }
+
+        private async Task RoomMenu()
+        {
+            Console.WriteLine($"Your room id: {_room.RoomId}\n" +
+                              $"Waiting for opponent.");
+            
+            await UpdateRoom();
+
+            if (_room.IsReady)
+            {
+                Console.WriteLine("Redirecting to round game:");
+            }
+        }
+        private async Task UpdateRoom()
+        {
+            while (_room.IsReady != true || _room != null)
+            {
+                await Task.Run(async () =>
+                {
+                    var options = new RequestOptions
+                    {
+                        Body = "",
+                        Address = BaseAddress + $"room/updateState/{_room.RoomId}",
+                        IsValid = true,
+                        Method = Services.RequestModels.RequestMethod.Get,
+                        Name = "Updating Room"
+                    };
+                    
+                    var reachedResponse = await _performer.PerformRequestAsync(options);
+                    
+                    _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
+                    
+                });
+                await Task.Delay(TimeSpan.FromSeconds(10));
+            }
+        }
         private async Task<int> Registration()
         {
             ColorTextWriterService.PrintLineMessageWithSpecialColor("\nWe are glad to welcome you in the registration form!\n" +
@@ -272,8 +308,7 @@ namespace Client
                 LastRequest = DateTime.Now
             };
             _playerAccount = registrationAccount;
-            // var stringContent = new StringContent(JsonConvert.SerializeObject(_playerAccount), Encoding.UTF8, "application/json");
-            //var responseMessage = await Client.PostAsync("user/create", stringContent);  //TODO: Cancellation token
+            
             var options = new RequestOptions
             {
                 ContentType = "application/json",

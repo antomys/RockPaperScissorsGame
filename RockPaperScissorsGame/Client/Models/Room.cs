@@ -16,5 +16,7 @@ namespace Client.Models
         
         [JsonProperty("CreationTime")]
         public DateTime CreationTime { get; set; }
+        
+        public bool IsReady { get; set; }
     }
 }

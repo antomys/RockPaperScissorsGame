@@ -21,8 +21,6 @@ namespace Server.GameLogic.LogicServices.Impl
         
         private Timer _timer;
 
-        private readonly TimerCallback tm;
-        
         public ConcurrentDictionary<string, Room> ActiveRooms { get; }
         
         public RoomCoordinator(
@@ -32,14 +30,14 @@ namespace Server.GameLogic.LogicServices.Impl
             _accountManager = accountManager;
             _roundCoordinator = roundCoordinator;
             ActiveRooms = new ConcurrentDictionary<string, Room>();
-            tm = CheckRoomDate;
+            _timer = new Timer(CheckRoomDate, null, 0, 10000);
         }
        
         public async Task<Room> CreateRoom(string sessionId, bool isPrivate)
         {
             var tasks = Task.Factory.StartNew(() =>
             {
-                var account = GetAccountById(sessionId);
+                var account = GetAccountBySessionId(sessionId);
 
                 if(ActiveRooms.Any(x=> x.Value.Players.Any(p=> p.Key.Equals(account.Id))))
                     throw new TwinkGameRoomCreationException();
@@ -60,16 +58,17 @@ namespace Server.GameLogic.LogicServices.Impl
                     ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
                 }
 
-                _timer = new Timer(tm, null, 0, 10000); //todo: implement
+                //_timer = new Timer(tm, null, 0, 10000); //todo: implement
                 return newRoom;
             });
             return await tasks;
         }
+        
         public async Task<Room> CreateTrainingRoom(string sessionId)
         {
             var tasks = Task.Factory.StartNew(() =>
             {
-                var account = GetAccountById(sessionId);
+                var account = GetAccountBySessionId(sessionId);
 
                 if (ActiveRooms.Any(x => x.Value.Players.Any(p => p.Key.Equals(account.Id))))
                     throw new TwinkGameRoomCreationException();
@@ -93,12 +92,32 @@ namespace Server.GameLogic.LogicServices.Impl
                 return newRoom;
             });
             return await tasks;
+        }
 
+        public async Task<Room> JoinPrivateRoom(string sessionId, string roomId)
+        {
+            var tasks = Task.Factory.StartNew(() =>
+            {
+                if (!ActiveRooms.TryGetValue(roomId, out var thisRoom))
+                    return null; //todo:exception;
+                var newRoom = thisRoom;
+                var thisAccount = GetAccountBySessionId(sessionId);
+                newRoom.Players.TryAdd(thisAccount.Id, false);
+
+                if (newRoom.Players.Count > 1)
+                    newRoom.IsFull = true;
+            
+                return ActiveRooms.TryUpdate(roomId,
+                    newRoom, thisRoom) ? newRoom : null; //todo: change to exception;
+            });
+           
+            return await tasks;
         }
         private async void CheckRoomDate(object state)
         {
             var threads = Task.Factory.StartNew(() =>
             {
+                if (ActiveRooms.IsEmpty) return;
                 foreach (var room in ActiveRooms)
                 {
                     if (room.Value.CreationTime.AddMinutes(5) < DateTime.Now && room.Value.CurrentRoundId == null)
@@ -134,7 +153,7 @@ namespace Server.GameLogic.LogicServices.Impl
         {
             var tasks = Task.Factory.StartNew(() =>
             {
-                var account = GetAccountById(sessionId);
+                var account = GetAccountBySessionId(sessionId);
                 var room = ActiveRooms.Values
                     .FirstOrDefault(x => x.Players.Keys
                         .Any(p => p
@@ -164,7 +183,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     throw new Exception(); //todo: exception;
                 }
 
-                if (room.Players.Values.All(x => x))
+                if (room.Players.Values.All(x => x) && room.Players.Count==2)
                 {
                     var round = new Round
                     {
@@ -182,6 +201,8 @@ namespace Server.GameLogic.LogicServices.Impl
                         round.PlayerMoves.TryAdd(value, RequiredGameMove.Default);
                     }
 
+                    room.IsReady = true;
+
                     room.CurrentRoundId = round.Id;
 
                     _roundCoordinator.ActiveRounds.TryAdd(roomId, round);
@@ -194,6 +215,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
             return await thread;
         }
+        
 
 
         #region PrivateMethods
@@ -203,7 +225,7 @@ namespace Server.GameLogic.LogicServices.Impl
             return new string(Enumerable.Repeat(chars, 5)
                 .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
-        private Account GetAccountById(string sessionId)
+        private Account GetAccountBySessionId(string sessionId)
         {
             _accountManager.AccountsActive.TryGetValue(sessionId, out var account);
             if (account != null) 

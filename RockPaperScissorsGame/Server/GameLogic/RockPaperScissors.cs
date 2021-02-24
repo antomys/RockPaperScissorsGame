@@ -33,21 +33,19 @@ namespace Server.GameLogic
                     {
                         return String.Empty;
                     }
-                    else
-                    {
-                        if (surrenderMove == 1 && (int)m.Value == 3)
-                            continue;
-                        else if (surrenderMove == 2 && (int)m.Value == 1)
-                            continue;
-                        else if (surrenderMove == 3 && (int)m.Value == 2)
-                            continue;
-                        else if (surrenderMove == 1 && (int)m.Value == 2)
-                            winner = m.Key;
-                        else if (surrenderMove == 2 && (int)m.Value == 3)
-                            winner = m.Key;
-                        else if (surrenderMove == 3 && (int)m.Value == 1)
-                            winner = m.Key;
-                    }
+                    
+                    if (surrenderMove == 1 && (int)m.Value == 3)
+                        continue;
+                    else if (surrenderMove == 2 && (int)m.Value == 1)
+                        continue;
+                    else if (surrenderMove == 3 && (int)m.Value == 2)
+                        continue;
+                    else if (surrenderMove == 1 && (int)m.Value == 2)
+                        winner = m.Key;
+                    else if (surrenderMove == 2 && (int)m.Value == 3)
+                        winner = m.Key;
+                    else if (surrenderMove == 3 && (int)m.Value == 1)
+                        winner = m.Key;
                 }
             }
             return winner;
