@@ -6,8 +6,8 @@ namespace Server.GameLogic.Models
 {
     public interface IRound
     {
-        [JsonProperty("RoundId")]
-        string RoundId { get; init; }  //Not to store identical rounds
+        [JsonProperty("Id")]
+        string Id { get; init; }  //Not to store identical rounds
         [JsonProperty("Moves")]
         public ConcurrentDictionary<string, int>  Moves { get; set; }
         [JsonProperty("IsFinished")]

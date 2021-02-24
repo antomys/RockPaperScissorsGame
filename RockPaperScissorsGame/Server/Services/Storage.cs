@@ -70,8 +70,15 @@ namespace Server.Services
         /// <exception cref="UnknownReasonException"></exception>
         public int Add(T item)
         {
-
-           var guid = GetGuidFromT(item);
+            var guid = GetGuidFromT(item);
+            if (typeof(T).Name.Contains("Round"))
+            {
+                if (!_deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item)) throw new UnknownReasonException(item.GetType().ToString());
+                _deserializedObject.UpdateData();
+                return (int)HttpStatusCode.OK;
+            } 
+            
+            //var guid = GetGuidFromT(item);
 
            if (CheckIfExists(item))
                throw new AlreadyExistsException(item.GetType().ToString());
