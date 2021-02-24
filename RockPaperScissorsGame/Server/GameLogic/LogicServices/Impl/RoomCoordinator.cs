@@ -41,8 +41,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     CreationTime = DateTime.Now
                 };
 
-                if (newRoom.Players.TryAdd(account.Id, false) &&
-                   newRoom.IsPrivate)
+                if (newRoom.Players.TryAdd(account.Id, false))
                 {
                     ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
                 }
