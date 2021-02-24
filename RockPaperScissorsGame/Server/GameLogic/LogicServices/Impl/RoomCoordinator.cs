@@ -27,8 +27,9 @@ namespace Server.GameLogic.LogicServices.Impl
             {
                 var account = GetAccountById(sessionId);
 
-                if (ActiveRooms.Any(x => x.Value.Players.Any(p => p.Key.Item1.Equals(account.Login))))
+                if(ActiveRooms.Any(x=> x.Value.Players.Any(p=> p.Key.Equals(account.Id))))
                     throw new TwinkGameRoomCreationException();
+
                 var newRoom = new Room
                 {
                     RoomId = RandomString(),
@@ -46,20 +47,48 @@ namespace Server.GameLogic.LogicServices.Impl
                     ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
                 }
 
-                _timer = new Timer(tm, null, 0, 2000);
+                _timer = new Timer(tm, null, 0, 2000); //todo: implement
                 return newRoom;
             });
             return await tasks;
         }
-        public  Task<Room> CreateTrainingRoom(string sessionId)
+        public async Task<Room> CreateTrainingRoom(string sessionId)
         {
-            throw new NotImplementedException();
+            var tasks = Task.Factory.StartNew(() =>
+            {
+                var account = GetAccountById(sessionId);
+
+                if (ActiveRooms.Any(x => x.Value.Players.Any(p => p.Key.Equals(account.Id))))
+                    throw new TwinkGameRoomCreationException();
+
+                var newRoom = new Room
+                {
+                    RoomId = RandomString(),
+                    Players = new ConcurrentDictionary<string, bool>(),
+                    IsPrivate = true,
+                    IsReady = false,
+                    IsRoundEnded = false,
+                    IsFull = false,
+                    CreationTime = DateTime.Now
+                };
+
+                newRoom.Players.TryAdd(sessionId, false);
+                newRoom.Players.TryAdd("Bot", true);
+                newRoom.IsFull = true;
+                ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
+                
+                _timer = new Timer(tm, null, 0, 2000); //todo: implement
+                
+                return newRoom;
+            });
+            return await tasks;
+
         }
         public Task<bool> DeleteRoom(string roomId)
         {
             throw new NotImplementedException();
         }
-        public Task<Room> UpdateRoom(string login)
+        public Task<Room> UpdateRoom(string roomId)
         {
             throw new NotImplementedException();
         }
