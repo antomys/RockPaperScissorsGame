@@ -55,14 +55,29 @@ namespace Server.GameLogic.LogicServices.Impl
         {
             throw new NotImplementedException();
         }
-        public Task<bool> DeleteRoom(string roomId)
+        public async Task<bool> DeleteRoom(string roomId)
         {
-            throw new NotImplementedException();
+            var tasks = Task.Factory.StartNew(() =>
+                ActiveRooms.TryRemove(roomId, out _));
+            return await tasks;
         }
-        public Task<Room> UpdateRoom(string login)
+        public async Task<Room> UpdateRoom(Room updated)
         {
-            throw new NotImplementedException();
-        }
+            var thread = Task.Factory.StartNew(() =>
+            {
+                ActiveRooms.TryGetValue(updated.RoomId, out var room);
+                if (room == null)
+                {
+                    return null;
+                }
+                return ActiveRooms.TryUpdate(room.RoomId,
+                    updated,
+                    ActiveRooms.FirstOrDefault(x => x.Key == room.RoomId).Value) ? room : null;
+            });
+            return await thread;
+        } 
+        //update client status
+        
         private async void CheckRoomDate(object state)
         {
             var threads = Task.Factory.StartNew(() =>
