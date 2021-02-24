@@ -38,8 +38,9 @@ namespace Server.GameLogic.LogicServices.Impl
             thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
 
             if (thisRound.PlayerMoves.Values.All(x => x != RequiredGameMove.Default))
-
-                throw new NotImplementedException();
+            {
+                var winner = RockPaperScissors.MoveComparator(thisRound.PlayerMoves);
+            }
         }
     }
 
