@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Server.Contracts;
 
 namespace Server.GameLogic.Models
 {
@@ -13,9 +14,9 @@ namespace Server.GameLogic.Models
             [JsonProperty("RoomId")]
             string RoomId { get; set; }
             [JsonProperty("Players")]
-            ConcurrentDictionary<Tuple<string, string>, bool> Players { get; set; }
-            [JsonProperty("CurrentRound")]
-            Round CurrentRound { get; set; }
+            ConcurrentDictionary<AccountDto, bool> Players { get; set; }
+            [JsonProperty("CurrentRoundId")]
+            string CurrentRoundId { get; set; }
             [JsonProperty("CreationTime")]
             DateTime CreationTime { get; set; }
             [JsonProperty("roundList")]
