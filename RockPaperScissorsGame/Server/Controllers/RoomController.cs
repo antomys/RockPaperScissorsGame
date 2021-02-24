@@ -14,6 +14,7 @@ namespace Server.Controllers
 {
     [ApiController]
     [Route("/room")]
+    //[Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     public class RoomController : ControllerBase
     {
@@ -52,7 +53,7 @@ namespace Server.Controllers
             }
 
         }
-     /*   [HttpGet]
+        /*[HttpPut]
         [Route("update/{session}Id{&isReady}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]

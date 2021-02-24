@@ -12,9 +12,9 @@ namespace Client.Services.RequestProcessor.Impl
     {
         public RequestPerformer()
         {
-            requestHandler = new RequestHandler();
+            RequestHandler = new RequestHandler();
         }
-        public IRequestHandler requestHandler;
+        public readonly IRequestHandler RequestHandler;
         public async Task<IResponse> PerformRequestAsync(IRequestOptions requestOptions)
         {
             IResponse response = null;
@@ -22,7 +22,7 @@ namespace Client.Services.RequestProcessor.Impl
             if (!requestOptions.IsValid) throw new ArgumentOutOfRangeException(nameof(requestOptions));
                 try
                 {
-                    response = await requestHandler.HandleRequestAsync(requestOptions);
+                    response = await RequestHandler.HandleRequestAsync(requestOptions);
                 }
                 catch (TimeoutException ex)
                 {

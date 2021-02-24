@@ -16,7 +16,7 @@ namespace Client.Services.RequestProcessor.Impl
         public async Task<IResponse> HandleRequestAsync(IRequestOptions requestOptions)
         {
             var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => { return true; };
+            handler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;
             _client = new HttpClient(handler);
             if (requestOptions == null) throw new ArgumentNullException(nameof(requestOptions));
             if (!requestOptions.IsValid) throw new ArgumentOutOfRangeException(nameof(requestOptions));
@@ -30,7 +30,7 @@ namespace Client.Services.RequestProcessor.Impl
                     msg.Content = new StringContent(requestOptions.Body, Encoding.UTF8, requestOptions.ContentType);
                     using var responseForPushingData = await _client.SendAsync(msg);
                     var bodyForPushing = await responseForPushingData.Content.ReadAsStringAsync();
-                    return new Response(true, (int)responseForPushingData.StatusCode, "Pushed:\n" + bodyForPushing);
+                    return new Response(true, (int)responseForPushingData.StatusCode, bodyForPushing);
                 }
                 using var response = await _client.SendAsync(msg);
                 var body = await response.Content.ReadAsStringAsync();
@@ -43,20 +43,14 @@ namespace Client.Services.RequestProcessor.Impl
         }
         private static HttpMethod MapMethod(RequestMethod method)
         {
-            switch (method)
+            return method switch
             {
-
-                case RequestMethod.Get:
-                    return HttpMethod.Get;
-                case RequestMethod.Post:
-                    return HttpMethod.Post;
-                case RequestMethod.Put:
-                    return HttpMethod.Put;
-                case RequestMethod.Patch:
-                    return HttpMethod.Patch;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(method), method, "Invalid request method");
-            }
+                RequestMethod.Get => HttpMethod.Get,
+                RequestMethod.Post => HttpMethod.Post,
+                RequestMethod.Put => HttpMethod.Put,
+                RequestMethod.Patch => HttpMethod.Patch,
+                _ => throw new ArgumentOutOfRangeException(nameof(method), method, "Invalid request method")
+            };
         }
     }
 }

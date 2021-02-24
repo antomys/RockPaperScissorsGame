@@ -35,8 +35,8 @@ namespace Server.Services
         public async Task<ICollection<T>> GetAllAsync()
         {
             var result = Task.Run(GetAll);
-
-            //await Task.WhenAll(result);
+            
+            
             return await result;
         }
         
@@ -78,14 +78,12 @@ namespace Server.Services
                 return (int)HttpStatusCode.OK;
             } 
             
-            //var guid = GetGuidFromT(item);
-
-           if (CheckIfExists(item))
-               throw new AlreadyExistsException(item.GetType().ToString());
+            if (CheckIfExists(item))
+                throw new AlreadyExistsException(item.GetType().ToString());
            
-           if (!_deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item)) throw new UnknownReasonException(item.GetType().ToString());
-           _deserializedObject.UpdateData();
-           return (int)HttpStatusCode.OK;
+            if (!_deserializedObject.ConcurrentDictionary.TryAdd(guid.ToString(), item)) throw new UnknownReasonException(item.GetType().ToString());
+            _deserializedObject.UpdateData();
+            return (int)HttpStatusCode.OK;
         }
 
         /// <summary>

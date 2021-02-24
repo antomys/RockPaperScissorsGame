@@ -35,29 +35,12 @@ namespace Server.Services
         
         private Task<bool> IsNeededFilesAvailable()
         { 
-            return Task.Run(()=>{   
-                try
-                {
-                    return File.Exists(_fileName);
-                }
-                finally
-                {
-                }
-            });
+            return Task.Run(()=> File.Exists(_fileName));
         }
         
         
         private async Task<ConcurrentDictionary<string, T>> Deserialize()
         {
-            /*if (typeof(T).Name.Contains("Account")) //dumb check for type 'HARDCODE' //typeof(T) == typeof(Account)
-            {
-                _fileName = "Accounts.bin";
-            }
-
-            if (typeof(T).Name.Contains("Statistics"))  //typeof(T) == typeof(Statistics) |
-            {
-                _fileName = "Statistics.bin";
-            }*/
             _fileName = typeof(T).Name.Contains("Statistics") ? "Statistics" : typeof(T).Name;
 
             var exists = IsNeededFilesAvailable().Result;
@@ -89,7 +72,7 @@ namespace Server.Services
 
             reader = File.Open(_fileName, FileMode.OpenOrCreate);
             reader.Close();
-            return new ConcurrentDictionary<string, T>();;
+            return new ConcurrentDictionary<string, T>();
             
         }
 

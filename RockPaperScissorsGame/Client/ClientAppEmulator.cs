@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -200,22 +201,24 @@ namespace Client
             }
             var options = new RequestOptions
             {
-                Body = _sessionId,
                 Address = BaseAddress + $"room/create/{_sessionId}&{isPrivate}",
                 IsValid = true,
+                Body = _sessionId,
                 Method = Services.RequestModels.RequestMethod.Post,
-                Name = "Registration"
+                Name = "Creating Room"
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            if (reachedResponse.Code == 200)
+
+             var room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content); //todo: remove
+            if (reachedResponse.Code == (int) HttpStatusCode.OK)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);               
-                return 1;
+                return 0;
             }
             else
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
-              //  await Logout();
+                //await Logout();
                 return -1;
             }
 
@@ -247,16 +250,14 @@ namespace Client
                 Name = "Registration"
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            if (reachedResponse.Code == 201)
+            if (reachedResponse.Code == (int) HttpStatusCode.OK)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
                 return 1;
             }
-            else
-            {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
-                return -1;
-            }
+
+            ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
+            return -1;
         }
 
         private async Task<int> LogIn() //For now Int. Dunno what to make
@@ -313,17 +314,5 @@ namespace Client
     }
 }
 
-       /* private async Task<IEnumerable<Statistics>> OverallStatistics()
-        {
-            var response = await Client.GetAsync($"overallStatistics");//TODO: Cancellation token
-            if (!response.IsSuccessStatusCode)
-                throw new Exception();
-            
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            var deserialized = JsonConvert.DeserializeObject<List<Statistics>>(responseBody);
-
-            return deserialized;
-            
-        }*/
+        
 
