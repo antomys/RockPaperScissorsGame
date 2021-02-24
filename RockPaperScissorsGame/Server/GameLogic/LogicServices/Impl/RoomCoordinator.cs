@@ -15,8 +15,6 @@ namespace Server.GameLogic.LogicServices.Impl
     {
         private readonly IAccountManager _accountManager;
 
-        private IRoundCoordinator _roundCoordinator;
-        
         private static readonly Random Random = new();
         
         private Timer _timer;
@@ -26,12 +24,10 @@ namespace Server.GameLogic.LogicServices.Impl
         public ConcurrentDictionary<string, Room> ActiveRooms { get; }
         
         public RoomCoordinator(
-            IAccountManager accountManager, 
-            IRoundCoordinator roundCoordinator)
+            IAccountManager accountManager)
         {
             _accountManager = accountManager;
             ActiveRooms = new ConcurrentDictionary<string, Room>();
-            _roundCoordinator = roundCoordinator;
             tm = CheckRoomDate;
         }
        
