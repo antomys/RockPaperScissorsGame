@@ -220,7 +220,6 @@ namespace Client
             }
             var options = new RequestOptions
             {
-                ContentType = "application/json",
                 Address = BaseAddress + $"room/create/{_sessionId}&{isPrivate}",
                 IsValid = true,
                 Method = Services.RequestModels.RequestMethod.Post,

@@ -27,14 +27,12 @@ namespace Server.GameLogic.LogicServices.Impl
             {
                 var account = GetAccountById(sessionId);
 
-                if (ActiveRooms.Any(x => x.Value.Players.Any(p => p.Key.Item2.Equals(account.Login))))
+                if (ActiveRooms.Any(x => x.Value.Players.Any(p => p.Key.Item1.Equals(account.Login))))
                     throw new TwinkGameRoomCreationException();
-
                 var newRoom = new Room
                 {
                     RoomId = RandomString(),
-                    Players = new ConcurrentDictionary<Tuple<string, string>, bool>(),  //Where Item1 = SessionId and Item2 = Login
-                    CurrentRound = null,
+                    Players = new ConcurrentDictionary<string, bool>(),
                     IsPrivate = isPrivate,
                     IsReady = false,
                     IsRoundEnded = false,
@@ -42,7 +40,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     CreationTime = DateTime.Now
                 };
 
-                if (newRoom.Players.TryAdd(new Tuple<string, string>(sessionId, account.Login), false) &&
+                if (newRoom.Players.TryAdd(sessionId, false) &&
                    newRoom.IsPrivate)
                 {
                     ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
@@ -71,7 +69,7 @@ namespace Server.GameLogic.LogicServices.Impl
             {
                 foreach (var room in ActiveRooms)
                 {
-                    if (room.Value.CreationTime.AddMinutes(5) < DateTime.Now && room.Value.CurrentRound == null)
+                    if (room.Value.CreationTime.AddMinutes(5) < DateTime.Now && room.Value.CurrentRoundId == null)
                         ActiveRooms.TryRemove(room);
                 }
             });

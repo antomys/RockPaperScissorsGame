@@ -11,7 +11,7 @@ namespace Server.GameLogic.Models.Impl
     public class Room : IRoom
     {
         public string RoomId { get; set; }
-        public ConcurrentDictionary<AccountDto, bool> Players { get; set; } //Where string - sessionId or login of player, bool - is he ready to play//Temporary made tuple to store sessionId and login.
+        public ConcurrentDictionary<string, bool> Players { get; set; } //Where string - sessionId or login of player, bool - is he ready to play//Temporary made tuple to store sessionId and login.
         
         public string CurrentRoundId { get; set; }
         public bool IsPrivate { get; set; }

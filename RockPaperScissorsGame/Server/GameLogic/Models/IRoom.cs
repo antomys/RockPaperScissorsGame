@@ -14,7 +14,7 @@ namespace Server.GameLogic.Models
             [JsonProperty("RoomId")]
             string RoomId { get; set; }
             [JsonProperty("Players")]
-            ConcurrentDictionary<AccountDto, bool> Players { get; set; }
+            ConcurrentDictionary<string, bool> Players { get; set; }
             [JsonProperty("CurrentRoundId")]
             string CurrentRoundId { get; set; }
             [JsonProperty("CreationTime")]
