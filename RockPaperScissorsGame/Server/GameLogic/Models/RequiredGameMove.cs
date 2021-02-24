@@ -1,6 +1,6 @@
 ﻿namespace Server.GameLogic.Models
 {
-    public enum MoveEnum
+    public enum RequiredGameMove
     {
         Rock = 1,
         Paper = 2,
