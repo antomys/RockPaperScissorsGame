@@ -27,8 +27,6 @@ namespace Server.Controllers
         private readonly ILogger<UserController> _logger;
 
         private readonly IAccountManager _accountManager;
-
-
         public UserController(
             IStorage<Account> users,
             IStorage<Statistics> statisticsStorage,
@@ -40,8 +38,7 @@ namespace Server.Controllers
             _statisticsStorage = statisticsStorage;
             _accountManager = accountManager;
             _logger = logger;
-        }
-        
+        }       
         /// <summary>
         /// Method to log in an account
         /// </summary>

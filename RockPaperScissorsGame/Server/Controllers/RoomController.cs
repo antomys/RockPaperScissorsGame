@@ -14,7 +14,6 @@ namespace Server.Controllers
 {
     [ApiController]
     [Route("/room")]
-    [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     public class RoomController : ControllerBase
     {
@@ -34,16 +33,16 @@ namespace Server.Controllers
 
         [HttpPost]
         [Route("create/{sessionId}&{isPrivate}")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<string>> CreateRoom(string sessionId, bool isPrivate)
+        public async Task<ActionResult<Room>> CreateRoom(string sessionId, bool isPrivate)
         {
             try
             {
                 var resultRoom = await _roomManager.CreateRoom(sessionId, isPrivate);
                 if (resultRoom != null)
                 {
-                    return JsonConvert.SerializeObject(resultRoom);
+                    return resultRoom;
                 }
                 return BadRequest();
             }
@@ -53,7 +52,7 @@ namespace Server.Controllers
             }
 
         }
-        /*[HttpPut]
+     /*   [HttpGet]
         [Route("update/{session}Id{&isReady}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]

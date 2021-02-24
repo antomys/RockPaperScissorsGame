@@ -200,13 +200,14 @@ namespace Client
             }
             var options = new RequestOptions
             {
+                Body = _sessionId,
                 Address = BaseAddress + $"room/create/{_sessionId}&{isPrivate}",
                 IsValid = true,
                 Method = Services.RequestModels.RequestMethod.Post,
                 Name = "Registration"
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            if (reachedResponse.Code == 201)
+            if (reachedResponse.Code == 200)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);               
                 return 1;
@@ -214,7 +215,7 @@ namespace Client
             else
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
-                await Logout();
+              //  await Logout();
                 return -1;
             }
 
