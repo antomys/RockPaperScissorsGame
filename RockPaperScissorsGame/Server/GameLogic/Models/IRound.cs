@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Server.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,17 +12,15 @@ namespace Server.GameLogic.Models
     {
         [JsonProperty("RoundId")]
         string RoundId { get; init; }  //Not to store identical rounds
-        [JsonProperty("SessionIdNextMove")]
-        public string SessionIdNextMove { get; set; }   //Idea to store SessionId of user, that has to make move.
-        [JsonProperty("NextMove")]
-        public int NextMove { get; set; }   //enum
+        [JsonProperty("Moves")]
+        public ConcurrentDictionary<string, int>  Moves { get; set; }
         [JsonProperty("IsFinished")]
         bool IsFinished { get; set; }  //Probably not needed.
-        [JsonProperty("TimeFinisher")]
+        [JsonProperty("TimeFinished")]
         DateTime TimeFinished { get; set; }
-        [JsonProperty("Winner")]
-        Account Winner { get; set; }
-        [JsonProperty("Loser")]
-        Account Loser { get; set; }
+        [JsonProperty("WinnerId")]
+        string WinnerId { get; set; }
+        [JsonProperty("LoserId")]
+        string LoserId { get; set; }
     }
 }

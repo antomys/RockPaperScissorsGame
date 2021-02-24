@@ -10,19 +10,16 @@ namespace Server.GameLogic.Models.Impl
 {
     public class Round : IRound
     {
-        [JsonProperty("roundId")]
         public string RoundId { get; init; }
-        [JsonProperty("isFinished")]
+        
         public bool IsFinished { get; set; }
-        [JsonProperty("sessionIdNextMove")]
-        public string SessionIdNextMove { get; set; } 
-        [JsonProperty("nextMove")]
-        public int NextMove { get; set; }   
-        [JsonProperty("timeFineshed")]
+        
+        public ConcurrentDictionary<string, int>  Moves { get; set; }
+        
         public DateTime TimeFinished { get; set; }
-        [JsonProperty("winner")]
-        public Account Winner { get; set; }
-        [JsonProperty("loser")]
-        public Account Loser { get; set; }
+        
+        public string WinnerId { get; set; }
+        
+        public string LoserId { get; set; }
     }
 }
