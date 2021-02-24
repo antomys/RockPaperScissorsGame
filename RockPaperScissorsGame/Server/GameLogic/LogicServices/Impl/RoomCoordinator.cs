@@ -41,7 +41,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     CreationTime = DateTime.Now
                 };
 
-                if (newRoom.Players.TryAdd(sessionId, false) &&
+                if (newRoom.Players.TryAdd(account.Id, false) &&
                    newRoom.IsPrivate)
                 {
                     ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
@@ -72,7 +72,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     CreationTime = DateTime.Now
                 };
 
-                newRoom.Players.TryAdd(sessionId, false);
+                newRoom.Players.TryAdd(account.Id, false);
                 newRoom.Players.TryAdd("Bot", true);
                 newRoom.IsFull = true;
                 ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
