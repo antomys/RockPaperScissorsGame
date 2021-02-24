@@ -1,7 +1,11 @@
-﻿namespace Server.GameLogic.LogicServices
+﻿using System.Threading.Tasks;
+using Server.GameLogic.Models.Impl;
+
+namespace Server.GameLogic.LogicServices
 {
-    public class IRoundCoordinator
+    public interface IRoundCoordinator
     {
+        Task<Round> MakeMove(string sessionId, int move);
         
     }
 }

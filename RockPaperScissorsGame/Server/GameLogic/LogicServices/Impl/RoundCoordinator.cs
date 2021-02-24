@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Server.GameLogic.Models.Impl;
 using Server.Services.Interfaces;
 
@@ -23,6 +20,11 @@ namespace Server.GameLogic.LogicServices.Impl
             _deserializedRounds = deserializedRounds;
             _roomCoordinator = roomCoordinator;
             _storageRounds = storageRounds;
+        }
+
+        public Task<Round> MakeMove(string sessionId, int move)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
