@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using Server.GameLogic.Models.Impl;
 using Server.Services.Interfaces;
 
@@ -11,6 +12,10 @@ namespace Server.GameLogic.LogicServices.Impl
         private readonly IDeserializedObject<Round> _deserializedRounds;
 
         private readonly IStorage<Round> _storageRounds;
+        
+        public ConcurrentDictionary<string, Round> ActiveRound { get; set; }
+        
+        
 
         public RoundCoordinator(
             IRoomCoordinator roomCoordinator,
@@ -22,9 +27,13 @@ namespace Server.GameLogic.LogicServices.Impl
             _storageRounds = storageRounds;
         }
 
-        public Task<Round> MakeMove(string sessionId, int move)
+        public Task<Round> MakeMove(string roomId, string accountId, int move)
         {
-            throw new System.NotImplementedException();
+            ActiveRound.TryGetValue(roomId, out var thisRound);
+            
+            
         }
+
+
     }
 }
