@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -202,14 +203,15 @@ namespace Client
             {
                 Address = BaseAddress + $"room/create/{_sessionId}&{isPrivate}",
                 IsValid = true,
+                Body = _sessionId,
                 Method = Services.RequestModels.RequestMethod.Post,
-                Name = "Registration"
+                Name = "Creating Room"
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            if (reachedResponse.Code == 201)
+            if (reachedResponse.Code == (int) HttpStatusCode.OK)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);               
-                return 1;
+                return 0;
             }
             else
             {

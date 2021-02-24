@@ -21,9 +21,7 @@ namespace Server.GameLogic.LogicServices.Impl
         }
 
         public ConcurrentDictionary<string, Round> ActiveRound { get; set; }
-
-
-
+        
         public RoundCoordinator(
             IRoomCoordinator roomCoordinator,
             IDeserializedObject<Round> deserializedRounds,

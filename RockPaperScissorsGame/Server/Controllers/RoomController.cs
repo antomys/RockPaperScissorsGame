@@ -14,7 +14,7 @@ namespace Server.Controllers
 {
     [ApiController]
     [Route("/room")]
-    [Consumes(MediaTypeNames.Application.Json)]
+    //[Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     public class RoomController : ControllerBase
     {
@@ -34,7 +34,7 @@ namespace Server.Controllers
 
         [HttpPost]
         [Route("create/{sessionId}&{isPrivate}")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<string>> CreateRoom(string sessionId, bool isPrivate)
         {
