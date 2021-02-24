@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
-using Server.GameLogic.Models;
 using Server.GameLogic.Models.Impl;
 using Server.Services.Interfaces;
 
@@ -22,8 +21,8 @@ namespace Server.GameLogic.LogicServices.Impl
         }
 
         public ConcurrentDictionary<string, Round> ActiveRound { get; set; }
-        
-        
+
+
 
         public RoundCoordinator(
             IRoomCoordinator roomCoordinator,
@@ -35,18 +34,16 @@ namespace Server.GameLogic.LogicServices.Impl
             _storageRounds = storageRounds;
         }
 
-        public Task<Round> MakeMove(string roomId, string accountId, int move)
+        public void MakeMove(string roomId, string accountId, int move)
         {
             ActiveRound.TryGetValue(roomId, out var thisRound);
 
             thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
-            
-            if(thisRound.PlayerMoves.Values.Any(x => x != 0))
-                
-                
 
+            if (thisRound.PlayerMoves.Values.Any(x => x != 0))
+
+                throw new NotImplementedException();
         }
-
-
     }
+
 }
