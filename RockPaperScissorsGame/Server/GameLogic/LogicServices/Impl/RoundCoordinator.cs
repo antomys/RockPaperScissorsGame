@@ -20,7 +20,7 @@ namespace Server.GameLogic.LogicServices.Impl
             throw new System.NotImplementedException();
         }
 
-        public ConcurrentDictionary<string, Round> ActiveRound { get; set; }
+        public ConcurrentDictionary<string, Round> ActiveRounds { get; set; }
         
         public RoundCoordinator(
             IDeserializedObject<Round> deserializedRounds,
@@ -30,10 +30,20 @@ namespace Server.GameLogic.LogicServices.Impl
             //_roomCoordinator = roomCoordinator;
             _storageRounds = storageRounds;
         }
+        public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string id)
+        {
+            var tasks = Task.Factory.StartNew(() =>
+            {
+                if (ActiveRounds.TryGetValue(id, out var thisRound))
+                    return thisRound;
+                return null; //ToDo: exception
+            });
+            return await tasks;
+        }
 
         public void MakeMove(string roomId, string accountId, int move)
         {
-            ActiveRound.TryGetValue(roomId, out var thisRound);
+            ActiveRounds.TryGetValue(roomId, out var thisRound);
 
             thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
 
