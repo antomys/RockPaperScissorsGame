@@ -10,17 +10,16 @@ namespace Client.Models
 {
     public class Room 
     {
-        [JsonProperty("roomId")]
+        [JsonProperty("RoomId")]
         public string RoomId { get; set; }
-        [JsonProperty("playersInLobby")]
-        public ConcurrentDictionary<Tuple<string, string>, bool> Players { get; set; } //Where string - sessionId or login of player, bool - is he ready to play
-        [JsonProperty("isPrivate")]
-        public bool IsPrivate { get; set; }
-        [JsonProperty("isReady")]
-        public bool IsReady { get; set; }  //To start game
-        [JsonProperty("isFull")]
-        public bool IsFull { get; set; }
-        [JsonProperty("creationTime")]
-        public DateTime CreationTime { get; set; }  //this to check 5 minutes and then delete room
+        
+        [JsonProperty("Players")]
+        public ConcurrentDictionary<string, bool> Players { get; set; }
+        
+        [JsonProperty("CurrentRoundId")]
+        public string CurrentRoundId { get; set; }
+        
+        [JsonProperty("CreationTime")]
+        public DateTime CreationTime { get; set; }
     }
 }

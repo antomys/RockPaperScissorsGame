@@ -10,7 +10,7 @@ namespace Server.GameLogic
         {
             //playerMoves.Values.All(x=> 0)
             
-            playerMoves.TryUpdate(accountId,move,)
+            Required
         }
     }
 }
