@@ -10,8 +10,6 @@ namespace Server.GameLogic.LogicServices.Impl
 {
     public class RoundCoordinator : IRoundCoordinator
     {
-        private readonly IRoomCoordinator _roomCoordinator;
-        
 
         private readonly IDeserializedObject<Round> _deserializedRounds;
 
@@ -25,12 +23,11 @@ namespace Server.GameLogic.LogicServices.Impl
         public ConcurrentDictionary<string, Round> ActiveRound { get; set; }
         
         public RoundCoordinator(
-            IRoomCoordinator roomCoordinator,
             IDeserializedObject<Round> deserializedRounds,
             IStorage<Round> storageRounds)
         {
             _deserializedRounds = deserializedRounds;
-            _roomCoordinator = roomCoordinator;
+            //_roomCoordinator = roomCoordinator;
             _storageRounds = storageRounds;
         }
 
