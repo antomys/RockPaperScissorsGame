@@ -24,12 +24,13 @@ namespace Client
             var room = new Room();
             var round = new Round(); 
             var statistics = new Statistics();
-
+            
             IRoomMenu roomMenu = new RoomMenu(_sessionId,BaseAddress,room,performer);
             IStatisticsMenu statisticsMenu = new StatisticsMenu(BaseAddress,performer);
             ILoginMenu loginMenu = new LoginMenu(_sessionId,BaseAddress,performer);
             IRegisterMenu registerMenu = new RegisterMenu(_sessionId,BaseAddress,playerAccount,performer);
             IMainMenu mainMenu = new MainMenu(playerAccount,roomMenu,loginMenu);
+            IRoundMenu roundMenu = new RoundMenu(room,playerAccount);
             _startMenu = new StartMenu(loginMenu,mainMenu,statisticsMenu,registerMenu,playerAccount);
         }
         

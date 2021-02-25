@@ -18,7 +18,6 @@ namespace Client.Menus
         private readonly string _baseAddress;
         private IRoom _room;
         private readonly IRequestPerformer _performer;
-        private readonly ILoginMenu _loginMenu;
 
         public RoomMenu(
             string sessionId,
@@ -82,7 +81,7 @@ namespace Client.Menus
             if (!string.IsNullOrEmpty(reachedResponse.Content) && reachedResponse.Code == (int) HttpStatusCode.OK)
             {
                 _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
-                Console.WriteLine("Found room! Entering room lobby");
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("Room Founded! Redirecting to room menu...",ConsoleColor.Green);
                 await ChangePlayerStatus();
                 await StartRoomMenu();
             }
@@ -127,8 +126,8 @@ namespace Client.Menus
             {
                 _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
                 ColorTextWriterService.PrintMessageWithSpecialColor($"Room created. Room id: ", ConsoleColor.Green);
-                ColorTextWriterService.PrintMessageWithSpecialColor($"{_room.RoomId} ; ",ConsoleColor.Red);
-                ColorTextWriterService.PrintMessageWithSpecialColor($"Is room private : {isPrivate}",ConsoleColor.Green);
+                ColorTextWriterService.PrintMessageWithSpecialColor($" {_room.RoomId} ; ",ConsoleColor.Red);
+                ColorTextWriterService.PrintMessageWithSpecialColor($" Is room private : {isPrivate}",ConsoleColor.Green);
                 
                 if (_room == null) return;
                 
@@ -203,6 +202,7 @@ namespace Client.Menus
             { //todo: add redirection;
                 Console.WriteLine("Opponent has joined and is ready.");
                 Console.WriteLine("Redirecting to round game:");
+                await _roun
             }
         }
 
