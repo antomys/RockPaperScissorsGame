@@ -184,18 +184,20 @@ namespace Server.GameLogic.LogicServices.Impl
                 var room = ActiveRooms.Values
                     .FirstOrDefault(x => x.Players.Keys
                         .Any(p => p
-                            .Equals(account.Id))); //Here you was equaling to sessionId
+                            .Equals(account.Id)));
 
                 var thisRoom = GetRoomByRoomId(room?.RoomId);
 
                 if (thisRoom == null)
                     return null; //To fix
-                //var newRoom = thisRoom;
+                
+                
                 var (key, oldValue) =
-                    thisRoom.Players.FirstOrDefault(x => x.Key == account.Id); //Here you were equaling to Login
+                    thisRoom.Players.FirstOrDefault(x => x.Key == account.Id);
 
+                
                 thisRoom.Players.TryUpdate(key, isReady, oldValue);
-
+                
                 var result = UpdateRoom(thisRoom).Result;
                 
                 return result;
@@ -224,7 +226,11 @@ namespace Server.GameLogic.LogicServices.Impl
                         {
                             if(key.Equals("Bot"))
                                 room.Players.TryUpdate(key, true, value);
-                            room.Players.TryUpdate(key, false, value);
+                            else
+                            {
+                                room.Players.TryUpdate(key, false, value); 
+                            }
+                            
                         }
 
                         _roundCoordinator.ActiveRounds.TryRemove(thisRound);

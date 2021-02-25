@@ -199,12 +199,10 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 if (updated.IsFinished)
                 {
-                    if (updated.PlayerMoves.Any(x => x.Key != "Bot" && !updated.IsDraw))
-                    {
-                        await _storageRounds.AddAsync(updated);
-                        await FillStatistics(updated);
-                    }
-                        
+                    if (!updated.PlayerMoves.All(x => x.Key != "Bot") || updated.IsDraw) return updated;
+                    await _storageRounds.AddAsync(updated);
+                    await FillStatistics(updated);
+
 
                     //ActiveRounds.TryRemove(roomId[0].Key, out _);
 
