@@ -32,10 +32,7 @@ namespace Server.Services
             _deserializedObject = deserializedObject;
             AccountsActive = new ConcurrentDictionary<string, Account>();
         }
-
-
         
-
         public async Task<Account> LogInAsync(AccountDto accountDto)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -97,6 +94,13 @@ namespace Server.Services
             var tasks = Task.Factory.StartNew(() => AccountsActive.ContainsKey(sessionId));
 
             return await tasks;
+        }
+
+        public Account GetActiveAccountBySessionId(string sessionId)
+        {
+            AccountsActive.TryGetValue(sessionId, out var account);
+
+            return account;
         }
 
 

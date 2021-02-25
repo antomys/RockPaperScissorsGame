@@ -6,7 +6,7 @@ namespace Server.GameLogic.LogicServices
 {
     public interface IRoundCoordinator
     {
-        Task<Round> MakeMove(string sessionId, int move);
+        Task<Round> MakeMove(string roomId, string accountId, int move);
         ConcurrentDictionary<string, Round> ActiveRounds { get; set; }
         Task<Round> GetCurrentActiveRoundForSpecialRoom(string roundId);
     }
