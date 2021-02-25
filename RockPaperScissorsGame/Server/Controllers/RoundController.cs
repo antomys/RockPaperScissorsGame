@@ -32,10 +32,10 @@ namespace Server.Controllers
         {
             try
             {
-                var resultRoom = await _roundManager.GetCurrentActiveRoundForSpecialRoom(roomId);
-                if (resultRoom != null)
+                var resultedRound = await _roundManager.GetCurrentActiveRoundForSpecialRoom(roomId);
+                if (resultedRound != null)
                 {
-                    return resultRoom;
+                    return resultedRound;
                 }
                 return BadRequest();
             }
@@ -45,6 +45,28 @@ namespace Server.Controllers
             }
 
         }
+        [HttpPatch]
+        [Route("move/{roomId}&{sessionId}&{move}")]
+        [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Round>> PlaceYourMoveToActiveRound(string roomId, string sessionId, int move)
+        {
+            try
+            {
+                var resultedRound = await _roundManager.MakeMove(roomId,sessionId,move);
+                if (resultedRound != null)
+                {
+                    return resultedRound;
+                }
+                return BadRequest();
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
+
+        }
+
         private readonly IRoundCoordinator _roundManager;
         private readonly ILogger<RoundController> _logger;
     }
