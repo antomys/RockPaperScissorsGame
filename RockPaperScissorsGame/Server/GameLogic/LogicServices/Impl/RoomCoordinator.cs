@@ -64,9 +64,19 @@ namespace Server.GameLogic.LogicServices.Impl
             return await tasks;
         }
 
-        public Task<Room> JoinPublicRoom(string sessionId)
+        public async Task<Room> JoinPublicRoom(string sessionId)
         {
-            throw new NotImplementedException();
+            var tasks = Task.Factory.StartNew(() =>
+            {
+                var thisRoom = ActiveRooms.FirstOrDefault(x => x.Value.IsPrivate == false).Value;
+
+                var thisAccount = GetAccountBySessionId(sessionId);
+                
+                thisRoom.Players.TryAdd(thisAccount.Id, false);
+                
+                return UpdateRoom(thisRoom).Result;
+            });
+            return await tasks;
         }
 
         public async Task<Room> CreateTrainingRoom(string sessionId)
@@ -207,6 +217,8 @@ namespace Server.GameLogic.LogicServices.Impl
                     }
 
                     room.IsReady = true;
+
+                    room.IsFull = true;
 
                     room.CurrentRoundId = round.Id;
 

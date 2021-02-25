@@ -169,7 +169,7 @@ namespace Client
                         await JoinPrivateRoom();
                         break;
                     case 4:
-                        //todo: JoinPublicRoom();
+                        await JoinPublicRoom();
                         return;
                     case 5:
                         await Logout();
@@ -179,6 +179,30 @@ namespace Client
                         continue;
                 }
             }
+        }
+
+        private async Task JoinPublicRoom()
+        {
+            Console.WriteLine("Trying to connect to random public room");
+            
+            var options = new RequestOptions
+            {
+                Address = BaseAddress + $"room/join/{_sessionId}",
+                IsValid = true,
+                Body = _sessionId,
+                Method = Services.RequestModels.RequestMethod.Get,
+                Name = "Creating Room"
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+
+            if (reachedResponse.Content != null)
+            {
+                _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
+                Console.WriteLine("Found room! Entering room lobby");
+                await ChangePlayerStatus();
+                await RoomMenu();
+            }
+            
         }
 
         private async Task JoinPrivateRoom()

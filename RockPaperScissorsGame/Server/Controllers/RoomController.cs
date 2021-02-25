@@ -74,6 +74,28 @@ namespace Server.Controllers
             {
                 return BadRequest(exception.Message);
             }
+        }
+        
+        [HttpGet]
+        [Route("join/{sessionId}")]
+        [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Room>> JoinPublicRoom(string sessionId)
+        {
+            try
+            {
+                var resultRoom = await _roomManager.JoinPublicRoom(sessionId);
+                
+                if (resultRoom != null)
+                {
+                    return resultRoom;
+                }
+                return BadRequest();
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
 
         }
         
