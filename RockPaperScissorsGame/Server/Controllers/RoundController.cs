@@ -28,11 +28,11 @@ namespace Server.Controllers
         [Route("get/{roundId}")]
         [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Round>> GetActualActiveRoundForCurrentRoom(string id)
+        public async Task<ActionResult<Round>> GetActualActiveRoundForCurrentRoom(string roundId)
         {
             try
             {
-                var resultRoom = await _roundManager.GetCurrentActiveRoundForSpecialRoom(id);
+                var resultRoom = await _roundManager.GetCurrentActiveRoundForSpecialRoom(roundId);
                 if (resultRoom != null)
                 {
                     return resultRoom;

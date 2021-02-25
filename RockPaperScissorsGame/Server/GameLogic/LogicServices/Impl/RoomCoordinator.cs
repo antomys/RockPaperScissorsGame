@@ -63,7 +63,12 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await tasks;
         }
-        
+
+        public Task<Room> JoinPublicRoom(string sessionId)
+        {
+            return ActiveRooms.FirstOrDefault(x=> x.Value.)
+        }
+
         public async Task<Room> CreateTrainingRoom(string sessionId)
         {
             var tasks = Task.Factory.StartNew(() =>

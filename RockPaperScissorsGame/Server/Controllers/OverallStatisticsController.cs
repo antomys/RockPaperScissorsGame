@@ -37,8 +37,10 @@ namespace Server.Controllers
                 var deserialized = _deserializedStatistics.ConcurrentDictionary.Values;
 
                 var resultList = deserialized.Where(x => x.Score > 10).AsParallel().ToArray();
+                
                 if (resultList.Length < 1)
                     return NotFound();
+                
                 return Ok(resultList);
             }
             catch (Exception exceptions) //todo: custom exception

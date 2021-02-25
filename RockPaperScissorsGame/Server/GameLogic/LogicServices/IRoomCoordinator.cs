@@ -10,6 +10,8 @@ namespace Server.GameLogic.LogicServices
         Task<Room> CreateRoom(string sessionId, bool isPrivate);
 
         Task<Room> JoinPrivateRoom(string sessionId, string roomId);
+
+        Task<Room> JoinPublicRoom(string sessionId);
         Task<Room> CreateTrainingRoom(string sessionId);
         Task<Room> UpdateRoom(Room updated); //maybe to delete in future
         Task<Room> UpdateRoom(string roomId);
