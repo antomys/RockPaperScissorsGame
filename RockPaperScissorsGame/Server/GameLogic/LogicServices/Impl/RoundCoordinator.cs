@@ -41,6 +41,39 @@ namespace Server.GameLogic.LogicServices.Impl
                 if (thisRound == null)
                     return null; //todo: exception;
 
+                //************************************************************************************************************************************
+                var elapsedTime = DateTime.Now.Subtract(thisRound.TimeFinished);
+                if (elapsedTime.Seconds>= 20 &&
+                    thisRound.PlayerMoves.Any(x => x.Value.Equals(RequiredGameMove.Default)))
+                {
+                    var dictionary = thisRound.PlayerMoves;
+                    var first = dictionary.Keys.First();
+                    var last = dictionary.Keys.First();
+
+                    if (dictionary[first] == dictionary[last])
+                        thisRound.IsDraw = true;
+                    else if (dictionary[first] == RequiredGameMove.Default)
+                    {
+                        thisRound.LoserId = first;
+                        thisRound.WinnerId = last;
+                    }
+                    else
+                    {
+                        thisRound.LoserId = last;
+                        thisRound.WinnerId = first;
+                    }
+                    thisRound.TimeFinished = DateTime.Now;
+                    thisRound.IsFinished = true;
+                    
+                    await UpdateRound(thisRound);
+                    return thisRound;
+                }
+
+                thisRound.TimeFinished = DateTime.Now;
+
+                //************************************************************************************************************************
+                
+                
                 if (thisRound.PlayerMoves.Any(x => x.Key.Equals("Bot")))
                     thisRound.PlayerMoves = RockPaperScissors.ChangeBotState(thisRound.PlayerMoves);
                 thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
@@ -141,6 +174,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     ActiveRounds.Where(x => x.Value
                         .Equals(updated)).Select(x => x.Key).ToString();
                 
+                
                 if (updated.IsFinished && !updated.IsDraw)
                 {
                     if(!updated.PlayerMoves.Any(x=> x.Key.Equals("Bot")))
@@ -168,8 +202,37 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 if (updated == null)
                     return null; //todo: add exception;
+                
+                //***************************************************************
+                var elapsedTime = DateTime.Now.Subtract(updated.TimeFinished);
+                if (elapsedTime.Seconds>= 20 &&
+                    updated.PlayerMoves.Any(x => x.Value.Equals(RequiredGameMove.Default)))
+                {
+                    var dictionary = updated.PlayerMoves;
+                    var first = dictionary.Keys.First();
+                    var last = dictionary.Keys.First();
 
-                if (updated.IsFinished)
+                    if (dictionary[first] == dictionary[last])
+                        updated.IsDraw = true;
+                    else if (dictionary[first] == RequiredGameMove.Default)
+                    {
+                        updated.LoserId = first;
+                        updated.WinnerId = last;
+                    }
+                    else
+                    {
+                        updated.LoserId = last;
+                        updated.WinnerId = first;
+                    }
+                    updated.TimeFinished = DateTime.Now;
+                    updated.IsFinished = true;
+                    
+                    await UpdateRound(updated);
+                    return updated;
+                }
+                //*****************************************************************
+                
+                if (updated.IsFinished && !updated.IsDraw)
                 {
                     if(updated.PlayerMoves.Keys.Any(x=> x!="Bot"))
                         await _storageRounds.AddAsync(updated);
