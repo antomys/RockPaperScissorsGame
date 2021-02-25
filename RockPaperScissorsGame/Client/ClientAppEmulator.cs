@@ -319,7 +319,7 @@ namespace Client
                     var options = new RequestOptions
                     {
                         Body = "",
-                        Address = baseAddress + $"get/update/{_room.RoomId}",
+                        Address = baseAddress + $"round/get/update/{_room.RoomId}",
                         IsValid = true,
                         Method = Services.RequestModels.RequestMethod.Get,
                         Name = "Updating Round"
