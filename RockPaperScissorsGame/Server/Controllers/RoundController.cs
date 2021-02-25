@@ -44,8 +44,7 @@ namespace Server.Controllers
                 return BadRequest(exception.Message);
             }
 
-        }
-        
+        }       
         [HttpGet]
         [Route("get/update/{roomId}")]
         [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
