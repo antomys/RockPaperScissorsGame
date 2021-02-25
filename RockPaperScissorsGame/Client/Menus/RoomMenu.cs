@@ -63,17 +63,15 @@ namespace Client.Menus
         public async Task JoinPrivateRoom()
         {
             Console.Write("Please enter room token: ");
-            var roomId = Console.ReadLine();
+            var roomId = Console.ReadLine().Trim().ToLower();
             if (string.IsNullOrEmpty(roomId))
             {
                 Console.WriteLine("Invalid input!");
             }
-
-            roomId = roomId?.Trim().ToLower();
             
             var options = new RequestOptions
             {
-                Address = _baseAddress + $"room/create/{_sessionId}&{roomId}",
+                Address = _baseAddress + $"room/join/{_sessionId}&{roomId}",
                 IsValid = true,
                 Body = _sessionId,
                 Method = Services.RequestModels.RequestMethod.Post,
