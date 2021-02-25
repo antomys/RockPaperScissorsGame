@@ -118,7 +118,7 @@ namespace Server.Controllers
                 return BadRequest(exception.Message);
             }
         }
-        
+       
         [HttpGet]
         [Route("updateState/{roomId}")]
         [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
@@ -146,6 +146,24 @@ namespace Server.Controllers
             {
                 var resultRound = await _roomManager.CreateTrainingRoom(sessionId);
                 return resultRound;
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
+        }
+        [HttpDelete]
+        [Route("delete/{sessionId}")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)] //Probably set new HttpStatus 
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<string>> DeleteRoomExit(string sessionId)
+        {
+            try
+            {
+                var deleted = await _roomManager.DeleteRoom(sessionId);
+                if (deleted)
+                    return Ok("Room was deleted successfully!");
+                return BadRequest();
             }
             catch (Exception exception)
             {
