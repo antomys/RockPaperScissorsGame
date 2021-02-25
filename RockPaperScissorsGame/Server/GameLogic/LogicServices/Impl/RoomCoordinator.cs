@@ -68,7 +68,7 @@ namespace Server.GameLogic.LogicServices.Impl
         {
             var tasks = Task.Factory.StartNew(() =>
             {
-                var thisRoom = ActiveRooms.FirstOrDefault(x => x.Value.IsPrivate == false).Value;
+                var thisRoom = ActiveRooms.FirstOrDefault(x => x.Value.IsPrivate == false && x.Value.Players.Count < 2).Value;
 
                 var thisAccount = GetAccountBySessionId(sessionId);
                 
@@ -115,6 +115,8 @@ namespace Server.GameLogic.LogicServices.Impl
             {
                 if (!ActiveRooms.TryGetValue(roomId, out var thisRoom))
                     return null; //todo:exception;
+                if (thisRoom.Players.Count == 2)
+                    return null;
                 var newRoom = thisRoom;
                 var thisAccount = GetAccountBySessionId(sessionId);
                 newRoom.Players.TryAdd(thisAccount.Id, false);
