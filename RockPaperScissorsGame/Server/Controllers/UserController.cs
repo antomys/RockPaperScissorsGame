@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Server.Contracts;
 using Server.Exceptions.LogIn;
 using Server.Exceptions.Register;
+using Server.GameLogic.LogicServices;
 using Server.Models;
 using Server.Services.Interfaces;
 
@@ -21,7 +22,7 @@ namespace Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly IStorage<Account> _accountStorage;
-
+        
         private readonly IStorage<Statistics> _statisticsStorage; //Just to write new statistics field into file along with account
 
         private readonly ILogger<UserController> _logger;
@@ -31,7 +32,8 @@ namespace Server.Controllers
             IStorage<Account> users,
             IStorage<Statistics> statisticsStorage,
             IAccountManager accountManager,
-            ILogger<UserController> logger
+            ILogger<UserController> logger,
+            IRoomCoordinator roomCoordinator
             )
         {
             _accountStorage = users;

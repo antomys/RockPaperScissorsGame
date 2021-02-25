@@ -32,7 +32,6 @@ namespace Server.GameLogic.LogicServices.Impl
             ActiveRooms = new ConcurrentDictionary<string, Room>();
             _timer = new Timer(CheckRoomDate, null, 0, 10000);
         }
-       
         public async Task<Room> CreateRoom(string sessionId, bool isPrivate)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -63,7 +62,6 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await tasks;
         }
-
         public async Task<Room> JoinPublicRoom(string sessionId)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -78,7 +76,6 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await tasks;
         }
-
         public async Task<Room> CreateTrainingRoom(string sessionId)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -108,7 +105,6 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await tasks;
         }
-
         public async Task<Room> JoinPrivateRoom(string sessionId, string roomId)
         {
             var tasks = Task.Run(() =>
@@ -145,8 +141,6 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             await Task.WhenAll(threads);
         }
-        
-
         public async Task<bool> DeleteRoom(string roomId)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -167,7 +161,6 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await thread;
         }
-       
         public async Task<Room> UpdatePlayerStatus(string sessionId, bool isReady)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -203,7 +196,7 @@ namespace Server.GameLogic.LogicServices.Impl
                 }
                 
                 var thisRound = _roundCoordinator.ActiveRounds.FirstOrDefault(x => x.Key.Equals(room.RoomId)).Value;
-
+                
                 if (thisRound != null && thisRound.IsFinished)
                 {
                     room.IsReady = false;
@@ -213,10 +206,35 @@ namespace Server.GameLogic.LogicServices.Impl
                     {
                         room.Players.TryUpdate(key, false, value);
                     }
-                    
                 }
-                
-                if (room.Players.Values.All(x => x) && room.Players.Count==2)
+
+                if (thisRound != null && thisRound.IsDraw)
+                {
+                    var round = new Round
+                    {
+                        Id = Guid.NewGuid()
+                            .ToString(),
+                        IsFinished = false,
+                        PlayerMoves = new ConcurrentDictionary<string, RequiredGameMove>(),
+                        TimeFinished = default,
+                        WinnerId = null,
+                        LoserId = null,
+                    };
+
+                    foreach (var value in room.Players.Keys.ToList())
+                    {
+                        round.PlayerMoves.TryAdd(value, RequiredGameMove.Default);
+                    }
+
+                    room.IsReady = true;
+
+                    room.IsFull = true;
+
+                    room.CurrentRoundId = round.Id;
+
+                    _roundCoordinator.ActiveRounds.TryAdd(roomId, round);
+                }
+                else if (room.Players.Values.All(x => x) && room.Players.Count==2)
                 {
                     var round = new Round
                     {
@@ -250,8 +268,6 @@ namespace Server.GameLogic.LogicServices.Impl
 
             return await thread;
         }
-        
-
 
         #region PrivateMethods
         private static string RandomString()
@@ -268,14 +284,13 @@ namespace Server.GameLogic.LogicServices.Impl
             throw new UserNotFoundException(nameof(account));
 
         }
-
         private Room GetRoomByRoomId(string roomId)
         {
             if (ActiveRooms.TryGetValue(roomId, out var thisRoom))
                 return thisRoom;
             throw new Exception(); //todo: implement exception;
         }
-        
+
         #endregion
         
     }

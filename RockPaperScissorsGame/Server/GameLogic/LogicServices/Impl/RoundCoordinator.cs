@@ -36,6 +36,8 @@ namespace Server.GameLogic.LogicServices.Impl
                 if (thisRound == null)
                     return null; //todo: exception;
 
+                if (thisRound.PlayerMoves.Any(x => x.Key.Equals("Bot")))
+                    thisRound.PlayerMoves = RockPaperScissors.ChangeBotState(thisRound.PlayerMoves);
                 thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
 
                 if (thisRound.PlayerMoves.Values.All(x => x != RequiredGameMove.Default))
@@ -43,7 +45,11 @@ namespace Server.GameLogic.LogicServices.Impl
                     var winner = RockPaperScissors.MoveComparator(thisRound.PlayerMoves);
 
                     if (string.IsNullOrEmpty(winner))
+                    {
+                        thisRound.IsDraw = true;
                         return null;
+                    }
+                        
 
                     thisRound.IsFinished = true;
                     thisRound.WinnerId = winner;
@@ -66,10 +72,11 @@ namespace Server.GameLogic.LogicServices.Impl
                 var roomId = 
                     ActiveRounds.Where(x => x.Value
                         .Equals(updated)).Select(x => x.Key).ToString();
-                if (updated.IsFinished)
+                
+                if (updated.IsFinished && !updated.IsDraw)
                 {
-                    await _storageRounds.AddAsync(updated);
-                    
+                    if(!updated.PlayerMoves.Any(x=> x.Key.Equals("Bot")))
+                        await _storageRounds.AddAsync(updated);
 
                     ActiveRounds.TryRemove(roomId, out _);
 
@@ -81,7 +88,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 return updated;
             });
-
+            
             return await await task;
         }
         
