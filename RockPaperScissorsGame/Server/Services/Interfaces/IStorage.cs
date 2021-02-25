@@ -18,6 +18,8 @@ namespace Server.Services.Interfaces
         void AddOrUpdate(string id, T item);
         Task AddOrUpdateAsync(string id, T item);
 
+        Task UpdateAsync(string id, T item);
+
         bool Delete(string id);
         Task<bool> DeleteAsync(string id);
         

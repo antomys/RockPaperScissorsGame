@@ -10,7 +10,6 @@ namespace Server.Models.Interfaces
         string Login { get; set; }
         
         [JsonPropertyName("Password")]
-        
         string Password { get; set; }
 
 

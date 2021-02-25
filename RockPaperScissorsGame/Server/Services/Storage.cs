@@ -49,7 +49,7 @@ namespace Server.Services
         {
             return _deserializedObject.ConcurrentDictionary.TryGetValue(id, out var account) ? account : default;
         }
-
+        
         /// <summary>
         /// Gets asynchronously element by Id
         /// </summary>
@@ -58,7 +58,7 @@ namespace Server.Services
         /// <exception cref="NotImplementedException"></exception>
         public Task<T> GetAsync(string id)
         {
-            throw new NotImplementedException();
+            return Task.Run(() => Get(id));
         }
 
         /// <summary>
@@ -113,6 +113,21 @@ namespace Server.Services
         public Task AddOrUpdateAsync(string id, T item)
         {
             throw new NotImplementedException();
+        }
+        
+        /// <summary>
+        /// Updates value in collection
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="item"></param>
+        /// <returns>Task</returns>
+        public Task UpdateAsync(string id, T item)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                var thisItem = _deserializedObject.ConcurrentDictionary[id];
+                _deserializedObject.ConcurrentDictionary.TryUpdate(id, item, thisItem);
+            });
         }
 
         /// <summary>
