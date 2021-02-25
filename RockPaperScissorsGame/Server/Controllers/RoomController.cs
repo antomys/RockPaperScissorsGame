@@ -21,9 +21,7 @@ namespace Server.Controllers
         private readonly IRoomCoordinator _roomManager;
 
         private readonly ILogger<RoomController> _logger;
-
-
-
+        
         public RoomController(
             IRoomCoordinator roomManager,
             ILogger<RoomController> logger)

@@ -127,6 +127,7 @@ namespace Server.Services
             {
                 var thisItem = _deserializedObject.ConcurrentDictionary[id];
                 _deserializedObject.ConcurrentDictionary.TryUpdate(id, item, thisItem);
+                _deserializedObject.UpdateData();
             });
         }
 

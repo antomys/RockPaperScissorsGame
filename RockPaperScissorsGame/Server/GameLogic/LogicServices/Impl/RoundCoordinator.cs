@@ -48,7 +48,7 @@ namespace Server.GameLogic.LogicServices.Impl
                 {
                     var dictionary = thisRound.PlayerMoves;
                     var first = dictionary.Keys.First();
-                    var last = dictionary.Keys.First();
+                    var last = dictionary.Keys.Last();
 
                     if (dictionary[first] == dictionary[last])
                         thisRound.IsDraw = true;
@@ -87,14 +87,15 @@ namespace Server.GameLogic.LogicServices.Impl
                         thisRound.IsDraw = true;
                         return null;
                     }
-                    
+                    var loserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Key;
+                   
                     thisRound.IsFinished = true;
-                    thisRound.WinnerId = winner;
-                    thisRound.LoserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Key;
+                    thisRound.WinnerId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
+                    thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
                     thisRound.TimeFinished = DateTime.Now;
 
-                    await FillStatistics(thisRound,thisRound.WinnerId);
-                    await FillStatistics(thisRound,thisRound.LoserId);
+                    //await FillStatistics(thisRound);
+                    //await FillStatistics(thisRound,thisRound.LoserId);
                     
                 }
                 
@@ -107,59 +108,65 @@ namespace Server.GameLogic.LogicServices.Impl
            
         }
 
-        private async Task FillStatistics(IRound thisRound, string accountId)
+        /*private async Task FillStatistics(IRound thisRound)
         {
-            var statistics = await _storageStatistics.GetAsync(thisRound.LoserId);
-            if (thisRound.WinnerId.Equals(accountId))
+            foreach (var (accountId,_) in thisRound.PlayerMoves) //FIX
             {
-                statistics.Wins += 1;
-                statistics.Score += 4;
-            }
-            else
-            {
-                statistics.Loss += 1;
-                statistics.Score -= 2;
-            }
-
-            var playerMove =
-                thisRound.PlayerMoves.FirstOrDefault(x => x.Key.Equals(accountId)).Value;
-            switch (playerMove) //NOT TO ADD ANYTHING ELSE
-            {
-                case RequiredGameMove.Paper:
-                    statistics.UsedPaper += 1;
-                    break;
-                case RequiredGameMove.Rock:
-                    statistics.UsedRock += 1;
-                    break;
-                case RequiredGameMove.Scissors:
-                    statistics.UsedScissors += 1;
-                    break;
-            }
-
-            if (statistics.Loss != 0)
-                statistics.WinLossRatio = (double)statistics.Wins / statistics.Loss;
-
-            var allRound = await _storageRounds.GetAllAsync();
-            
-            int wins=0, loss=0;
-            
-            foreach (var round in allRound)
-            {
-                if (!InRange(round.TimeFinished,DateTime.Now.Date, DateTime.Now.Date.AddDays(-7))) continue;
-                if (round.WinnerId.Equals(accountId))
-                    wins++;
+                var statistics = await _storageStatistics.GetAsync(thisRound.LoserId);
+                if (thisRound.WinnerId.Equals(accountId))
+                {
+                    statistics.Wins += 1;
+                    statistics.Score += 4;
+                }
                 else
                 {
-                    loss++;
+                    statistics.Loss += 1;
+                    statistics.Score -= 2;
                 }
+
+                var playerMove =
+                    thisRound.PlayerMoves.FirstOrDefault(x => x.Key.Equals(accountId)).Value;
+                switch (playerMove) //NOT TO ADD ANYTHING ELSE
+                {
+                    case RequiredGameMove.Paper:
+                        statistics.UsedPaper += 1;
+                        break;
+                    case RequiredGameMove.Rock:
+                        statistics.UsedRock += 1;
+                        break;
+                    case RequiredGameMove.Scissors:
+                        statistics.UsedScissors += 1;
+                        break;
+                }
+
+                if (statistics.Loss != 0)
+                    // ReSharper disable once PossibleLossOfFraction
+                    statistics.WinLossRatio = statistics.Wins / statistics.Loss * 100d;
+
+                var allRound = await _storageRounds.GetAllAsync();
+            
+                int wins=0, loss=0;
+            
+                foreach (var round in allRound)
+                {
+                    if (!InRange(round.TimeFinished,DateTime.Now.Date.AddDays(-7), DateTime.Now.Date)) continue;
+                    if (round.WinnerId.Equals(accountId))
+                        wins++;
+                    else
+                    {
+                        loss++;
+                    }
+                }
+
+                
+                statistics.TimeSpent = loss != 0 
+                    ? $"Last 7 days win rate: {(double) wins / loss}%" 
+                    : $"Last 7 days win rate: {(double) wins}%";
+
+                await _storageStatistics.UpdateAsync(accountId, statistics);
+                 
             }
-
-            statistics.TimeSpent = loss != 0 
-                ? $"Last 7 days win rate: {(double) wins / loss}%" 
-                : $"Last 7 days win rate: {(double) wins}%";
-
-            await _storageStatistics.UpdateAsync(accountId, statistics);
-        }
+        }*/
 
         private static bool InRange(DateTime dateToCheck, DateTime startDate, DateTime endDate)
         {
