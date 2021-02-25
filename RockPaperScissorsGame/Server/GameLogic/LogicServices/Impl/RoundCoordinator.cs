@@ -15,43 +15,89 @@ namespace Server.GameLogic.LogicServices.Impl
 
         private readonly IStorage<Round> _storageRounds;
 
-        public Task<Round> MakeMove(string sessionId, int move)
-        {
-            throw new System.NotImplementedException();
-        }
+        private readonly IAccountManager _accountManager;
+        
 
         public ConcurrentDictionary<string, Round> ActiveRounds { get; set; }
         
         public RoundCoordinator(
             IDeserializedObject<Round> deserializedRounds,
-            IStorage<Round> storageRounds)
+            IStorage<Round> storageRounds,
+            IAccountManager accountManager)
         {
             _deserializedRounds = deserializedRounds;
-            //_roomCoordinator = roomCoordinator;
             _storageRounds = storageRounds;
+            _accountManager = accountManager;
             ActiveRounds = new ConcurrentDictionary<string, Round>();
         }
-        public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string roomId)
+        
+
+        public async Task<Round> MakeMove(string roomId, string sessionId, int move)
         {
-            var thread = Task.Factory.StartNew(() =>
+            var tasks = Task.Factory.StartNew(async () =>
             {
-                if (ActiveRounds.TryGetValue(roomId, out var thisRound))
-                    return thisRound;
-                return null;
+                var accountId = _accountManager.GetActiveAccountBySessionId(sessionId).Id;
+                ActiveRounds.TryGetValue(roomId, out var thisRound);
+
+                if (thisRound == null)
+                    return null; //todo: exception;
+
+                thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
+
+                if (thisRound.PlayerMoves.Values.All(x => x != RequiredGameMove.Default))
+                {
+                    var winner = RockPaperScissors.MoveComparator(thisRound.PlayerMoves);
+
+                    if (string.IsNullOrEmpty(winner))
+                        return null;
+
+                    thisRound.IsFinished = true;
+                    thisRound.WinnerId = winner;
+                    thisRound.LoserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Value.ToString();
+                    thisRound.TimeFinished = DateTime.Now;
+                }
+                
+                await UpdateRound(thisRound);
+
+                return thisRound;
+                
             });
-            return await thread;
+            return await await tasks;  //AWAIT AWAIT?
+           
         }
 
-        public void MakeMove(string roomId, string accountId, int move)
+
+
+        private async Task<Round> UpdateRound(Round updated)
         {
-            ActiveRounds.TryGetValue(roomId, out var thisRound);
-
-            thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
-
-            if (thisRound.PlayerMoves.Values.All(x => x != RequiredGameMove.Default))
+            var task = Task.Factory.StartNew(async () =>
             {
-                var winner = RockPaperScissors.MoveComparator(thisRound.PlayerMoves);
-            }
+                var roomId = 
+                    ActiveRounds.Where(x => x.Value
+                        .Equals(updated)).Select(x => x.Key).ToString();
+                if (updated.IsFinished)
+                {
+                    await _storageRounds.AddAsync(updated);
+                    
+
+                    ActiveRounds.TryRemove(roomId, out _);
+
+                    return updated;
+                }
+
+                ActiveRounds.TryGetValue(roomId, out var oldRoom);
+                ActiveRounds.TryUpdate(roomId, updated, oldRoom);
+
+                return updated;
+            });
+
+            return await await task; //Task<Task<round>>??????????????????
+        }
+        public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string roundId)
+        {
+            var tasks = Task.Factory.StartNew(() => ActiveRounds.TryGetValue(roundId, out var thisRound) ? thisRound : null);
+            //todo: change null to exception;
+            return await tasks;
         }
     }
 
