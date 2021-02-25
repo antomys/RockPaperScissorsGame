@@ -14,11 +14,7 @@ namespace Server.GameLogic.LogicServices.Impl
         private readonly IDeserializedObject<Round> _deserializedRounds;
 
         private readonly IStorage<Round> _storageRounds;
-
-        public Task<Round> MakeMove(string sessionId, int move)
-        {
-            throw new System.NotImplementedException();
-        }
+        
 
         public ConcurrentDictionary<string, Round> ActiveRounds { get; set; }
         
@@ -27,7 +23,6 @@ namespace Server.GameLogic.LogicServices.Impl
             IStorage<Round> storageRounds)
         {
             _deserializedRounds = deserializedRounds;
-            //_roomCoordinator = roomCoordinator;
             _storageRounds = storageRounds;
             ActiveRounds = new ConcurrentDictionary<string, Round>();
         }
@@ -42,16 +37,74 @@ namespace Server.GameLogic.LogicServices.Impl
             return await tasks;
         }
 
-        public void MakeMove(string roomId, string accountId, int move)
+        public async Task<Round> MakeMove(string roomId, string accountId, int move)
         {
-            ActiveRounds.TryGetValue(roomId, out var thisRound);
-
-            thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
-
-            if (thisRound.PlayerMoves.Values.All(x => x != RequiredGameMove.Default))
+            var tasks = Task.Factory.StartNew(async () =>
             {
-                var winner = RockPaperScissors.MoveComparator(thisRound.PlayerMoves);
-            }
+                ActiveRounds.TryGetValue(roomId, out var thisRound);
+
+                if (thisRound == null)
+                    return null; //todo: exception;
+
+                thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
+
+                if (thisRound.PlayerMoves.Values.All(x => x != RequiredGameMove.Default))
+                {
+                    var winner = RockPaperScissors.MoveComparator(thisRound.PlayerMoves);
+
+                    if (string.IsNullOrEmpty(winner))
+                        return null;
+
+                    thisRound.IsFinished = true;
+                    thisRound.WinnerId = winner;
+                    thisRound.LoserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Value.ToString();
+                    thisRound.TimeFinished = DateTime.Now;
+                }
+                
+                await UpdateRound(thisRound);
+
+                return thisRound;
+                
+            });
+
+            return await await tasks;  //AWAIT AWAIT?
+           
+        }
+
+        /*public async Task<Round> UpdateRound(string roomId)
+        {
+            var task = Task.Factory.StartNew(() =>
+            {
+                
+            });
+
+            return await task;
+        }*/
+
+        private async Task<Round> UpdateRound(Round updated)
+        {
+            var task = Task.Factory.StartNew(async () =>
+            {
+                var roomId = 
+                    ActiveRounds.Where(x => x.Value
+                        .Equals(updated)).Select(x => x.Key).ToString();
+                if (updated.IsFinished)
+                {
+                    await _storageRounds.AddAsync(updated);
+                    
+
+                    ActiveRounds.TryRemove(roomId, out _);
+
+                    return updated;
+                }
+
+                ActiveRounds.TryGetValue(roomId, out var oldRoom);
+                ActiveRounds.TryUpdate(roomId, updated, oldRoom);
+
+                return updated;
+            });
+
+            return await await task; //Task<Task<round>>??????????????????
         }
     }
 

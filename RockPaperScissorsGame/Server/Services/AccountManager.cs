@@ -32,10 +32,7 @@ namespace Server.Services
             _deserializedObject = deserializedObject;
             AccountsActive = new ConcurrentDictionary<string, Account>();
         }
-
-
         
-
         public async Task<Account> LogInAsync(AccountDto accountDto)
         {
             var tasks = Task.Factory.StartNew(() =>
