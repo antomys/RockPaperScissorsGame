@@ -111,6 +111,10 @@ namespace Client
                         var status = await LogIn();
                         if (status == 0)
                         {
+                            ColorTextWriterService.PrintLineMessageWithSpecialColor("\n" +
+                                "To redirect to players menu, press any key.",ConsoleColor.Cyan);
+                            Console.ReadKey();
+                            Console.Clear();
                             await PlayerMenu();
                         }
                         else
