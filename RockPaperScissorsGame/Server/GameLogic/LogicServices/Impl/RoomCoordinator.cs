@@ -66,7 +66,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
         public Task<Room> JoinPublicRoom(string sessionId)
         {
-            return ActiveRooms.FirstOrDefault(x=> x.Value.)
+            throw new NotImplementedException();
         }
 
         public async Task<Room> CreateTrainingRoom(string sessionId)
