@@ -56,9 +56,11 @@ namespace Server.Services
         /// <param name="id">string If of an Element</param>
         /// <returns>Task T item</returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Task<T> GetAsync(string id)
+        public async Task<T> GetAsync(string id)
         {
-            return Task.Run(() => Get(id));
+            var task = Task.Run(() => Get(id));
+
+            return await task;
         }
 
         /// <summary>

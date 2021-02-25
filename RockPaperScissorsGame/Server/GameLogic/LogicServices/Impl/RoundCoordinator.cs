@@ -119,12 +119,14 @@ namespace Server.GameLogic.LogicServices.Impl
            
         }
 
-        /*private async Task FillStatistics(IRound thisRound)
+        private async Task FillStatistics(IRound thisRound)
         {
-            foreach (var (accountId,_) in thisRound.PlayerMoves) //FIX
+            var keys = thisRound.PlayerMoves.Keys;
+            foreach (var key in keys) //FIX
             {
-                var statistics = await _storageStatistics.GetAsync(thisRound.LoserId);
-                if (thisRound.WinnerId.Equals(accountId))
+                var thisAccountLogin = _accountManager.AccountsActive.FirstOrDefault(x => x.Value.Id == key);
+                var statistics = await _storageStatistics.GetAsync(key); //here is the problem.
+                if (thisRound.WinnerId.Equals(thisAccountLogin.Value.Login))
                 {
                     statistics.Wins += 1;
                     statistics.Score += 4;
@@ -136,7 +138,7 @@ namespace Server.GameLogic.LogicServices.Impl
                 }
 
                 var playerMove =
-                    thisRound.PlayerMoves.FirstOrDefault(x => x.Key.Equals(accountId)).Value;
+                    thisRound.PlayerMoves.FirstOrDefault(x => x.Key.Equals(key)).Value;
                 switch (playerMove) //NOT TO ADD ANYTHING ELSE
                 {
                     case RequiredGameMove.Paper:
@@ -161,29 +163,30 @@ namespace Server.GameLogic.LogicServices.Impl
                 foreach (var round in allRound)
                 {
                     if (!InRange(round.TimeFinished,DateTime.Now.Date.AddDays(-7), DateTime.Now.Date)) continue;
-                    if (round.WinnerId.Equals(accountId))
+                    if (round.WinnerId.Equals(key))
                         wins++;
                     else
                     {
                         loss++;
                     }
                 }
-
                 
                 statistics.TimeSpent = loss != 0 
                     ? $"Last 7 days win rate: {(double) wins / loss}%" 
                     : $"Last 7 days win rate: {(double) wins}%";
 
-                await _storageStatistics.UpdateAsync(accountId, statistics);
+                await _storageStatistics.UpdateAsync(key, statistics);
                  
             }
-        }*/
+        }
 
         private static bool InRange(DateTime dateToCheck, DateTime startDate, DateTime endDate)
         {
             return dateToCheck >= startDate && dateToCheck < endDate;
         }
         
+        
+        //*****************************
         private async Task<Round> UpdateRound(Round updated)
         {
             var task = Task.Factory.StartNew(async () =>
@@ -196,8 +199,12 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 if (updated.IsFinished)
                 {
-                    if(updated.PlayerMoves.Any(x=> x.Key != "Bot" && !updated.IsDraw))
+                    if (updated.PlayerMoves.Any(x => x.Key != "Bot" && !updated.IsDraw))
+                    {
                         await _storageRounds.AddAsync(updated);
+                        await FillStatistics(updated);
+                    }
+                        
 
                     //ActiveRounds.TryRemove(roomId[0].Key, out _);
 
@@ -212,6 +219,7 @@ namespace Server.GameLogic.LogicServices.Impl
             return await await task;
         }
         
+        //********************************
         public async Task<Round> UpdateRound(string roomId)
         {
             var task = Task.Factory.StartNew(async () =>
