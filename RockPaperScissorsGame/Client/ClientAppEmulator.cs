@@ -30,7 +30,7 @@ namespace Client
             ILoginMenu loginMenu = new LoginMenu(_sessionId,BaseAddress,performer);
             IRegisterMenu registerMenu = new RegisterMenu(_sessionId,BaseAddress,playerAccount,performer);
             IMainMenu mainMenu = new MainMenu(playerAccount,roomMenu,loginMenu);
-            IRoundMenu roundMenu = new RoundMenu(room,playerAccount);
+            IRoundMenu roundMenu = new RoundMenu(_sessionId,BaseAddress,room,playerAccount,performer);
             _startMenu = new StartMenu(loginMenu,mainMenu,statisticsMenu,registerMenu,playerAccount);
         }
         
