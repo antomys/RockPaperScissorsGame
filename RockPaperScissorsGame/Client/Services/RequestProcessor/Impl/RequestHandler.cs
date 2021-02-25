@@ -36,7 +36,7 @@ namespace Client.Services.RequestProcessor.Impl
                 var body = await response.Content.ReadAsStringAsync();
                 return new Response(true, (int)response.StatusCode, body);
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException) //todo: probably redo
             {
                 return new Response(false, 500, "Server is not responding!");
             }

@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using Client.Models.Interfaces;
 
 namespace Client.Models
 {
-    public class Round
+    internal class Round : IRound
     {
         [JsonProperty("Id")]
         public string Id { get; init; }  //Not to store identical rounds

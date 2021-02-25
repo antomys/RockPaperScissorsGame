@@ -9,6 +9,7 @@ namespace Server.Models
         public string Login { get; set; }
         public int Wins { get; set; }
         public int Loss { get; set; }
+        public int Draws { get; set; }
         public double WinLossRatio { get; set; }
         public string TimeSpent { get; set; } //Maybe redo?
         public int UsedRock { get; set; }

@@ -1,23 +1,24 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
+using System.Text.Json.Serialization;
 
 namespace Server.GameLogic.Models
 {
     public interface IRound
     {
-        [JsonProperty("Id")]
+        [JsonPropertyName("Id")]
         string Id { get; init; }  //Not to store identical rounds
-        [JsonProperty("Moves")]
+        [JsonPropertyName("Moves")]
         
         public ConcurrentDictionary<string, RequiredGameMove>  PlayerMoves { get; set; } //where string key is playerId
-        [JsonProperty("IsFinished")]
+        [JsonPropertyName("IsFinished")]
         bool IsFinished { get; set; }  //Probably not needed.
-        [JsonProperty("TimeFinished")]
+        
+        [JsonPropertyName("TimeFinished")]
         DateTime TimeFinished { get; set; }
-        [JsonProperty("WinnerId")]
+        [JsonPropertyName("WinnerId")]
         string WinnerId { get; set; }
-        [JsonProperty("LoserId")]
+        [JsonPropertyName("LoserId")]
         string LoserId { get; set; }
     }
 }

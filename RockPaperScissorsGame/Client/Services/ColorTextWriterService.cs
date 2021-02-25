@@ -12,5 +12,12 @@ namespace Client.Services
             Console.WriteLine(msg);
             Console.ResetColor();
         }
+        
+        public static void PrintMessageWithSpecialColor(string msg, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.Write(msg);
+            Console.ResetColor();
+        }
     }
 }

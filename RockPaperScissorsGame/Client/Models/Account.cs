@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Client.Models
 {
-    public class Account : IAccount
+    internal class Account : IAccount
     {
         
         [JsonProperty("SessionId")]

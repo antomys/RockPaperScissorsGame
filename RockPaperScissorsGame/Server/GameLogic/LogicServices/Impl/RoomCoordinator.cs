@@ -111,12 +111,14 @@ namespace Server.GameLogic.LogicServices.Impl
 
         public async Task<Room> JoinPrivateRoom(string sessionId, string roomId)
         {
-            var tasks = Task.Factory.StartNew(() =>
+            var tasks = Task.Run(() =>
             {
                 if (!ActiveRooms.TryGetValue(roomId, out var thisRoom))
                     return null; //todo:exception;
+                
                 if (thisRoom.Players.Count == 2)
                     return null;
+                
                 var newRoom = thisRoom;
                 var thisAccount = GetAccountBySessionId(sessionId);
                 newRoom.Players.TryAdd(thisAccount.Id, false);
@@ -199,7 +201,21 @@ namespace Server.GameLogic.LogicServices.Impl
                 {
                     throw new Exception(); //todo: exception;
                 }
+                
+                var thisRound = _roundCoordinator.ActiveRounds.FirstOrDefault(x => x.Key.Equals(room.RoomId)).Value;
 
+                if (thisRound != null && thisRound.IsFinished)
+                {
+                    room.IsReady = false;
+                    room.IsRoundEnded = false;
+                    room.CurrentRoundId = null;
+                    foreach (var (key,value) in room.Players)
+                    {
+                        room.Players.TryUpdate(key, false, value);
+                    }
+                    
+                }
+                
                 if (room.Players.Values.All(x => x) && room.Players.Count==2)
                 {
                     var round = new Round

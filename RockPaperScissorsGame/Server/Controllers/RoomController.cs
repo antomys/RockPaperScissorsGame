@@ -135,5 +135,22 @@ namespace Server.Controllers
                 return BadRequest(exception.Message);
             }
         }
+        
+        [HttpGet]
+        [Route("create/training/{sessionId}")]
+        [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Room>> CreateTrainingRoom(string sessionId)
+        {
+            try
+            {
+                var resultRound = await _roomManager.CreateTrainingRoom(sessionId);
+                return resultRound;
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
+        }
     }
 }

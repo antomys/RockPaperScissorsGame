@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Server.Models.Interfaces
 {
@@ -16,6 +15,9 @@ namespace Server.Models.Interfaces
         
         [JsonPropertyName("Loss")]
         int Loss { get; set; }
+        
+        [JsonPropertyName("Draws")]
+        int Draws { get; set; }
         
         [JsonPropertyName("WinToLossRatio")]
         double WinLossRatio { get; set; }
@@ -34,7 +36,6 @@ namespace Server.Models.Interfaces
         
         [JsonPropertyName("Score")]
         int Score { get; set; }
-
-        //IAccount Account { get; }
+        
     }
 }

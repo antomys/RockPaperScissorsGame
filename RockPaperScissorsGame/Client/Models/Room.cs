@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using Client.Models.Interfaces;
+
 namespace Client.Models
 {
-    public class Room 
+    internal class Room : IRoom
     {
         [JsonProperty("RoomId")]
         public string RoomId { get; set; }

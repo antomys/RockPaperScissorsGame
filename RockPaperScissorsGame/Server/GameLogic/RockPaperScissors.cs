@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Linq;
 using Server.GameLogic.Models;
 
@@ -15,37 +14,40 @@ namespace Server.GameLogic
 
             return playerMoves;
         }
-        public static string MoveComparator( //Can be improved
-            ConcurrentDictionary<string, RequiredGameMove> playerMoves)
+        public static string MoveComparator(
+            ConcurrentDictionary<string, 
+                RequiredGameMove> playerMoves)
         {
-            int surrenderMove = 0;
-            string winner = String.Empty;
-            foreach (var m in playerMoves)
+            var surrenderMove = 0;
+            var winner = string.Empty;
+            
+            foreach (var (key, value) in playerMoves)
             {
-                if (surrenderMove == 0 && String.IsNullOrEmpty(winner))
+                
+                if (surrenderMove == 0 && string.IsNullOrEmpty(winner))
                 {
-                    winner = m.Key;
-                    surrenderMove = (int)m.Value;
+                    winner = key;
+                    surrenderMove = (int)value;
                 }
                 else
                 {
-                    if ((int)m.Value == surrenderMove)
+                    if ((int)value == surrenderMove)
                     {
-                        return String.Empty;
+                        return "Draw";
                     }
                     
-                    if (surrenderMove == 1 && (int)m.Value == 3)
+                    if (surrenderMove == 1 && (int)value == 3)
                         continue;
-                    else if (surrenderMove == 2 && (int)m.Value == 1)
+                    if (surrenderMove == 2 && (int)value == 1)
                         continue;
-                    else if (surrenderMove == 3 && (int)m.Value == 2)
+                    else if (surrenderMove == 3 && (int)value == 2)
                         continue;
-                    else if (surrenderMove == 1 && (int)m.Value == 2)
-                        winner = m.Key;
-                    else if (surrenderMove == 2 && (int)m.Value == 3)
-                        winner = m.Key;
-                    else if (surrenderMove == 3 && (int)m.Value == 1)
-                        winner = m.Key;
+                    else if (surrenderMove == 1 && (int)value == 2)
+                        winner = key;
+                    else if (surrenderMove == 2 && (int)value == 3)
+                        winner = key;
+                    else if (surrenderMove == 3 && (int)value == 1)
+                        winner = key;
                 }
             }
             return winner;

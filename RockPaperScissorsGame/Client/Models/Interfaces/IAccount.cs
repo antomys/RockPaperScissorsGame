@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Client.Models.Interfaces
 {
     internal interface IAccount
     {
-        string Login { get; }
-        //string Email { get; }
-        string Password { get; }
+        public string SessionId { get; set; }
+        public string Login { get; set; }
+        public string Password { get; set; }
+        public DateTime LastRequest { get; set; }
+        //soon wil be deleted
     }
 }

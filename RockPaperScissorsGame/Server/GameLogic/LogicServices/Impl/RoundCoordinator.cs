@@ -10,22 +10,16 @@ namespace Server.GameLogic.LogicServices.Impl
 {
     public class RoundCoordinator : IRoundCoordinator
     {
-
-        private readonly IDeserializedObject<Round> _deserializedRounds;
-
         private readonly IStorage<Round> _storageRounds;
 
         private readonly IAccountManager _accountManager;
-        
 
         public ConcurrentDictionary<string, Round> ActiveRounds { get; set; }
         
         public RoundCoordinator(
-            IDeserializedObject<Round> deserializedRounds,
             IStorage<Round> storageRounds,
             IAccountManager accountManager)
         {
-            _deserializedRounds = deserializedRounds;
             _storageRounds = storageRounds;
             _accountManager = accountManager;
             ActiveRounds = new ConcurrentDictionary<string, Round>();
@@ -53,7 +47,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
                     thisRound.IsFinished = true;
                     thisRound.WinnerId = winner;
-                    thisRound.LoserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Value.ToString();
+                    thisRound.LoserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Key;
                     thisRound.TimeFinished = DateTime.Now;
                 }
                 
@@ -65,9 +59,6 @@ namespace Server.GameLogic.LogicServices.Impl
             return await await tasks;  //AWAIT AWAIT?
            
         }
-
-
-
         private async Task<Round> UpdateRound(Round updated)
         {
             var task = Task.Factory.StartNew(async () =>
@@ -86,6 +77,34 @@ namespace Server.GameLogic.LogicServices.Impl
                 }
 
                 ActiveRounds.TryGetValue(roomId, out var oldRoom);
+                ActiveRounds.TryUpdate(roomId, updated, oldRoom);
+
+                return updated;
+            });
+
+            return await await task;
+        }
+        
+        public async Task<Round> UpdateRound(string roomId)
+        {
+            var task = Task.Factory.StartNew(async () =>
+            {
+                ActiveRounds.TryGetValue(roomId, out var updated);
+
+                if (updated == null)
+                    return null; //todo: add exception;
+
+                if (updated.IsFinished)
+                {
+                    if(updated.PlayerMoves.Keys.Any(x=> x!="Bot"))
+                        await _storageRounds.AddAsync(updated);
+
+                    ActiveRounds.TryRemove(roomId, out _);
+
+                    return updated;
+                }
+
+                ActiveRounds.TryGetValue(roomId, out var oldRoom); //Do something with this
                 ActiveRounds.TryUpdate(roomId, updated, oldRoom);
 
                 return updated;

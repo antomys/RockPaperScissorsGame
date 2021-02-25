@@ -45,6 +45,30 @@ namespace Server.Controllers
             }
 
         }
+        
+        [HttpGet]
+        [Route("get/update/{roomId}")]
+        [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Round>> UpdateCurrentRound(string roomId)
+        {
+            try
+            {
+                var resultedRound = await _roundManager.UpdateRound(roomId);
+                
+                if (resultedRound != null)
+                {
+                    return resultedRound;
+                }
+                return BadRequest();
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
+
+        }
+        
         [HttpPatch]
         [Route("move/{roomId}&{sessionId}&{move}")]
         [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]

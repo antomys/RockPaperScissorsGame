@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    internal class Program
+    internal static class Program
     {
-        static async Task<int> Main(string[] args)
+        private static async Task<int> Main()
         {
             try
             {
                 var emulator = new ClientAppEmulator(new RequestPerformer());
                 return await emulator.StartAsync();
             }
-            catch (Exception ex)
+            catch (Exception) //todo : do this need a message?
             {
                 return -1;
             }

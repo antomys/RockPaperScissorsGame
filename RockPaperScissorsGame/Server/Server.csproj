@@ -13,5 +13,10 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Account" />
+      <None Remove="Statistics" />
+    </ItemGroup>
+
 
 </Project>

@@ -9,5 +9,6 @@ namespace Server.GameLogic.LogicServices
         Task<Round> MakeMove(string roomId, string accountId, int move);
         ConcurrentDictionary<string, Round> ActiveRounds { get; set; }
         Task<Round> GetCurrentActiveRoundForSpecialRoom(string roundId);
+        Task<Round> UpdateRound(string roomId);
     }
 }

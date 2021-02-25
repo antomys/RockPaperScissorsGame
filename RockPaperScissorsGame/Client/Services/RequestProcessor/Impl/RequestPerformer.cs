@@ -24,7 +24,7 @@ namespace Client.Services.RequestProcessor.Impl
                 {
                     response = await RequestHandler.HandleRequestAsync(requestOptions);
                 }
-                catch (TimeoutException ex)
+                catch (TimeoutException) //todo: Probably redo
                 {
                     response = new Response(false, 408, null);
                 }        
