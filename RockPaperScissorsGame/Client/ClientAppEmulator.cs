@@ -255,7 +255,7 @@ namespace Client
                 Console.WriteLine("Opponent has joined and is ready.");
                 Console.WriteLine("Redirecting to round game:");
                 await MakeYourMove();
-           //     await UpdateRoundResultAsync(); //fixbug
+                await UpdateRoundResultAsync(); //fixbug
                 Console.WriteLine("---------------------------");
                 Console.ReadKey();
             }
@@ -298,6 +298,7 @@ namespace Client
             var reachedResponse = await _performer.PerformRequestAsync(options);
 
             _round = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
+            
             if (_round.WinnerId != null && _round.LoserId != null)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {_round.WinnerId}", ConsoleColor.Green);
@@ -307,6 +308,25 @@ namespace Client
         }
         public async Task UpdateRoundResultAsync()
         {
+            while (_round.WinnerId == null)
+            {
+                await Task.Run(async () =>
+                {
+                    var options = new RequestOptions
+                    {
+                        Body = "",
+                        Address = baseAddress + $"get/update/{_room.RoomId}",
+                        IsValid = true,
+                        Method = Services.RequestModels.RequestMethod.Get,
+                        Name = "Updating Round"
+                    };
+                    var reachedResponse = await _performer.PerformRequestAsync(options);
+
+                    _round = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
+                });
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
+            /*
             do
             {
                 await Task.Run(async () =>
@@ -323,7 +343,7 @@ namespace Client
                     _round = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
                 });
                 await Task.Delay(TimeSpan.FromSeconds(1));
-            } while (_round.IsFinished == true);
+            } while (_round.IsFinished == true);*/
             if (_round.WinnerId != null && _round.LoserId != null)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {_round.WinnerId}", ConsoleColor.Green);
