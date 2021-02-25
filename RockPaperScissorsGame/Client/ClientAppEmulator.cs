@@ -17,7 +17,7 @@ namespace Client
     public class ClientAppEmulator
     {
         private readonly string _sessionId;
-        private const string BaseAddress = "http://localhost:5000/";
+        private const string baseAddress = "http://localhost:5000/";
 
         public ClientAppEmulator(IRequestPerformer performer)
         {
@@ -170,10 +170,10 @@ namespace Client
                         break;
                     case 4:
                         await JoinPublicRoom();
-                        return;
+                        break;
                     case 5:
                         await Logout();
-                        break;
+                        return;
                     default:
                         ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
                         continue;
@@ -187,7 +187,7 @@ namespace Client
             
             var options = new RequestOptions
             {
-                Address = BaseAddress + $"room/join/{_sessionId}",
+                Address = baseAddress + $"room/join/{_sessionId}",
                 IsValid = true,
                 Body = _sessionId,
                 Method = Services.RequestModels.RequestMethod.Get,
@@ -200,26 +200,23 @@ namespace Client
                 _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
                 Console.WriteLine("Found room! Entering room lobby");
                 await ChangePlayerStatus();
-                await RoomMenu();
+                await StartRoomMenu();
             }
             
         }
 
-        private async Task JoinPrivateRoom()
+        public async Task JoinPrivateRoom()
         {
             Console.Write("Please enter room token: ");
-            var roomId = Console.ReadLine();
+            var roomId = Console.ReadLine().Trim().ToLower();
             if (string.IsNullOrEmpty(roomId))
             {
                 Console.WriteLine("Invalid input!");
-                //todo: something
             }
 
-            roomId = roomId?.Trim().ToLower();
-            
             var options = new RequestOptions
             {
-                Address = BaseAddress + $"room/create/{_sessionId}&{roomId}",
+                Address = baseAddress + $"room/join/{_sessionId}&{roomId}",
                 IsValid = true,
                 Body = _sessionId,
                 Method = Services.RequestModels.RequestMethod.Post,
@@ -227,14 +224,151 @@ namespace Client
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
 
-            if (reachedResponse.Content != null)
+            if (!string.IsNullOrEmpty(reachedResponse.Content) && reachedResponse.Code == (int)HttpStatusCode.OK)
             {
                 _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
-                Console.WriteLine("Found room! Entering room lobby");
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("Room Founded! Redirecting to room menu...", ConsoleColor.Green);
                 await ChangePlayerStatus();
-                await RoomMenu();
+                await StartRoomMenu();
             }
-            //todo: if this is null
+            else
+            {
+                Console.WriteLine("Error occured. Probably there is either no room or it is already full");
+            }
+        }
+        public async Task StartRoomMenu()
+        {
+            Console.WriteLine($"Your room id: {_room.RoomId}\n");
+            Console.WriteLine("Players in room: ");
+            _room.Players.ToList().ForEach(x =>
+            {
+                var (key, value) = x;
+                Console.WriteLine("Id: " + key + "; Is ready: " + value);
+            });
+            await RecurrentlyUpdateRoom();
+
+
+            await RecurrentlyUpdateRoom();
+
+            if (_room.IsReady)
+            { 
+                Console.WriteLine("Opponent has joined and is ready.");
+                Console.WriteLine("Redirecting to round game:");
+                await MakeYourMove();
+                await UpdateRoundResultAsync();
+                Console.WriteLine("---------------------------");
+                Console.ReadKey();
+            }
+        }
+
+        public async Task MakeYourMove()
+        {
+            int move = 0;
+            ColorTextWriterService.PrintLineMessageWithSpecialColor("Now, try to coop with your move", ConsoleColor.Cyan);
+            while (true)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("Available moves:\n" +
+                    "1.\tRock\n" +
+                    "2.\tPaper\n" +
+                    "3.\tScissors\n", ConsoleColor.Magenta);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("You should choose only a item from list!", ConsoleColor.DarkYellow);
+                Console.Write("Select--> ");
+                var input = int.TryParse(Console.ReadLine()?.Trim(), out var choosse);
+                if (!input)
+                {
+                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Bad input", ConsoleColor.Red);
+                    continue;
+                }
+                if (!(choosse > 0 && choosse <4))
+                    continue;
+                else
+                {
+                    move = choosse;
+                    break;
+                }
+            }
+            var options = new RequestOptions //ToDo: Recycle
+            {
+                Address = baseAddress + $"round/move/{_room.RoomId}&{_sessionId}&{move}",
+                IsValid = true,
+                Body = _sessionId,
+                Method = Services.RequestModels.RequestMethod.Patch,
+                Name = "Make your move"
+            };
+            var reachedResponse = await _performer.PerformRequestAsync(options);
+
+            var round = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
+            if (round.WinnerId != null && round.LoserId != null)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {round.WinnerId}", ConsoleColor.Green);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Loser: {round.LoserId}", ConsoleColor.Red);
+            }
+            else ColorTextWriterService.PrintLineMessageWithSpecialColor("Waiting for move of another player", ConsoleColor.Cyan);
+        }
+        public async Task UpdateRoundResultAsync()
+        {
+            var roundEnded = new Round();
+            do
+            {
+                await Task.Run(async () =>
+                {
+                    var options = new RequestOptions
+                    {
+                        Body = "",
+                        Address = baseAddress + $"get/update/{_room.RoomId}",
+                        IsValid = true,
+                        Method = Services.RequestModels.RequestMethod.Get,
+                        Name = "Updating round satus"
+                    };
+                    var reachedResponse = await _performer.PerformRequestAsync(options);
+                    roundEnded = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
+                });
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            } while (roundEnded.IsFinished == true);
+            if (roundEnded.WinnerId != null && roundEnded.LoserId != null)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {roundEnded.WinnerId}", ConsoleColor.Green);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Loser: {roundEnded.LoserId}", ConsoleColor.Red);
+            }
+            else ColorTextWriterService.PrintLineMessageWithSpecialColor("Waiting for move of another player", ConsoleColor.Cyan);
+
+        }
+        public async Task RecurrentlyUpdateRoom()
+        {
+            var oneTimeShowed = true;
+            while (!_room.IsReady)
+            {
+                await Task.Run(async () =>
+                {
+                    var options = new RequestOptions
+                    {
+                        Body = "",
+                        Address = baseAddress + $"room/updateState/{_room.RoomId}",
+                        IsValid = true,
+                        Method = Services.RequestModels.RequestMethod.Get,
+                        Name = "Updating Room"
+                    };
+
+                    var reachedResponse = await _performer.PerformRequestAsync(options);
+
+                    _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
+
+                    //**************************************
+                    //This is just to show once message when someone has joined to your room
+                    if (oneTimeShowed && _room.Players.Count > 1)
+                    {
+                        Console.WriteLine("Updated player list: ");
+                        _room.Players.ToList().ForEach(x =>
+                        {
+                            var (key, value) = x;
+                            Console.WriteLine("Id: " + key + "; Is ready: " + value);
+                        });
+                        oneTimeShowed = false;
+                    }
+
+                });
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
         }
 
         private async Task CreationRoom()
@@ -259,7 +393,7 @@ namespace Client
             }
             var options = new RequestOptions
             {
-                Address = BaseAddress + $"room/create/{_sessionId}&{isPrivate}",
+                Address = baseAddress + $"room/create/{_sessionId}&{isPrivate}",
                 IsValid = true,
                 Body = _sessionId,
                 Method = Services.RequestModels.RequestMethod.Post,
@@ -285,7 +419,7 @@ namespace Client
             var readyToStart = false;
                 
             ColorTextWriterService.PrintLineMessageWithSpecialColor("Ready to start game?", ConsoleColor.Cyan);
-                
+
             while (true)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(
@@ -298,13 +432,18 @@ namespace Client
                     ColorTextWriterService.PrintLineMessageWithSpecialColor("Bad input", ConsoleColor.Red);
                     continue;
                 }
-                if (startListInput == 1)
-                    readyToStart = true;
-                break;
+                readyToStart = startListInput switch
+                {
+                    1 => true,
+                    2 => false,
+                    _ => false
+                };
+                if (readyToStart)
+                    break;
             }
             var options = new RequestOptions
             {
-                Address = BaseAddress + $"room/updateState/{_sessionId}&{readyToStart}",
+                Address = baseAddress + $"room/updateState/{_sessionId}&{readyToStart}",
                 IsValid = true,
                 Body = _sessionId,
                 Method = Services.RequestModels.RequestMethod.Put,
@@ -318,47 +457,11 @@ namespace Client
 
             if (readyToStart)
             {
-                await RoomMenu();
+                await StartRoomMenu();
             }
             //Console.WriteLine("Here to spam update until round is created");
         }
 
-        private async Task RoomMenu()
-        {
-            Console.WriteLine($"Your room id: {_room.RoomId}\n" +
-                              $"Waiting for opponent.");
-            
-            await UpdateRoom();
-
-            if (_room.IsReady)
-            { //todo: add redirection;
-                Console.WriteLine("Opponent has joined and is ready.");
-                Console.WriteLine("Redirecting to round game:");
-            }
-        }
-        private async Task UpdateRoom()
-        {
-            while (!_room.IsReady)
-            {
-                await Task.Run(async () =>
-                {
-                    var options = new RequestOptions
-                    {
-                        Body = "",
-                        Address = BaseAddress + $"room/updateState/{_room.RoomId}",
-                        IsValid = true,
-                        Method = Services.RequestModels.RequestMethod.Get,
-                        Name = "Updating Room"
-                    };
-                    
-                    var reachedResponse = await _performer.PerformRequestAsync(options);
-                    
-                    _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
-                    
-                });
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            }
-        }
         private async Task<int> Registration()
         {
             ColorTextWriterService.PrintLineMessageWithSpecialColor("\nWe are glad to welcome you in the registration form!\n" +
@@ -378,7 +481,7 @@ namespace Client
             {
                 ContentType = "application/json",
                 Body = JsonConvert.SerializeObject(_playerAccount),
-                Address = BaseAddress + "user/create",
+                Address = baseAddress + "user/create",
                 IsValid = true,
                 Method = Services.RequestModels.RequestMethod.Post,
                 Name = "Registration"
@@ -407,7 +510,7 @@ namespace Client
             {
                 ContentType = "application/json",
                 Body = JsonConvert.SerializeObject(inputAccount),
-                Address = BaseAddress + "user/login",
+                Address = baseAddress + "user/login",
                 IsValid = true,
                 Method = Services.RequestModels.RequestMethod.Post,
                 Name = "Registration"
@@ -427,7 +530,7 @@ namespace Client
         {
             var options = new RequestOptions
             {
-                Address = BaseAddress + $"user/logout/{_sessionId}",
+                Address = baseAddress + $"user/logout/{_sessionId}",
                 IsValid = true,
                 Method = Services.RequestModels.RequestMethod.Get
             };
@@ -446,7 +549,7 @@ namespace Client
         {
             var options = new RequestOptions
             {
-                Address = BaseAddress + "overallStatistics",
+                Address = baseAddress + "overallStatistics",
                 IsValid = true,
                 Method = Services.RequestModels.RequestMethod.Get
             };

@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Client.Menus
 {
-    internal class RoomMenu : IRoomMenu
+   /* internal class RoomMenu : IRoomMenu
     {
         private readonly string _sessionId;
         private readonly string _baseAddress;
@@ -202,7 +202,7 @@ namespace Client.Menus
             { //todo: add redirection;
                 Console.WriteLine("Opponent has joined and is ready.");
                 Console.WriteLine("Redirecting to round game:");
-                await _roun
+               // await _roun
             }
         }
 
@@ -244,5 +244,5 @@ namespace Client.Menus
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
         }
-    }
+    }*/
 }

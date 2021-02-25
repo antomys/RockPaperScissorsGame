@@ -13,7 +13,6 @@ namespace Server.Controllers
 {
     [ApiController]
     [Route("/round")]
-    [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     public class RoundController:ControllerBase
     {

@@ -6,15 +6,15 @@ using Client.Services;
 
 namespace Client.Menus
 {
-    internal class MainMenu : IMainMenu
+    /*internal class MainMenu : IMainMenu
     {
-        private readonly IAccount _playerAccount;
-        private readonly IRoomMenu _roomMenu;
+      /*  private readonly IAccount _playerAccount;
+     //   private readonly IRoomMenu _roomMenu;
         private readonly ILoginMenu _loginMenu;
 
         public MainMenu(
             IAccount playerAccount,
-            IRoomMenu roomMenu,
+           // IRoomMenu roomMenu,
             ILoginMenu loginMenu)
         {
             _playerAccount = playerAccount;
@@ -68,5 +68,5 @@ namespace Client.Menus
                 }
             }
         }
-    }
+    }*/
 }
