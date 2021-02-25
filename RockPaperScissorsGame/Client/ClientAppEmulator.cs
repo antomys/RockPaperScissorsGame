@@ -255,7 +255,7 @@ namespace Client
                 Console.WriteLine("Opponent has joined and is ready.");
                 Console.WriteLine("Redirecting to round game:");
                 await MakeYourMove();
-                await UpdateRoundResultAsync();
+           //     await UpdateRoundResultAsync(); //fixbug
                 Console.WriteLine("---------------------------");
                 Console.ReadKey();
             }
@@ -297,17 +297,16 @@ namespace Client
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
 
-            var round = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
-            if (round.WinnerId != null && round.LoserId != null)
+            _round = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
+            if (_round.WinnerId != null && _round.LoserId != null)
             {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {round.WinnerId}", ConsoleColor.Green);
-                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Loser: {round.LoserId}", ConsoleColor.Red);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {_round.WinnerId}", ConsoleColor.Green);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Loser: {_round.LoserId}", ConsoleColor.Red);
             }
             else ColorTextWriterService.PrintLineMessageWithSpecialColor("Waiting for move of another player", ConsoleColor.Cyan);
         }
         public async Task UpdateRoundResultAsync()
         {
-            var roundEnded = new Round();
             do
             {
                 await Task.Run(async () =>
@@ -321,17 +320,16 @@ namespace Client
                         Name = "Updating round satus"
                     };
                     var reachedResponse = await _performer.PerformRequestAsync(options);
-                    roundEnded = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
+                    _round = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
                 });
                 await Task.Delay(TimeSpan.FromSeconds(1));
-            } while (roundEnded.IsFinished == true);
-            if (roundEnded.WinnerId != null && roundEnded.LoserId != null)
+            } while (_round.IsFinished == true);
+            if (_round.WinnerId != null && _round.LoserId != null)
             {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {roundEnded.WinnerId}", ConsoleColor.Green);
-                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Loser: {roundEnded.LoserId}", ConsoleColor.Red);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {_round.WinnerId}", ConsoleColor.Green);
+                ColorTextWriterService.PrintLineMessageWithSpecialColor($"Loser: {_round.LoserId}", ConsoleColor.Red);
             }
             else ColorTextWriterService.PrintLineMessageWithSpecialColor("Waiting for move of another player", ConsoleColor.Cyan);
-
         }
         public async Task RecurrentlyUpdateRoom()
         {
