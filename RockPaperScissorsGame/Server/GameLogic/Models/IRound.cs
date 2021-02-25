@@ -9,6 +9,9 @@ namespace Server.GameLogic.Models
         [JsonPropertyName("Id")]
         string Id { get; init; }  //Not to store identical rounds
         
+        [JsonPropertyName("RoomId")]
+        string RoomId { get; set; }
+        
         [JsonPropertyName("Moves")]
         public ConcurrentDictionary<string, RequiredGameMove>  PlayerMoves { get; set; } //where string key is playerId
         

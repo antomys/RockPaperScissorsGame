@@ -7,7 +7,8 @@ namespace Server.GameLogic.Models.Impl
     public class Round : IRound
     {
         public string Id { get; init; }
-        
+
+        public string RoomId { get; set; }
         public bool IsFinished { get; set; }
         
         //where string key is playerId
