@@ -17,12 +17,13 @@ namespace Server.GameLogic.LogicServices.Impl
         private readonly IAccountManager _accountManager;
 
         private readonly IRoundCoordinator _roundCoordinator;
+
         private static readonly Random Random = new();
-        
+
         private Timer _timer;
 
         public ConcurrentDictionary<string, Room> ActiveRooms { get; }
-        
+
         public RoomCoordinator(
             IAccountManager accountManager,
             IRoundCoordinator roundCoordinator)
@@ -32,13 +33,14 @@ namespace Server.GameLogic.LogicServices.Impl
             ActiveRooms = new ConcurrentDictionary<string, Room>();
             _timer = new Timer(CheckRoomDate, null, 0, 10000);
         }
+
         public async Task<Room> CreateRoom(string sessionId, bool isPrivate)
         {
             var tasks = Task.Factory.StartNew(() =>
             {
                 var account = GetAccountBySessionId(sessionId);
 
-                if(ActiveRooms.Any(x=> x.Value.Players.Any(p=> p.Key.Equals(account.Id))))
+                if (ActiveRooms.Any(x => x.Value.Players.Any(p => p.Key.Equals(account.Id))))
                     throw new TwinkGameRoomCreationException();
 
                 var newRoom = new Room
@@ -62,20 +64,23 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await tasks;
         }
+
         public async Task<Room> JoinPublicRoom(string sessionId)
         {
             var tasks = Task.Factory.StartNew(() =>
             {
-                var thisRoom = ActiveRooms.FirstOrDefault(x => x.Value.IsPrivate == false && x.Value.Players.Count < 2).Value;
+                var thisRoom = ActiveRooms.FirstOrDefault(x => x.Value.IsPrivate == false && x.Value.Players.Count < 2)
+                    .Value;
 
                 var thisAccount = GetAccountBySessionId(sessionId);
-                
+
                 thisRoom.Players.TryAdd(thisAccount.Id, false);
-                
+
                 return UpdateRoom(thisRoom).Result;
             });
             return await tasks;
         }
+
         public async Task<Room> CreateTrainingRoom(string sessionId)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -105,29 +110,33 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await tasks;
         }
+
         public async Task<Room> JoinPrivateRoom(string sessionId, string roomId)
         {
             var tasks = Task.Run(() =>
             {
                 if (!ActiveRooms.TryGetValue(roomId, out var thisRoom))
                     return null; //todo:exception;
-                
+
                 if (thisRoom.Players.Count == 2)
                     return null;
-                
+
                 var newRoom = thisRoom;
                 var thisAccount = GetAccountBySessionId(sessionId);
                 newRoom.Players.TryAdd(thisAccount.Id, false);
 
                 if (newRoom.Players.Count > 1)
                     newRoom.IsFull = true;
-            
+
                 return ActiveRooms.TryUpdate(roomId,
-                    newRoom, thisRoom) ? newRoom : null; //todo: change to exception;
+                    newRoom, thisRoom)
+                    ? newRoom
+                    : null; //todo: change to exception;
             });
-           
+
             return await tasks;
         }
+
         private async void CheckRoomDate(object state)
         {
             var threads = Task.Factory.StartNew(() =>
@@ -141,12 +150,14 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             await Task.WhenAll(threads);
         }
+
         public async Task<bool> DeleteRoom(string roomId)
         {
             var tasks = Task.Factory.StartNew(() =>
                 ActiveRooms.TryRemove(roomId, out _));
             return await tasks;
         }
+
         public async Task<Room> UpdateRoom(Room updated)
         {
             var thread = Task.Factory.StartNew(() =>
@@ -156,11 +167,15 @@ namespace Server.GameLogic.LogicServices.Impl
                 {
                     return null; //todo: change into exception;
                 }
+
                 return ActiveRooms.TryUpdate(room.RoomId,
-                    updated, room) ? room : null;
+                    updated, room)
+                    ? room
+                    : null;
             });
             return await thread;
         }
+
         public async Task<Room> UpdatePlayerStatus(string sessionId, bool isReady)
         {
             var tasks = Task.Factory.StartNew(() =>
@@ -170,77 +185,92 @@ namespace Server.GameLogic.LogicServices.Impl
                     .FirstOrDefault(x => x.Players.Keys
                         .Any(p => p
                             .Equals(account.Id))); //Here you was equaling to sessionId
-                
-                if (!ActiveRooms.TryGetValue(room.RoomId, out var thisRoom))
+
+                var thisRoom = GetRoomByRoomId(room?.RoomId);
+
+                if (thisRoom == null)
                     return null; //To fix
-                var newRoom = thisRoom;
-                var (key, oldValue) = newRoom.Players.FirstOrDefault(x => x.Key == account.Id); //Here you were equaling to Login
+                //var newRoom = thisRoom;
+                var (key, oldValue) =
+                    thisRoom.Players.FirstOrDefault(x => x.Key == account.Id); //Here you were equaling to Login
+
+                thisRoom.Players.TryUpdate(key, isReady, oldValue);
+
+                var result = UpdateRoom(thisRoom).Result;
                 
-                newRoom.Players.TryUpdate(key, isReady, oldValue);
-                
-                return newRoom;
+                return result;
             });
-            
-            
+
+
             return await tasks;
         }
+
         public async Task<Room> UpdateRoom(string roomId)
         {
-            var thread = Task.Factory.StartNew(() =>
+            var thread = Task.Factory.StartNew(async () =>
             {
-                var room = GetRoomByRoomId(roomId);
-
-                if (room == null)
+                try
                 {
-                    throw new Exception(); //todo: exception;
-                }
-                
-                var thisRound = _roundCoordinator.ActiveRounds.FirstOrDefault(x => x.Key.Equals(room.RoomId)).Value;
-                
-                if (thisRound != null && thisRound.IsFinished)
-                {
-                    room.IsReady = false;
-                    room.IsRoundEnded = false;
-                    room.CurrentRoundId = null;
-                    foreach (var (key,value) in room.Players)
-                    {
-                        room.Players.TryUpdate(key, false, value);
-                    }
-                }
-                
-                if (room.Players.Values.All(x => x) && room.Players.Count==2)
-                {
-                    var round = new Round
-                    {
-                        Id = Guid.NewGuid()
-                            .ToString(),
-                        IsFinished = false,
-                        PlayerMoves = new ConcurrentDictionary<string, RequiredGameMove>(),
-                        TimeFinished = DateTime.Now,
-                        WinnerId = null,
-                        LoserId = null,
-                    };
-
-                    foreach (var value in room.Players.Keys.ToList())
-                    {
-                        round.PlayerMoves.TryAdd(value, RequiredGameMove.Default);
-                    }
-
-                    room.IsReady = true;
-
-                    room.IsFull = true;
-
-                    room.CurrentRoundId = round.Id;
-
-                    _roundCoordinator.ActiveRounds.TryAdd(roomId, round);
+                    var room = GetRoomByRoomId(roomId);
                     
+                    var thisRound = _roundCoordinator.ActiveRounds.FirstOrDefault(x => x.Key.Equals(room.RoomId));
+                    
+                    if (thisRound.Value != null && thisRound.Value.IsFinished || thisRound.Value != null && thisRound.Value.IsDraw)
+                    {
+                        room.IsReady = false;
+                        room.IsRoundEnded = false;
+                        room.CurrentRoundId = null;
+                        foreach (var (key,value) in room.Players)
+                        {
+                            if(key.Equals("Bot"))
+                                room.Players.TryUpdate(key, true, value);
+                            room.Players.TryUpdate(key, false, value);
+                        }
+
+                        _roundCoordinator.ActiveRounds.TryRemove(thisRound);
+
+                        await UpdateRoom(room);
+                    }
+
+                    if (!room.Players.Values.All(x => x) || room.Players.Count != 2) return UpdateRoom(room).Result;
+                    {
+                        var round = new Round
+                        {
+                            Id = Guid.NewGuid()
+                                .ToString(),
+                            IsFinished = false,
+                            PlayerMoves = new ConcurrentDictionary<string, RequiredGameMove>(),
+                            TimeFinished = DateTime.Now,
+                            WinnerId = null,
+                            LoserId = null,
+                        };
+
+                        foreach (var value in room.Players.Keys.ToList())
+                        {
+                            round.PlayerMoves.TryAdd(value, RequiredGameMove.Default);
+                        }
+
+                        room.IsReady = true;
+
+                        room.IsFull = true;
+
+                        room.CurrentRoundId = round.Id;
+
+                        _roundCoordinator.ActiveRounds.TryAdd(roomId, round);
+                    }
+                    /*return ActiveRooms.TryUpdate(room.RoomId,
+                        room,
+                        ActiveRooms.FirstOrDefault(x => x.Key == room.RoomId).Value) ? room : null;*/
+                    
+                    return UpdateRoom(room).Result;
                 }
-                return ActiveRooms.TryUpdate(room.RoomId,
-                    room,
-                    ActiveRooms.FirstOrDefault(x => x.Key == room.RoomId).Value) ? room : null;
+                catch (Exception exception)
+                {
+                    return null;
+                }
             });
 
-            return await thread;
+            return await await thread;
         }
 
         #region PrivateMethods
@@ -260,9 +290,9 @@ namespace Server.GameLogic.LogicServices.Impl
         }
         private Room GetRoomByRoomId(string roomId)
         {
-            if (ActiveRooms.TryGetValue(roomId, out var thisRoom))
-                return thisRoom;
-            throw new Exception(); //todo: implement exception;
+            return ActiveRooms.TryGetValue(roomId, out var thisRoom)
+                ? thisRoom
+                : throw new UserNotFoundException();
         }
 
         #endregion

@@ -43,7 +43,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 //************************************************************************************************************************************
                 var elapsedTime = DateTime.Now.Subtract(thisRound.TimeFinished);
-                if (elapsedTime.Seconds>= 20 &&
+                if (elapsedTime.Seconds>= 200 &&
                     thisRound.PlayerMoves.Any(x => x.Value.Equals(RequiredGameMove.Default)))
                 {
                     var dictionary = thisRound.PlayerMoves;
@@ -72,10 +72,13 @@ namespace Server.GameLogic.LogicServices.Impl
                 thisRound.TimeFinished = DateTime.Now;
 
                 //************************************************************************************************************************
-                
-                
+
+                var botPlays = false;
                 if (thisRound.PlayerMoves.Any(x => x.Key.Equals("Bot")))
+                {
                     thisRound.PlayerMoves = RockPaperScissors.ChangeBotState(thisRound.PlayerMoves);
+                    botPlays = true;
+                }
                 thisRound.PlayerMoves = RockPaperScissors.UpdateMove(thisRound.PlayerMoves, accountId, move);
 
                 if (thisRound.PlayerMoves.Values.All(x => x != RequiredGameMove.Default))
@@ -85,15 +88,23 @@ namespace Server.GameLogic.LogicServices.Impl
                     if (string.IsNullOrEmpty(winner))
                     {
                         thisRound.IsDraw = true;
-                        return null;
+                        await UpdateRound(thisRound);
+                        //return null;
                     }
-                    var loserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Key;
-                   
-                    thisRound.IsFinished = true;
-                    thisRound.WinnerId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
-                    thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
-                    thisRound.TimeFinished = DateTime.Now;
 
+                    if (botPlays)
+                    {
+                        thisRound.IsFinished = true;
+                    }
+                    else
+                    {
+                        var loserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Key;
+                   
+                        thisRound.IsFinished = true;
+                        thisRound.WinnerId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
+                        thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
+                        thisRound.TimeFinished = DateTime.Now;
+                    }
                     //await FillStatistics(thisRound);
                     //await FillStatistics(thisRound,thisRound.LoserId);
                     
@@ -177,23 +188,23 @@ namespace Server.GameLogic.LogicServices.Impl
         {
             var task = Task.Factory.StartNew(async () =>
             {
-                var roomId = 
+                var roomId =
                     ActiveRounds.Where(x => x.Value
-                        .Equals(updated)).Select(x => x.Key).ToString();
+                        .Equals(updated)).ToArray();
                 
-                
-                if (updated.IsFinished && !updated.IsDraw)
+
+
+                if (updated.IsFinished)
                 {
-                    if(!updated.PlayerMoves.Any(x=> x.Key.Equals("Bot")))
+                    if(updated.PlayerMoves.Any(x=> x.Key != "Bot" && !updated.IsDraw))
                         await _storageRounds.AddAsync(updated);
 
-                    ActiveRounds.TryRemove(roomId, out _);
+                    //ActiveRounds.TryRemove(roomId[0].Key, out _);
 
                     return updated;
                 }
-
-                ActiveRounds.TryGetValue(roomId, out var oldRoom);
-                ActiveRounds.TryUpdate(roomId, updated, oldRoom);
+                ActiveRounds.TryGetValue(roomId[0].Key, out var oldRoom);
+                ActiveRounds.TryUpdate(roomId[0].Key, updated, oldRoom);
 
                 return updated;
             });
@@ -263,9 +274,5 @@ namespace Server.GameLogic.LogicServices.Impl
             //todo: change null to exception;
             return await tasks;
         }
-    }
-
-    internal class Datetime
-    {
     }
 }
