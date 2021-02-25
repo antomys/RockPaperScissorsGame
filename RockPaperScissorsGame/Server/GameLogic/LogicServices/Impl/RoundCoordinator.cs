@@ -14,33 +14,29 @@ namespace Server.GameLogic.LogicServices.Impl
         private readonly IDeserializedObject<Round> _deserializedRounds;
 
         private readonly IStorage<Round> _storageRounds;
+
+        private readonly IAccountManager _accountManager;
         
 
         public ConcurrentDictionary<string, Round> ActiveRounds { get; set; }
         
         public RoundCoordinator(
             IDeserializedObject<Round> deserializedRounds,
-            IStorage<Round> storageRounds)
+            IStorage<Round> storageRounds,
+            IAccountManager accountManager)
         {
             _deserializedRounds = deserializedRounds;
             _storageRounds = storageRounds;
+            _accountManager = accountManager;
             ActiveRounds = new ConcurrentDictionary<string, Round>();
         }
-        public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string roundId)
-        {
-            var tasks = Task.Factory.StartNew(() =>
-            {
-                if (ActiveRounds.TryGetValue(roundId, out var thisRound))
-                    return thisRound;
-                return null; //ToDo: exception
-            });
-            return await tasks;
-        }
+        
 
-        public async Task<Round> MakeMove(string roomId, string accountId, int move)
+        public async Task<Round> MakeMove(string roomId, string sessionId, int move)
         {
             var tasks = Task.Factory.StartNew(async () =>
             {
+                var accountId = _accountManager.GetActiveAccountBySessionId(sessionId).Id;
                 ActiveRounds.TryGetValue(roomId, out var thisRound);
 
                 if (thisRound == null)
@@ -66,20 +62,11 @@ namespace Server.GameLogic.LogicServices.Impl
                 return thisRound;
                 
             });
-
             return await await tasks;  //AWAIT AWAIT?
            
         }
 
-        /*public async Task<Round> UpdateRound(string roomId)
-        {
-            var task = Task.Factory.StartNew(() =>
-            {
-                
-            });
 
-            return await task;
-        }*/
 
         private async Task<Round> UpdateRound(Round updated)
         {
@@ -105,6 +92,12 @@ namespace Server.GameLogic.LogicServices.Impl
             });
 
             return await await task; //Task<Task<round>>??????????????????
+        }
+        public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string roundId)
+        {
+            var tasks = Task.Factory.StartNew(() => ActiveRounds.TryGetValue(roundId, out var thisRound) ? thisRound : null);
+            //todo: change null to exception;
+            return await tasks;
         }
     }
 

@@ -96,6 +96,13 @@ namespace Server.Services
             return await tasks;
         }
 
+        public Account GetActiveAccountBySessionId(string sessionId)
+        {
+            AccountsActive.TryGetValue(sessionId, out var account);
+
+            return account;
+        }
+
 
         /*public async Task<int> LogOutAsync()
         {

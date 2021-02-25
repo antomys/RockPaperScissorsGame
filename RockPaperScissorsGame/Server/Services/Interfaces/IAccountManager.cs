@@ -12,5 +12,7 @@ namespace Server.Services.Interfaces
         Task<bool> LogOutAsync(string sessionId);
 
         Task<bool> IsActive(string sessionId);
+
+        Account GetActiveAccountBySessionId(string sessionId);
     }
 }
