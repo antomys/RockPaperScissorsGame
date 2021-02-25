@@ -153,14 +153,14 @@ namespace Server.Controllers
             }
         }
         [HttpDelete]
-        [Route("delete/{sessionId}")]
+        [Route("delete/{roomId}")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)] //Probably set new HttpStatus 
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<string>> DeleteRoomExit(string sessionId)
+        public async Task<ActionResult<string>> DeleteRoomExit(string roomId)
         {
             try
             {
-                var deleted = await _roomManager.DeleteRoom(sessionId);
+                var deleted = await _roomManager.DeleteRoom(roomId);
                 if (deleted)
                     return Ok("Room was deleted successfully!");
                 return BadRequest();
