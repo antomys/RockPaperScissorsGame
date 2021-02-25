@@ -98,7 +98,6 @@ namespace Server.Controllers
             }
 
         }
-   
         
         [HttpPut]
         [Route("updateState/{sessionId}&{state}")]

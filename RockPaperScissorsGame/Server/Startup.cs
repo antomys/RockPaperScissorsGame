@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -75,6 +76,12 @@ namespace Server
                     {
                         context.Response.StatusCode = (int) HttpStatusCode.Forbidden;
                     }
+                });
+                
+                endpoints.Map("/status/", async context =>
+                {
+                    context.Response.StatusCode = (int) HttpStatusCode.OK;
+                    await context.Response.WriteAsync("alive");
                 });
                 
                 endpoints.MapControllers();

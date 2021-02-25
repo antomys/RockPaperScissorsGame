@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using Server.GameLogic.Models;
 
@@ -33,7 +34,7 @@ namespace Server.GameLogic
                 {
                     if ((int)value == surrenderMove)
                     {
-                        return "Draw";
+                        return string.Empty;
                     }
                     
                     if (surrenderMove == 1 && (int)value == 3)
@@ -51,6 +52,24 @@ namespace Server.GameLogic
                 }
             }
             return winner;
+        }
+
+        public static ConcurrentDictionary<string,RequiredGameMove> ChangeBotState(
+            ConcurrentDictionary<string,
+                RequiredGameMove> playerMoves)
+        {
+            var (key, value) = playerMoves.FirstOrDefault(x => x.Key.Equals("Bot"));
+            playerMoves.TryUpdate(key, GenerateRandomMove(), value);
+
+            return playerMoves;
+        }
+
+        private static RequiredGameMove GenerateRandomMove()
+        {
+            var r = new Random();
+            var rInt = r.Next(1, 4);
+
+            return (RequiredGameMove)rInt;
         }
     }
 

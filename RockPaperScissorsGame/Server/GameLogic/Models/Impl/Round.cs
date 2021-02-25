@@ -12,6 +12,8 @@ namespace Server.GameLogic.Models.Impl
         //where string key is playerId
         public ConcurrentDictionary<string, RequiredGameMove>  PlayerMoves { get; set; }
         
+        public bool IsDraw { get; set; }
+        
         public DateTime TimeFinished { get; set; }
         
         public string WinnerId { get; set; }
