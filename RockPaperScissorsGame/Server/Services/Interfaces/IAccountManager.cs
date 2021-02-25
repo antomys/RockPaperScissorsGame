@@ -13,6 +13,6 @@ namespace Server.Services.Interfaces
 
         Task<bool> IsActive(string sessionId);
 
-        Account GetActiveAccountBySessionId(string sessionId);
+        Account GetActiveAccountBySessionId(string sessionId); //SYNC?????
     }
 }
