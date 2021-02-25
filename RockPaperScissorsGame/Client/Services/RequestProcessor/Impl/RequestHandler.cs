@@ -49,6 +49,7 @@ namespace Client.Services.RequestProcessor.Impl
                 RequestMethod.Post => HttpMethod.Post,
                 RequestMethod.Put => HttpMethod.Put,
                 RequestMethod.Patch => HttpMethod.Patch,
+                RequestMethod.Delete => HttpMethod.Delete,
                 _ => throw new ArgumentOutOfRangeException(nameof(method), method, "Invalid request method")
             };
         }
