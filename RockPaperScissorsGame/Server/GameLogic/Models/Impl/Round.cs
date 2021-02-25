@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Server.GameLogic.LogicServices.Impl;
 
 namespace Server.GameLogic.Models.Impl
 {
@@ -19,5 +20,6 @@ namespace Server.GameLogic.Models.Impl
         public string WinnerId { get; set; }
         
         public string LoserId { get; set; }
+        
     }
 }

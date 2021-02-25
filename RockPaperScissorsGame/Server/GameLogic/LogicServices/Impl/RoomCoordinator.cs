@@ -207,8 +207,8 @@ namespace Server.GameLogic.LogicServices.Impl
                         room.Players.TryUpdate(key, false, value);
                     }
                 }
-
-                if (thisRound != null && thisRound.IsDraw)
+                
+                if (room.Players.Values.All(x => x) && room.Players.Count==2)
                 {
                     var round = new Round
                     {
@@ -216,33 +216,7 @@ namespace Server.GameLogic.LogicServices.Impl
                             .ToString(),
                         IsFinished = false,
                         PlayerMoves = new ConcurrentDictionary<string, RequiredGameMove>(),
-                        TimeFinished = default,
-                        WinnerId = null,
-                        LoserId = null,
-                    };
-
-                    foreach (var value in room.Players.Keys.ToList())
-                    {
-                        round.PlayerMoves.TryAdd(value, RequiredGameMove.Default);
-                    }
-
-                    room.IsReady = true;
-
-                    room.IsFull = true;
-
-                    room.CurrentRoundId = round.Id;
-
-                    _roundCoordinator.ActiveRounds.TryAdd(roomId, round);
-                }
-                else if (room.Players.Values.All(x => x) && room.Players.Count==2)
-                {
-                    var round = new Round
-                    {
-                        Id = Guid.NewGuid()
-                            .ToString(),
-                        IsFinished = false,
-                        PlayerMoves = new ConcurrentDictionary<string, RequiredGameMove>(),
-                        TimeFinished = default,
+                        TimeFinished = DateTime.Now,
                         WinnerId = null,
                         LoserId = null,
                     };
