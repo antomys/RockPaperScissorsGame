@@ -10,9 +10,7 @@ namespace Server.Services.Interfaces
         ConcurrentDictionary<string, Account> AccountsActive { get; set; }
         Task<Account> LogInAsync(AccountDto accountDto);
         Task<bool> LogOutAsync(string sessionId);
-
         Task<bool> IsActive(string sessionId);
-
         Account GetActiveAccountBySessionId(string sessionId); //SYNC?????
     }
 }

@@ -7,6 +7,8 @@ namespace Client.Menus.Interfaces
     internal interface IStatisticsMenu
     {
         Task OverallStatistics();
-        
+
+        Task PersonalStatistics();
+
     }
 }

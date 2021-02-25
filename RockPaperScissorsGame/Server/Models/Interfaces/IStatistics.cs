@@ -16,9 +16,6 @@ namespace Server.Models.Interfaces
         [JsonPropertyName("Loss")]
         int Loss { get; set; }
         
-        [JsonPropertyName("Draws")]
-        int Draws { get; set; }
-        
         [JsonPropertyName("WinToLossRatio")]
         double WinLossRatio { get; set; }
         
