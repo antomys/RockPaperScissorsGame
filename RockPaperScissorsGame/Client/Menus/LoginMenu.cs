@@ -52,6 +52,8 @@ namespace Client.Menus
             {
                 _playerAccount =  inputAccount;
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
+                Console.ReadKey();
+                Console.Clear();
                 return 0;
             }
             ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);

@@ -76,7 +76,7 @@ namespace Server.Controllers
         /// <returns>HttpStatusCode and response string</returns>
         [HttpPost]
         [Route("create")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<int>> CreateAccount(AccountDto accountDto)
         {

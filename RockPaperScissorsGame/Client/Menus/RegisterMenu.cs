@@ -55,7 +55,7 @@ namespace Client.Menus
                 Name = "Registration"
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            if (reachedResponse.Code == (int) HttpStatusCode.OK)
+            if (reachedResponse.Code == (int) HttpStatusCode.Created)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
                 return 1;

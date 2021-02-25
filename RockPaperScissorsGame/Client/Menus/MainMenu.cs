@@ -59,7 +59,9 @@ namespace Client.Menus
                         return;
                     case 5:
                         await _loginMenu.Logout();
-                        break;
+                        Console.ReadKey();
+                        Console.Clear();
+                        return;
                     default:
                         ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
                         continue;

@@ -37,7 +37,7 @@ namespace Client.Menus
                 "1.\tSign up\n" +
                 "2.\tLog in\n" +
                 "3.\tSee Leaderboard\n" +       //This part will be available after we figure out the statistics
-                "4.\tExit", ConsoleColor.DarkYellow);
+                "4.\tExit", ConsoleColor.White);
 
                 ColorTextWriterService.PrintLineMessageWithSpecialColor("\nPlease select an item from the list", ConsoleColor.Green);
 

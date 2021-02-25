@@ -18,6 +18,7 @@ namespace Client.Menus
         private readonly string _baseAddress;
         private IRoom _room;
         private readonly IRequestPerformer _performer;
+        private readonly ILoginMenu _loginMenu;
 
         public RoomMenu(
             string sessionId,
@@ -163,7 +164,8 @@ namespace Client.Menus
                     2 => false,
                     _ => false
                 };
-                break;
+                if (readyToStart)
+                    break;
             }
             var options = new RequestOptions
             {

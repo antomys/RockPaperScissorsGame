@@ -26,7 +26,7 @@ namespace Client.Services
                 if(destination == StringDestination.PassportType || destination == StringDestination.Email)
                     ColorTextWriterService.PrintLineMessageWithSpecialColor($"What is your {msg}?", ConsoleColor.Yellow);
                 else
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor($"Try to сome up with { msg}?", ConsoleColor.Yellow);
+                    ColorTextWriterService.PrintLineMessageWithSpecialColor($"Try to come up with  {msg}?", ConsoleColor.Yellow);
                 Console.Write($"{msg}--> ");
                 output = Console.ReadLine()
                     ?.Trim()
