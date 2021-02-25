@@ -25,14 +25,14 @@ namespace Server.Controllers
             _logger = logger;
         }
         [HttpGet]
-        [Route("get/{roundId}")]
+        [Route("get/{roomId}")]
         [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Round>> GetActualActiveRoundForCurrentRoom(string roundId)
+        public async Task<ActionResult<Round>> GetActualActiveRoundForCurrentRoom(string roomId)
         {
             try
             {
-                var resultRoom = await _roundManager.GetCurrentActiveRoundForSpecialRoom(roundId);
+                var resultRoom = await _roundManager.GetCurrentActiveRoundForSpecialRoom(roomId);
                 if (resultRoom != null)
                 {
                     return resultRoom;

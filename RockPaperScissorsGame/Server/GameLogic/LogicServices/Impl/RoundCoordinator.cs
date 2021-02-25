@@ -31,15 +31,15 @@ namespace Server.GameLogic.LogicServices.Impl
             _storageRounds = storageRounds;
             ActiveRounds = new ConcurrentDictionary<string, Round>();
         }
-        public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string roundId)
+        public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string roomId)
         {
-            var tasks = Task.Factory.StartNew(() =>
+            var thread = Task.Factory.StartNew(() =>
             {
-                if (ActiveRounds.TryGetValue(roundId, out var thisRound))
+                if (ActiveRounds.TryGetValue(roomId, out var thisRound))
                     return thisRound;
-                return null; //ToDo: exception
+                return null;
             });
-            return await tasks;
+            return await thread;
         }
 
         public void MakeMove(string roomId, string accountId, int move)
