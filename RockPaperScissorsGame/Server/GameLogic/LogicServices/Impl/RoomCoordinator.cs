@@ -284,14 +284,13 @@ namespace Server.GameLogic.LogicServices.Impl
             throw new UserNotFoundException(nameof(account));
 
         }
-
         private Room GetRoomByRoomId(string roomId)
         {
             if (ActiveRooms.TryGetValue(roomId, out var thisRoom))
                 return thisRoom;
             throw new Exception(); //todo: implement exception;
         }
-        
+
         #endregion
         
     }
