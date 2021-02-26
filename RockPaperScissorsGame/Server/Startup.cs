@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Server.GameLogic.LogicServices;
+using Server.GameLogic.LogicServices.Impl;
+using Server.Services;
+using Server.Services.Interfaces;
 
 namespace Server
 {
@@ -21,13 +20,24 @@ namespace Server
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            services.AddSingleton(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
+            services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
+
+            services.AddSingleton<IAccountManager, AccountManager>();
+            services.AddSingleton<IRoundCoordinator, RoundCoordinator>();
+            services.AddSingleton<IRoomCoordinator, RoomCoordinator>();
+            
             services.AddControllers();
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"}); });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"});
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,7 +56,37 @@ namespace Server
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.Map("/status/{sessionId}", async context =>
+                {
+                    var service = context.RequestServices.GetRequiredService<IAccountManager>();  //todo: remove
+                    
+                    var sessionId = (string) context.Request.RouteValues["sessionId"];
+
+                    if (sessionId == null)
+                    {
+                        context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    }
+                    else  if (await service.IsActive(sessionId))
+                    {
+                        context.Response.StatusCode = (int) HttpStatusCode.OK;
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = (int) HttpStatusCode.Forbidden;
+                    }
+                });
+                
+                endpoints.Map("/status/", async context =>
+                {
+                    context.Response.StatusCode = (int) HttpStatusCode.OK;
+                    await context.Response.WriteAsync("alive");
+                });
+                
+                endpoints.MapControllers();
+                
+            });
         }
     }
 }
