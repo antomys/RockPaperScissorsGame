@@ -277,30 +277,32 @@ namespace Client
                 await MakeYourMove();
                 await UpdateRoundResultAsync();
                 
-                if (_round.IsDraw)
+                /*if (_round.IsDraw)
                 {
                     await UpdateRoom();
                     await ChangePlayerStatus(true);
                    //await StartRoomMenu();
                    await MakeYourMove();
-                }
-                else
-                {
-                    Console.WriteLine("Do you want to continue playing in this room?");
-                    Console.WriteLine("Press enter to continue\n\nPress any key to exit root");
+                }*/
+                //else
+                //{
+                    //Console.WriteLine("Do you want to continue playing in this room?");
+                    //Console.WriteLine("Press enter to continue\n\nPress any key to exit root");
+                    var j = "0";
+                    string? input;
 
-                    if (Console.ReadKey().Key == ConsoleKey.Enter)
+                    do
                     {
+                        input = Console.ReadLine();
                         await UpdateRoom();
                         await ChangePlayerStatus();
                         await RecurrentlyUpdateRoom();
                         await MakeYourMove();
-                    }
-                    else
-                    {
-                        await DeleteRoom();
-                    }
-                }
+                        foreach(var values in _round.PlayerMoves.Values)
+                            Console.WriteLine($"{j}:{values}\n");
+                    } while (input != j);
+                    
+                //}
                 Console.WriteLine("---------------------------");
                 Console.ReadKey();
             }

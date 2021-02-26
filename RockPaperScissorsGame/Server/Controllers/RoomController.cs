@@ -15,7 +15,6 @@ namespace Server.Controllers
     {
         private readonly IRoomCoordinator _roomManager;
         
-        
         public RoomController(
             IRoomCoordinator roomManager)
         {

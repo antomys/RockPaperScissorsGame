@@ -178,7 +178,6 @@ namespace Server.GameLogic.LogicServices.Impl
             });
             return await thread;
         }
-
         public async Task<Room> UpdatePlayerStatus(string sessionId, bool isReady)
         {
             var account = GetAccountBySessionId(sessionId);
@@ -247,7 +246,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     room.IsReady = false;
                     room.IsRoundEnded = false;
                     room.CurrentRoundId = null;
-                    /*foreach (var (key, value) in room.Players)
+                    foreach (var (key, value) in room.Players)
                     {
                         if (key.Equals("Bot"))
                             room.Players.TryUpdate(key, true, value);
@@ -255,8 +254,7 @@ namespace Server.GameLogic.LogicServices.Impl
                         {
                             room.Players.TryUpdate(key, false, value);
                         }
-
-                    }*/
+                    }
                     _roundCoordinator.ActiveRounds.TryRemove(thisRound);
 
                     await UpdateRoom(room);
