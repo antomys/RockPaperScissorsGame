@@ -291,7 +291,8 @@ namespace Client
 
                     if (Console.ReadKey().Key == ConsoleKey.Enter)
                     {
-                        await ChangePlayerStatus(true);
+                        await UpdateRoom();
+                        await ChangePlayerStatus();
                         await RecurrentlyUpdateRoom();
                         await MakeYourMove();
                     }
@@ -375,12 +376,12 @@ namespace Client
                 });
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
-            if (_round.WinnerId != null && _round.LoserId != null)
+            /*if (_round.WinnerId != null && _round.LoserId != null)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {_round.WinnerId}", ConsoleColor.Green);
                 ColorTextWriterService.PrintLineMessageWithSpecialColor($"Loser: {_round.LoserId}", ConsoleColor.Red);
             }
-            else Console.WriteLine("Round timed out");
+            else Console.WriteLine("Round timed out");*/
         }
         private async Task UpdateRoom()
         {
