@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Server.GameLogic.LogicServices;
 using Server.GameLogic.Models.Impl;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -14,20 +10,16 @@ namespace Server.Controllers
 {
     [ApiController]
     [Route("/room")]
-    //[Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     public class RoomController : ControllerBase
     {
         private readonly IRoomCoordinator _roomManager;
-
-        private readonly ILogger<RoomController> _logger;
+        
         
         public RoomController(
-            IRoomCoordinator roomManager,
-            ILogger<RoomController> logger)
+            IRoomCoordinator roomManager)
         {
             _roomManager = roomManager;
-            _logger = logger;
         }
 
         [HttpPost]

@@ -4,10 +4,8 @@ using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Server.Contracts;
 using Server.Mappings;
 using Server.Models;
-using Server.Models.Interfaces;
 using Server.Services.Interfaces;
 
 namespace Server.Controllers

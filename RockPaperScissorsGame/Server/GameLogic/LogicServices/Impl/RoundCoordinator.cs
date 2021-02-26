@@ -88,8 +88,8 @@ namespace Server.GameLogic.LogicServices.Impl
                     if (string.IsNullOrEmpty(winner))
                     {
                         thisRound.IsDraw = true;
+                       
                         await UpdateRound(thisRound);
-                        //return null;
                     }
 
                     if (botPlays)
@@ -106,8 +106,6 @@ namespace Server.GameLogic.LogicServices.Impl
                         thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
                         thisRound.TimeFinished = DateTime.Now;
                     }
-                    //await FillStatistics(thisRound);
-                    //await FillStatistics(thisRound,thisRound.LoserId);
                     
                 }
                 

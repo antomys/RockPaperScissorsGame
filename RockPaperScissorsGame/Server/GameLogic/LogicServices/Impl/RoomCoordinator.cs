@@ -192,7 +192,7 @@ namespace Server.GameLogic.LogicServices.Impl
                 var thisRoom = GetRoomByRoomId(room?.RoomId);
 
                 if (thisRoom == null)
-                    return null; //To fix
+                    return null; //Never performs
                 
                 
                 var (key, oldValue) =
@@ -267,10 +267,6 @@ namespace Server.GameLogic.LogicServices.Impl
 
                         _roundCoordinator.ActiveRounds.TryAdd(roomId, round);
                     }
-                    /*return ActiveRooms.TryUpdate(room.RoomId,
-                        room,
-                        ActiveRooms.FirstOrDefault(x => x.Key == room.RoomId).Value) ? room : null;*/
-                    
                     return UpdateRoom(room).Result;
                 }
                 catch (Exception exception)
