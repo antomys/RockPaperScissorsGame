@@ -655,9 +655,8 @@ namespace Client
                 Method = Services.RequestModels.RequestMethod.Get
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            
-            return JsonConvert.DeserializeObject<IEnumerable<StatisticsDto>>(reachedResponse.Content);
-            
+            return reachedResponse.Code == 404 ? null : 
+                JsonConvert.DeserializeObject<IEnumerable<StatisticsDto>>(reachedResponse.Content);
         }
 
         private async Task<Statistics> PersonalStatistics(string sessionId)

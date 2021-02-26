@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Server.Contracts;
 using Server.Mappings;
 using Server.Models;
 using Server.Services.Interfaces;
@@ -32,9 +33,9 @@ namespace Server.Controllers
 
         [HttpGet]
         [Route("overallStatistics")]
-        [ProducesResponseType(typeof(IEnumerable<Statistics>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<StatisticsDto>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public  ActionResult<IEnumerable<Statistics>> GetOverallStatistics()
+        public  ActionResult<IEnumerable<StatisticsDto>> GetOverallStatistics()
         {
             try
             {
@@ -47,7 +48,7 @@ namespace Server.Controllers
                
                 var resultList = statisticsList.Select(statistics => statistics.ToStatisticsDto()).ToList();
 
-                return Ok(resultList);
+                return resultList;
             }
             catch (Exception exceptions) //todo: custom exception OR NOT :)
             {
