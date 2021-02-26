@@ -13,32 +13,48 @@ namespace Server.Services
     public class DeserializedObject<T> : IDeserializedObject<T> where T: class
     {
         private static string _fileName;
-        private static ILogger<IDeserializedObject<T>> _logger;
-        //private bool IsBusy = false;
-        
+
+        /// <summary>
+        /// Concurrent Dictionary. Heart of our project
+        /// </summary>
         public ConcurrentDictionary<string, T> ConcurrentDictionary { get; set; }
 
-        public DeserializedObject(ILogger<IDeserializedObject<T>> logger)
+        public DeserializedObject()
         {
-            _logger = logger;
             ConcurrentDictionary = GetData().Result;
         }
 
+        /// <summary>
+        /// Method to retrieve data from Dictionary
+        /// </summary>
+        /// <returns>ConcurrentDictionary</returns>
         private async Task<ConcurrentDictionary<string, T>> GetData()
         {
            return await Deserialize();
         }
+        
+        /// <summary>
+        /// Method to update data in ConcurrentDictionary
+        /// </summary>
+        /// <returns></returns>
         public async Task UpdateData()
         {
             await Serialize();
         }
         
+        /// <summary>
+        /// Check if file is available. Returns true if it exists. Else false
+        /// </summary>
+        /// <returns>bool</returns>
         private Task<bool> IsNeededFilesAvailable()
         { 
             return Task.Run(()=> File.Exists(_fileName));
         }
         
-        
+        /// <summary>
+        /// Method to deserialize data from T file
+        /// </summary>
+        /// <returns>ConcurrentDictionary</returns>
         private async Task<ConcurrentDictionary<string, T>> Deserialize()
         {
             _fileName = typeof(T).Name.Contains("Statistics") ? "Statistics" : typeof(T).Name;
@@ -65,7 +81,6 @@ namespace Server.Services
                 }
                 catch (FileNotFoundException exception)
                 {
-                    _logger.LogWarning($"{exception.Message}");  //todo:remove crap
                     File.Create(_fileName);
                     return new ConcurrentDictionary<string, T>();
                 }
@@ -76,6 +91,10 @@ namespace Server.Services
             
         }
 
+        /// <summary>
+        /// Method to serialize T objects
+        /// </summary>
+        /// <returns>Void</returns>
         private async Task Serialize()
         {
             var streamManager = new RecyclableMemoryStreamManager();

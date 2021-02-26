@@ -69,7 +69,10 @@ namespace Server.GameLogic.LogicServices.Impl
         {
             var tasks = Task.Factory.StartNew(() =>
             {
-                var thisRoom = ActiveRooms.FirstOrDefault(x => x.Value.IsPrivate == false && x.Value.Players.Count < 2)
+                var thisRoom = ActiveRooms
+                    .FirstOrDefault(x => 
+                        x.Value.IsPrivate == false 
+                        && x.Value.Players.Count < 2)
                     .Value;
 
                 var thisAccount = GetAccountBySessionId(sessionId);

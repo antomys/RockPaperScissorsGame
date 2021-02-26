@@ -95,6 +95,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     if (botPlays)
                     {
                         thisRound.IsFinished = true;
+                        thisRound.WinnerId = winner;
                     }
                     else
                     {
@@ -155,6 +156,10 @@ namespace Server.GameLogic.LogicServices.Impl
                 if (statistics.Loss != 0)
                     // ReSharper disable once PossibleLossOfFraction
                     statistics.WinLossRatio = statistics.Wins / statistics.Loss * 100d;
+                else
+                {
+                    statistics.WinLossRatio = 100d;
+                }
 
                 var allRound = await _storageRounds.GetAllAsync();
             
@@ -162,18 +167,24 @@ namespace Server.GameLogic.LogicServices.Impl
             
                 foreach (var round in allRound)
                 {
-                    if (!InRange(round.TimeFinished,DateTime.Now.Date.AddDays(-7), DateTime.Now.Date)) continue;
+                    if (!InRange(round.TimeFinished,DateTime.Now.AddDays(-7), DateTime.Now)) continue;
                     if (round.WinnerId.Equals(key))
                         wins++;
-                    else
+                    else if (round.LoserId.Equals(key))
                     {
                         loss++;
                     }
                 }
+
+                var winRate = 0d;
+                if (loss == 0)
+                    winRate = 100d;
+                else
+                {
+                    winRate = (float) wins / loss * 100d;
+                }
                 
-                statistics.TimeSpent = loss != 0 
-                    ? $"Last 7 days win rate: {(double) wins / loss}%" 
-                    : $"Last 7 days win rate: {(double) wins}%";
+                statistics.TimeSpent = $"Last 7 days win rate: {winRate}%";
 
                 await _storageStatistics.UpdateAsync(key, statistics);
                  
