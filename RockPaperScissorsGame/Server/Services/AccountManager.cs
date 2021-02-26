@@ -80,7 +80,9 @@ namespace Server.Services
                     || AccountsActive.ContainsKey(accountDto.SessionId))
 
                 {
-                    throw new UserAlreadySignedInException(nameof(login.Login));
+                    var thisAccount = AccountsActive.FirstOrDefault(x => x.Key == accountDto.SessionId).Value;
+                    AccountsActive.TryUpdate(accountDto.SessionId, login, thisAccount);
+                    //throw new UserAlreadySignedInException(nameof(login.Login));
                 }
 
                 AccountsActive.TryAdd(accountDto.SessionId, login);
