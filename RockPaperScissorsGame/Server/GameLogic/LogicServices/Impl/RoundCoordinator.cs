@@ -119,12 +119,22 @@ namespace Server.GameLogic.LogicServices.Impl
                     else
                     {
                         var loserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Key;
-                   
-                        thisRound.IsFinished = true;
-                        thisRound.WinnerId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
-                        thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
-                        thisRound.TimeFinished = DateTime.Now;
                         
+                        ////////////////////////////////////////////////////////////////////////////
+                        if (thisRound.WinnerId == "DRAW" || thisRound.LoserId == "DRAW")
+                        {
+                            thisRound.IsFinished = true;
+                            thisRound.WinnerId = "DRAW";
+                            thisRound.LoserId = "DRAW";
+                            thisRound.TimeFinished = DateTime.Now;
+                        }
+                        else
+                        {
+                            thisRound.IsFinished = true;
+                            thisRound.WinnerId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
+                            thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
+                            thisRound.TimeFinished = DateTime.Now;
+                        }
                         _storageRounds.Add(thisRound);
                         await FillStatistics(thisRound);
                     }
