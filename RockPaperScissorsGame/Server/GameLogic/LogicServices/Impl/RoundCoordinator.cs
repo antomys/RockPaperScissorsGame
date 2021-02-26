@@ -56,7 +56,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     var last = dictionary.Keys.Last();
 
                     if (dictionary[first] == dictionary[last])
-                        thisRound.IsDraw = true;
+                        thisRound.IsDraw = false;
                     else if (dictionary[first] == RequiredGameMove.Default)
                     {
                         thisRound.LoserId = first;
@@ -92,8 +92,9 @@ namespace Server.GameLogic.LogicServices.Impl
 
                     if (string.IsNullOrEmpty(winner))
                     {
-                        thisRound.IsDraw = true;
-                       
+                        thisRound.IsDraw = false;
+                        thisRound.WinnerId = "DRAW";
+                        thisRound.LoserId = "DRAW";
                         await UpdateRound(thisRound);
                     }
 
@@ -141,11 +142,14 @@ namespace Server.GameLogic.LogicServices.Impl
 
         private async Task FillStatistics(IRound thisRound)
         {
+            if (thisRound.WinnerId == "DRAW" || thisRound.LoserId == "DRAW")
+                return;
             var keys = thisRound.PlayerMoves.Keys;
             foreach (var key in keys) //FIX
             {
                 var thisAccountLogin = _accountManager.AccountsActive.FirstOrDefault(x => x.Value.Id == key);
                 var statistics = await _storageStatistics.GetAsync(key); //here is the problem.
+                
                 if (thisRound.WinnerId.Equals(thisAccountLogin.Value.Login))
                 {
                     statistics.Wins += 1;
@@ -203,7 +207,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 var winRate = 0d;
                 if (loss == 0)
-                    winRate = 100d;
+                    winRate = 0d;
                 else
                 {
                     winRate = (float) wins / loss * 100d;
@@ -271,7 +275,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     var last = dictionary.Keys.First();
 
                     if (dictionary[first] == dictionary[last])
-                        updated.IsDraw = true;
+                        updated.IsDraw = false;
                     else if (dictionary[first] == RequiredGameMove.Default)
                     {
                         updated.LoserId = first;
@@ -290,7 +294,7 @@ namespace Server.GameLogic.LogicServices.Impl
                 }
                 //*****************************************************************
                 
-                if (updated.IsFinished && !updated.IsDraw)
+                if (updated.IsFinished)
                 {
                     //if(updated.PlayerMoves.Keys.Any(x=> x!="Bot"))
                         //await _storageRounds.AddAsync(updated);

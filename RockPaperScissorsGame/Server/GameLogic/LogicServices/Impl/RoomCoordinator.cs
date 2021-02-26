@@ -240,8 +240,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 var thisRound = _roundCoordinator.ActiveRounds.FirstOrDefault(x => x.Key.Equals(room.RoomId));
 
-                if (thisRound.Value != null && thisRound.Value.IsFinished ||
-                    thisRound.Value != null && thisRound.Value.IsDraw)
+                if (thisRound.Value != null && thisRound.Value.IsFinished)
                 {
                     room.IsReady = false;
                     room.IsRoundEnded = false;
