@@ -41,6 +41,11 @@ namespace Server.GameLogic.LogicServices.Impl
                 if (thisRound == null)
                     return null; //todo: exception;
 
+                if (thisRound.IsFinished)
+                {
+                    return thisRound;
+                }
+
                 //************************************************************************************************************************************
                 var elapsedTime = DateTime.Now.Subtract(thisRound.TimeFinished);
                 if (elapsedTime.Seconds>= 200 &&
@@ -118,6 +123,9 @@ namespace Server.GameLogic.LogicServices.Impl
                         thisRound.WinnerId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
                         thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
                         thisRound.TimeFinished = DateTime.Now;
+                        
+                        _storageRounds.Add(thisRound);
+                        await FillStatistics(thisRound);
                     }
                     
                 }
@@ -227,9 +235,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 if (updated.IsFinished)
                 {
-                    if (!updated.PlayerMoves.All(x => x.Key != "Bot") || updated.IsDraw) return updated;
-                    await _storageRounds.AddAsync(updated);
-                    await FillStatistics(updated);
+                    //if (!updated.PlayerMoves.All(x => x.Key != "Bot") || updated.IsDraw) return updated;
 
 
                     //ActiveRounds.TryRemove(roomId[0].Key, out _);
@@ -286,10 +292,10 @@ namespace Server.GameLogic.LogicServices.Impl
                 
                 if (updated.IsFinished && !updated.IsDraw)
                 {
-                    if(updated.PlayerMoves.Keys.Any(x=> x!="Bot"))
-                        await _storageRounds.AddAsync(updated);
+                    //if(updated.PlayerMoves.Keys.Any(x=> x!="Bot"))
+                        //await _storageRounds.AddAsync(updated);
 
-                    ActiveRounds.TryRemove(roomId, out _);
+                    //ActiveRounds.TryRemove(roomId, out _);
 
                     return updated;
                 }

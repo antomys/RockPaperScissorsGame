@@ -70,8 +70,8 @@ namespace Server.GameLogic.LogicServices.Impl
             var tasks = Task.Factory.StartNew(() =>
             {
                 var thisRoom = ActiveRooms
-                    .FirstOrDefault(x => 
-                        x.Value.IsPrivate == false 
+                    .FirstOrDefault(x =>
+                        x.Value.IsPrivate == false
                         && x.Value.Players.Count < 2)
                     .Value;
 
@@ -181,101 +181,95 @@ namespace Server.GameLogic.LogicServices.Impl
 
         public async Task<Room> UpdatePlayerStatus(string sessionId, bool isReady)
         {
-            var tasks = Task.Factory.StartNew(() =>
+            var account = GetAccountBySessionId(sessionId);
+
+            var room = ActiveRooms.Values
+                .FirstOrDefault(x => x.Players.Keys
+                    .Any(p => p
+                        .Equals(account.Id)));
+
+            var thisRoom = GetRoomByRoomId(room?.RoomId);
+
+            if (thisRoom == null)
+                return null; //Never performs
+
+
+            var (key, oldValue) =
+                thisRoom.Players.FirstOrDefault(x => x.Key == account.Id);
+
+
+            thisRoom.Players.TryUpdate(key, isReady, oldValue);
+
+            if (thisRoom.Players.Values.All(x => x) && thisRoom.Players.Count == 2)
             {
-                var account = GetAccountBySessionId(sessionId);
-                var room = ActiveRooms.Values
-                    .FirstOrDefault(x => x.Players.Keys
-                        .Any(p => p
-                            .Equals(account.Id)));
+                thisRoom.IsReady = true;
 
-                var thisRoom = GetRoomByRoomId(room?.RoomId);
+                thisRoom.IsFull = true;
 
-                if (thisRoom == null)
-                    return null; //Never performs
-                
-                
-                var (key, oldValue) =
-                    thisRoom.Players.FirstOrDefault(x => x.Key == account.Id);
+                if (thisRoom.CurrentRoundId != null)
+                    return thisRoom;
 
-                
-                thisRoom.Players.TryUpdate(key, isReady, oldValue);
-                
-                var result = UpdateRoom(thisRoom).Result;
-                
-                return result;
-            });
+                var round = new Round
+                {
+                    Id = Guid.NewGuid()
+                        .ToString(),
+                    IsFinished = false,
+                    PlayerMoves = new ConcurrentDictionary<string, RequiredGameMove>(),
+                    TimeFinished = DateTime.Now,
+                    WinnerId = null,
+                    LoserId = null,
+                };
 
+                foreach (var value in thisRoom.Players.Keys.ToList())
+                {
+                    round.PlayerMoves.TryAdd(value, RequiredGameMove.Default);
+                }
 
-            return await tasks;
+                thisRoom.CurrentRoundId = round.Id;
+
+                _roundCoordinator.ActiveRounds.TryAdd(thisRoom.RoomId, round);
+
+            }
+
+            return await UpdateRoom(thisRoom);
         }
-
         public async Task<Room> UpdateRoom(string roomId)
         {
-            var thread = Task.Factory.StartNew(async () =>
+            try
             {
-                try
+                var room = GetRoomByRoomId(roomId);
+
+                var thisRound = _roundCoordinator.ActiveRounds.FirstOrDefault(x => x.Key.Equals(room.RoomId));
+
+                if (thisRound.Value != null && thisRound.Value.IsFinished ||
+                    thisRound.Value != null && thisRound.Value.IsDraw)
                 {
-                    var room = GetRoomByRoomId(roomId);
-                    
-                    var thisRound = _roundCoordinator.ActiveRounds.FirstOrDefault(x => x.Key.Equals(room.RoomId));
-                    
-                    if (thisRound.Value != null && thisRound.Value.IsFinished || thisRound.Value != null && thisRound.Value.IsDraw)
+                    room.IsReady = false;
+                    room.IsRoundEnded = false;
+                    room.CurrentRoundId = null;
+                    foreach (var (key, value) in room.Players)
                     {
-                        room.IsReady = false;
-                        room.IsRoundEnded = false;
-                        room.CurrentRoundId = null;
-                        foreach (var (key,value) in room.Players)
+                        if (key.Equals("Bot"))
+                            room.Players.TryUpdate(key, true, value);
+                        else
                         {
-                            if(key.Equals("Bot"))
-                                room.Players.TryUpdate(key, true, value);
-                            else
-                            {
-                                room.Players.TryUpdate(key, false, value); 
-                            }
-                            
+                            room.Players.TryUpdate(key, false, value);
                         }
 
-                        _roundCoordinator.ActiveRounds.TryRemove(thisRound);
-
-                        await UpdateRoom(room);
                     }
 
-                    if (!room.Players.Values.All(x => x) || room.Players.Count != 2) return UpdateRoom(room).Result;
-                    {
-                        var round = new Round
-                        {
-                            Id = Guid.NewGuid()
-                                .ToString(),
-                            IsFinished = false,
-                            PlayerMoves = new ConcurrentDictionary<string, RequiredGameMove>(),
-                            TimeFinished = DateTime.Now,
-                            WinnerId = null,
-                            LoserId = null,
-                        };
+                    _roundCoordinator.ActiveRounds.TryRemove(thisRound);
 
-                        foreach (var value in room.Players.Keys.ToList())
-                        {
-                            round.PlayerMoves.TryAdd(value, RequiredGameMove.Default);
-                        }
-
-                        room.IsReady = true;
-
-                        room.IsFull = true;
-
-                        room.CurrentRoundId = round.Id;
-
-                        _roundCoordinator.ActiveRounds.TryAdd(roomId, round);
-                    }
-                    return UpdateRoom(room).Result;
+                    await UpdateRoom(room);
                 }
-                catch (Exception exception)
-                {
-                    return null;
-                }
-            });
-
-            return await await thread;
+                
+                return await UpdateRoom(room);
+            }
+            catch (Exception exception)
+            {
+                return null;
+            }
+            
         }
 
         #region PrivateMethods

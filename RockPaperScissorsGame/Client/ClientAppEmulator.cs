@@ -276,9 +276,10 @@ namespace Client
                 Console.WriteLine("Redirecting to round game:");
                 await MakeYourMove();
                 await UpdateRoundResultAsync();
-                await UpdateRoom();
+                
                 if (_round.IsDraw)
                 {
+                    await UpdateRoom();
                     await ChangePlayerStatus(true);
                    //await StartRoomMenu();
                    await MakeYourMove();
@@ -374,30 +375,12 @@ namespace Client
                 });
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
-            /*
-            do
-            {
-                await Task.Run(async () =>
-                {
-                    var options = new RequestOptions
-                    {
-                        Body = "",
-                        Address = baseAddress + $"get/update/{_room.RoomId}",
-                        IsValid = true,
-                        Method = Services.RequestModels.RequestMethod.Get,
-                        Name = "Updating round satus"
-                    };
-                    var reachedResponse = await _performer.PerformRequestAsync(options);
-                    _round = JsonConvert.DeserializeObject<Round>(reachedResponse.Content);
-                });
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            } while (_round.IsFinished == true);*/
             if (_round.WinnerId != null && _round.LoserId != null)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {_round.WinnerId}", ConsoleColor.Green);
                 ColorTextWriterService.PrintLineMessageWithSpecialColor($"Loser: {_round.LoserId}", ConsoleColor.Red);
             }
-            else ColorTextWriterService.PrintLineMessageWithSpecialColor("Waiting for move of another player", ConsoleColor.Cyan);
+            else Console.WriteLine("Round timed out");
         }
         private async Task UpdateRoom()
         {
