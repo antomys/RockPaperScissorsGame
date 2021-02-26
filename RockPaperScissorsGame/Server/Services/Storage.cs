@@ -35,8 +35,6 @@ namespace Server.Services
         public async Task<ICollection<T>> GetAllAsync()
         {
             var result = Task.Run(GetAll);
-            
-            
             return await result;
         }
         
@@ -55,11 +53,9 @@ namespace Server.Services
         /// </summary>
         /// <param name="id">string If of an Element</param>
         /// <returns>Task T item</returns>
-        /// <exception cref="NotImplementedException"></exception>
         public async Task<T> GetAsync(string id)
         {
             var task = Task.Run(() => Get(id));
-
             return await task;
         }
 

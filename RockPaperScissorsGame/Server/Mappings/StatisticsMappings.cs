@@ -1,11 +1,15 @@
-﻿using System;
-using Server.Contracts;
+﻿using Server.Contracts;
 using Server.Models;
 
 namespace Server.Mappings
 {
     public static class StatisticsMappings
     {
+        /// <summary>
+        /// Method to map Big statistics to a small overall statistics
+        /// </summary>
+        /// <param name="statistics">Big statistics of all accounts</param>
+        /// <returns>StatisticsDto</returns>
         public static StatisticsDto ToStatisticsDto(this Statistics statistics)
         {
             return statistics == null
@@ -14,19 +18,9 @@ namespace Server.Mappings
                 {
                     Login = statistics.Login,
                     Score = statistics.Score
+                    
                 };
+            
         }
-
-        /*public static AccountDto ToUserDto(this Account user)
-        {
-            return user == null
-                ? null
-                : new AccountDto
-                {
-                    Login= user.Login,
-                    Password = user.Password,
-                    /*Statistics = user.Statistics#1#
-                };
-        }*/
     }
 }

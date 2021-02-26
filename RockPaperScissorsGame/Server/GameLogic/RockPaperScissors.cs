@@ -15,6 +15,12 @@ namespace Server.GameLogic
 
             return playerMoves;
         }
+        
+        /// <summary>
+        /// Implementation or Rock Paper Scissors Game. 
+        /// </summary>
+        /// <param name="playerMoves">ConcurrentDictionary of players</param>
+        /// <returns>string Winner</returns>
         public static string MoveComparator(
             ConcurrentDictionary<string, 
                 RequiredGameMove> playerMoves)
@@ -54,6 +60,11 @@ namespace Server.GameLogic
             return winner;
         }
 
+        /// <summary>
+        /// Changes Bot move if he is in room
+        /// </summary>
+        /// <param name="playerMoves">ConcurrentDictionary of players</param>
+        /// <returns>ConcurrentDictionary of players</returns>
         public static ConcurrentDictionary<string,RequiredGameMove> ChangeBotState(
             ConcurrentDictionary<string,
                 RequiredGameMove> playerMoves)
@@ -64,6 +75,10 @@ namespace Server.GameLogic
             return playerMoves;
         }
 
+        /// <summary>
+        /// Gets randomized move for the bot
+        /// </summary>
+        /// <returns>Enumerator RequiredGameMove</returns>
         private static RequiredGameMove GenerateRandomMove()
         {
             var r = new Random();

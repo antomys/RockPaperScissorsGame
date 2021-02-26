@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using Server.GameLogic.LogicServices.Impl;
 
 namespace Server.GameLogic.Models.Impl
 {
@@ -11,7 +10,6 @@ namespace Server.GameLogic.Models.Impl
         public string RoomId { get; set; }
         public bool IsFinished { get; set; }
         
-        //where string key is playerId
         public ConcurrentDictionary<string, RequiredGameMove>  PlayerMoves { get; set; }
         
         public bool IsDraw { get; set; }

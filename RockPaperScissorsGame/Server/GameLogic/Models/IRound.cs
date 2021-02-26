@@ -7,16 +7,16 @@ namespace Server.GameLogic.Models
     public interface IRound
     {
         [JsonPropertyName("Id")]
-        string Id { get; init; }  //Not to store identical rounds
+        string Id { get; init; } 
         
         [JsonPropertyName("RoomId")]
         string RoomId { get; set; }
         
         [JsonPropertyName("Moves")]
-        public ConcurrentDictionary<string, RequiredGameMove>  PlayerMoves { get; set; } //where string key is playerId
+        public ConcurrentDictionary<string, RequiredGameMove>  PlayerMoves { get; set; } 
         
         [JsonPropertyName("IsFinished")]
-        bool IsFinished { get; set; }  //Probably not needed.
+        bool IsFinished { get; set; } 
         
         [JsonPropertyName("TimeFinished")]
         DateTime TimeFinished { get; set; }

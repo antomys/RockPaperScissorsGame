@@ -1,11 +1,6 @@
 ﻿using Newtonsoft.Json;
-using Server.GameLogic.Models.Impl;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Server.Contracts;
 
 namespace Server.GameLogic.Models
 {

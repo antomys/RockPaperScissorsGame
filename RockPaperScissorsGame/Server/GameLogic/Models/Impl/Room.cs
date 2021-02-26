@@ -1,18 +1,24 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace Server.GameLogic.Models.Impl
 {
     public class Room : IRoom
     {
+        /// <summary>
+        /// Id of the room. Consists of 5 randomized chars
+        /// </summary>
         public string RoomId { get; set; }
-        public ConcurrentDictionary<string, bool> Players { get; set; } //Where string - sessionId or login of player, bool - is he ready to play//Temporary made tuple to store sessionId and login.
+        
+        /// <summary>
+        /// ConcurrentDictionary of all players
+        /// </summary>
+        public ConcurrentDictionary<string, bool> Players { get; set; } 
         public string CurrentRoundId { get; set; }
         public bool IsPrivate { get; set; }
-        public bool IsReady { get; set; }  //To start game
+        public bool IsReady { get; set; }  
         public bool IsFull { get; set; }
-        public DateTime CreationTime { get; set; }  //this to check 5 minutes and then delete room
+        public DateTime CreationTime { get; set; }  
         public bool IsRoundEnded { get; set; }
         
     }
