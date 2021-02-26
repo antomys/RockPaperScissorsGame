@@ -277,32 +277,20 @@ namespace Client
                 await MakeYourMove();
                 await UpdateRoundResultAsync();
                 
-                /*if (_round.IsDraw)
-                {
-                    await UpdateRoom();
-                    await ChangePlayerStatus(true);
-                   //await StartRoomMenu();
-                   await MakeYourMove();
-                }*/
-                //else
-                //{
-                    //Console.WriteLine("Do you want to continue playing in this room?");
-                    //Console.WriteLine("Press enter to continue\n\nPress any key to exit root");
+                
+                    Console.WriteLine("Do you want to continue playing in this room?");
+                    Console.WriteLine("Write 0 to continue\n\nWrite anything to back to the players menu");
                     var j = "0";
-                    string? input;
-
+                    string? inputed;
                     do
                     {
-                        input = Console.ReadLine();
+                        inputed = Console.ReadLine() ;
                         await UpdateRoom();
                         await ChangePlayerStatus();
                         await RecurrentlyUpdateRoom();
                         await MakeYourMove();
-                        foreach(var values in _round.PlayerMoves.Values)
-                            Console.WriteLine($"{j}:{values}\n");
-                    } while (input != j);
-                    
-                //}
+                    } while (inputed != j);
+                   
                 Console.WriteLine("---------------------------");
                 Console.ReadKey();
             }
@@ -351,10 +339,10 @@ namespace Client
                 if(_round.IsDraw)
                     ColorTextWriterService.
                         PrintLineMessageWithSpecialColor("Round was finished with result: [DRAW]\n" + "",ConsoleColor.Cyan);
-                ColorTextWriterService.
+              /*  ColorTextWriterService.
                     PrintLineMessageWithSpecialColor($"Winner: {_round.WinnerId}", ConsoleColor.Green);
                 ColorTextWriterService.
-                    PrintLineMessageWithSpecialColor($"Loser: {_round.LoserId}", ConsoleColor.Red);
+                    PrintLineMessageWithSpecialColor($"Loser: {_round.LoserId}", ConsoleColor.Red);*/
             }
             else ColorTextWriterService.PrintLineMessageWithSpecialColor("Waiting for move of another player", ConsoleColor.Cyan);
         }
@@ -378,12 +366,12 @@ namespace Client
                 });
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
-            /*if (_round.WinnerId != null && _round.LoserId != null)
+            if (_round.WinnerId != null && _round.LoserId != null)
             {
                 ColorTextWriterService.PrintLineMessageWithSpecialColor($"Winner: {_round.WinnerId}", ConsoleColor.Green);
                 ColorTextWriterService.PrintLineMessageWithSpecialColor($"Loser: {_round.LoserId}", ConsoleColor.Red);
             }
-            else Console.WriteLine("Round timed out");*/
+            else Console.WriteLine("Round timed out");
         }
         private async Task UpdateRoom()
         {
@@ -404,39 +392,46 @@ namespace Client
         }
         private async Task RecurrentlyUpdateRoom()
         {
-            var oneTimeShowed = true;
-            while (!_room.IsReady)
+            try
             {
-                await Task.Run(async () =>
+                var oneTimeShowed = true;
+                while (!_room.IsReady)
                 {
-                    var options = new RequestOptions
+                    await Task.Run(async () =>
                     {
-                        Body = "",
-                        Address = baseAddress + $"room/updateState/{_room.RoomId}",
-                        IsValid = true,
-                        Method = Services.RequestModels.RequestMethod.Get,
-                        Name = "Updating Room"
-                    };
+                        var options = new RequestOptions
+                        {
+                            Body = "",
+                            Address = baseAddress + $"room/updateState/{_room.RoomId}",
+                            IsValid = true,
+                            Method = Services.RequestModels.RequestMethod.Get,
+                            Name = "Updating Room"
+                        };
 
-                    var reachedResponse = await _performer.PerformRequestAsync(options);
+                        var reachedResponse = await _performer.PerformRequestAsync(options);
 
-                    _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
+                        _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
 
                     //**************************************
                     //This is just to show once message when someone has joined to your room
                     if (oneTimeShowed && _room.Players.Count > 1)
-                    {
-                        Console.WriteLine("Updated player list: ");
-                        _room.Players.ToList().ForEach(x =>
                         {
-                            var (key, value) = x;
-                            Console.WriteLine("Id: " + key + "; Is ready: " + value);
-                        });
-                        oneTimeShowed = false;
-                    }
+                            Console.WriteLine("Updated player list: ");
+                            _room.Players.ToList().ForEach(x =>
+                            {
+                                var (key, value) = x;
+                                Console.WriteLine("Id: " + key + "; Is ready: " + value);
+                            });
+                            oneTimeShowed = false;
+                        }
 
-                });
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                    });
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+                }
+            }
+            catch(NullReferenceException ex)
+            {
+                await PlayerMenu();
             }
         }
         private async Task CreationRoom()
@@ -646,7 +641,7 @@ namespace Client
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
             }
         }
-        private async Task<IEnumerable<StatisticsDto>> OverallStatistics() //Refurbish
+        private async Task<IEnumerable<StatisticsDto>> OverallStatistics() 
         {
             var options = new RequestOptions
             {
@@ -655,7 +650,8 @@ namespace Client
                 Method = Services.RequestModels.RequestMethod.Get
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            
+            if (reachedResponse.Code == 404)
+                return null;
             return JsonConvert.DeserializeObject<IEnumerable<StatisticsDto>>(reachedResponse.Content);
             
         }

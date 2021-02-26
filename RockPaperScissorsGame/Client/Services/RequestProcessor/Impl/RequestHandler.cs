@@ -24,6 +24,12 @@ namespace Client.Services.RequestProcessor.Impl
             using var msg = new HttpRequestMessage(MapMethod(requestOptions.Method), new Uri(requestOptions.Address));
             try
             {
+                if (MapMethod(requestOptions.Method) == HttpMethod.Delete)
+                {
+                    using var responseD = await _client.SendAsync(msg);
+                    var bodyD = await responseD.Content.ReadAsStringAsync();
+                    return new Response(true, (int)responseD.StatusCode, bodyD);
+                }
 
                 if (MapMethod(requestOptions.Method) != HttpMethod.Get)
                 {
