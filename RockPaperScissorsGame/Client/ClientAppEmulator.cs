@@ -391,20 +391,30 @@ namespace Client
         }
         private async Task UpdateRoom()
         {
-            await Task.Run(async () =>
+            try
             {
-                var options = new RequestOptions
+                await Task.Run(async () =>
                 {
-                    Body = "",
-                    Address = baseAddress + $"room/updateState/{_room.RoomId}",
-                    IsValid = true,
-                    Method = Services.RequestModels.RequestMethod.Get,
-                    Name = "Updating Room"
-                };
+                    var options = new RequestOptions
+                    {
+                        Body = "",
+                        Address = baseAddress + $"room/updateState/{_room.RoomId}",
+                        IsValid = true,
+                        Method = Services.RequestModels.RequestMethod.Get,
+                        Name = "Updating Room"
+                    };
 
-                var reachedResponse = await _performer.PerformRequestAsync(options);
-                _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
-            });
+                    var reachedResponse = await _performer.PerformRequestAsync(options);
+                    _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
+                });
+            }
+            catch (NullReferenceException ex)
+            {
+                ColorTextWriterService.PrintLineMessageWithSpecialColor("User refused to play", ConsoleColor.White);
+                logger.Info("User refused to play, redirecting from Update room to Start Room menu");
+                await StartRoomMenu();
+            }
+           
         }
         private async Task RecurrentlyUpdateRoom()
         {
@@ -447,6 +457,7 @@ namespace Client
             }
             catch(NullReferenceException ex)
             {
+                logger.Info("Updated room. Returning to Player menu");
                 await PlayerMenu();
             }
         }
@@ -670,7 +681,10 @@ namespace Client
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
             if (reachedResponse.Code == 404)
+            {
+                logger.Info("Statistics is empty");
                 return null;
+            }
             return JsonConvert.DeserializeObject<IEnumerable<StatisticsDto>>(reachedResponse.Content);
             
         }
@@ -690,7 +704,10 @@ namespace Client
         }
         private static void PrintStatistics(IEnumerable<StatisticsDto> statisticsEnumerable)//Refurbish
         {
-            Console.WriteLine(statisticsEnumerable.Select(x=> x.ToString()).ToArray());
+            foreach (var statistic in statisticsEnumerable)
+            {
+                Console.WriteLine(statistic.ToString());
+            }
         }
     }
 }
