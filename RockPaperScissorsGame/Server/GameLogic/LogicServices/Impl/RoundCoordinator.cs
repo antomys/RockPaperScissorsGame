@@ -95,8 +95,21 @@ namespace Server.GameLogic.LogicServices.Impl
                     if (botPlays)
                     {
                         thisRound.IsFinished = true;
-                        thisRound.WinnerId = winner;
+                        var thisPlayerKey = 
+                            thisRound.LoserId = thisRound.PlayerMoves
+                                .FirstOrDefault(x => x.Key != "Bot").Key;
+                        if (winner == "Bot")
+                        {
+                            thisRound.WinnerId = winner;
+                            thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==thisPlayerKey).Value.Login;
+                        }
+                        else
+                        {
+                            thisRound.WinnerId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
+                            thisRound.LoserId = "Bot";
+                        }
                     }
+                    
                     else
                     {
                         var loserId = thisRound.PlayerMoves.FirstOrDefault(x => x.Key != winner).Key;
@@ -133,7 +146,13 @@ namespace Server.GameLogic.LogicServices.Impl
                 else
                 {
                     statistics.Loss += 1;
-                    statistics.Score -= 2;
+                    
+                    if (statistics.Score == 0)
+                        statistics.Score = 0;
+                    else
+                    {
+                        statistics.Score -= 2; 
+                    }
                 }
 
                 var playerMove =

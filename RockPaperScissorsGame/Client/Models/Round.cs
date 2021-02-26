@@ -24,5 +24,8 @@ namespace Client.Models
         
         [JsonProperty("LoserId")]
         public string LoserId { get; set; }
+        
+        [JsonProperty("IsDraw")]
+        public bool IsDraw { get; set; }
     }
 }
