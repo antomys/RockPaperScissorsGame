@@ -10,6 +10,7 @@ using Client.Services;
 using Client.Services.RequestProcessor;
 using Client.Services.RequestProcessor.RequestModels.Impl;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Client
 {
@@ -17,6 +18,8 @@ namespace Client
     {
         private readonly string _sessionId;
         private const string baseAddress = "http://localhost:5000/";
+        
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public ClientAppEmulator(IRequestPerformer performer)
         {
@@ -47,7 +50,9 @@ namespace Client
             }
             catch (Exception exception)
             {
+                logger.Error("Catched exception in StartAsync method", exception.Message);
                 throw;
+                
             }
         }
         private void Greeting()
@@ -75,6 +80,7 @@ namespace Client
                 Console.Write("Select -> ");
                 if (token.IsCancellationRequested)
                 {
+                    logger.Trace($"CancellationTokenRequest from Start menu");
                     return;
                 }
                 var passed = int.TryParse(Console.ReadLine(), out var startMenuInput);
@@ -96,11 +102,13 @@ namespace Client
                         var status = await LogIn();
                         if (status == 0)
                         {
+                            logger.Trace($"Successfull login Code: {status}");
                             Console.Clear();
                             await PlayerMenu();
                         }
                         else
                         {
+                            logger.Trace($"Login status code Code: {status}");
                             ColorTextWriterService.PrintLineMessageWithSpecialColor(
                                 "\n\nPress any key to back to the start up menu list!", ConsoleColor.Cyan);
                             Console.ReadKey();
@@ -146,6 +154,7 @@ namespace Client
                 var passed = int.TryParse(Console.ReadLine(), out int playersMenuInput);
                 if (!passed)
                 {
+                    logger.Trace($"Not passed argument to player Menu");
                     ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
                     continue;
                 }
@@ -185,6 +194,7 @@ namespace Client
         }
         private async Task JoinRoomWithBot()
         {
+            logger.Trace("JoinRoomWithBot method");
             Console.WriteLine("Trying to connect to training room with bot");
             var options = new RequestOptions
             {
@@ -198,8 +208,10 @@ namespace Client
 
             if (reachedResponse.Content != null)
             {
+                logger.Trace($"Catched response from Join Room with Bot method. Code: {reachedResponse.Code}");
                 _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
                 Console.WriteLine("Room with bot created!");
+                logger.Info("Room with bot created!");
                 await ChangePlayerStatus();
                 await StartRoomMenu();
             }
@@ -220,14 +232,17 @@ namespace Client
 
             if (reachedResponse.Content != null && reachedResponse.Code == (int) HttpStatusCode.OK)
             {
+                logger.Trace($"Catched response from Join Public Room method Code: {reachedResponse.Code}");
                 _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content);
                 Console.WriteLine("Found room! Entering room lobby");
+                logger.Info("Found room! Entering room lobby");
                 await ChangePlayerStatus();
                 await StartRoomMenu();
             }
             else
             {
                 Console.WriteLine("Error occured. Probably there is either no room or all rooms are full");
+                logger.Info("Error occured. Probably there is either no room or all rooms are full");
             }
         }
         
@@ -238,6 +253,7 @@ namespace Client
             if (string.IsNullOrEmpty(roomId))
             {
                 Console.WriteLine("Invalid input!");
+                logger.Info("Invalid input in Join Private room method");
             }
 
             var options = new RequestOptions
@@ -256,10 +272,12 @@ namespace Client
                 ColorTextWriterService.PrintLineMessageWithSpecialColor("Room Founded! Redirecting to room menu...", ConsoleColor.Green);
                 await ChangePlayerStatus();
                 await StartRoomMenu();
+                logger.Info("Room Founded! Redirecting to room menu...");
             }
             else
             {
                 Console.WriteLine("Error occured. Probably there is either no room or it is already full");
+                logger.Info("Error occured. Probably there is either no room or it is already full");
             }
         }
         /**/
@@ -465,6 +483,7 @@ namespace Client
              _room = JsonConvert.DeserializeObject<Room>(reachedResponse.Content); //todo: remove           
             if (reachedResponse.Code == (int) HttpStatusCode.OK)
             {
+                logger.Info($"Thred http from Creation room method. Code: {reachedResponse.Code}");
                 
                 ColorTextWriterService.PrintLineMessageWithSpecialColor($"Room created. Room id: {_room.RoomId};" +
                                                                         $"Private flag : {isPrivate}", ConsoleColor.Green);
@@ -583,10 +602,12 @@ namespace Client
             var reachedResponse = await _performer.PerformRequestAsync(options);
             if (reachedResponse.Code == (int) HttpStatusCode.Created)
             {
+                
                 ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Green);
                 return 1;
             }
 
+            logger.Info($"Threw http from Registration method. Code: {reachedResponse.Code}");
             ColorTextWriterService.PrintLineMessageWithSpecialColor(reachedResponse.Content, ConsoleColor.Red);
             return -1;
         }
