@@ -1,10 +1,10 @@
-﻿using Server.Exceptions.LogIn;
+﻿/*using Server.Exceptions.LogIn;
 using Server.GameLogic.Exceptions;
-using Server.GameLogic.Models.Impl;
 using Server.Models;
 using Server.Services.Interfaces;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,8 +45,8 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 var newRoom = new Room
                 {
-                    RoomId = RandomString(),
-                    Players = new ConcurrentDictionary<string, bool>(),
+                    Id = RandomString(),
+                    Players = new Dictionary<string, bool>(),
                     IsPrivate = isPrivate,
                     IsReady = false,
                     IsRoundEnded = false,
@@ -56,7 +56,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 if (newRoom.Players.TryAdd(account.Id, false))
                 {
-                    ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
+                    ActiveRooms.TryAdd(newRoom.Id, newRoom);
                 }
 
                 //_timer = new Timer(tm, null, 0, 10000); //todo: implement
@@ -95,8 +95,8 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 var newRoom = new Room
                 {
-                    RoomId = RandomString(),
-                    Players = new ConcurrentDictionary<string, bool>(),
+                    Id = RandomString(),
+                    Players = new Dictionary<string, bool>(),
                     IsPrivate = true,
                     IsReady = false,
                     IsRoundEnded = false,
@@ -107,7 +107,7 @@ namespace Server.GameLogic.LogicServices.Impl
                 newRoom.Players.TryAdd(account.Id, false);
                 newRoom.Players.TryAdd("Bot", true);
                 newRoom.IsFull = true;
-                ActiveRooms.TryAdd(newRoom.RoomId, newRoom);
+                ActiveRooms.TryAdd(newRoom.Id, newRoom);
 
                 return newRoom;
             });
@@ -165,13 +165,13 @@ namespace Server.GameLogic.LogicServices.Impl
         {
             var thread = Task.Factory.StartNew(() =>
             {
-                ActiveRooms.TryGetValue(updated.RoomId, out var room);
+                ActiveRooms.TryGetValue(updated.Id, out var room);
                 if (room == null)
                 {
                     return null; //todo: change into exception;
                 }
 
-                return ActiveRooms.TryUpdate(room.RoomId,
+                return ActiveRooms.TryUpdate(room.Id,
                     updated, room)
                     ? room
                     : null;
@@ -187,7 +187,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     .Any(p => p
                         .Equals(account.Id)));
 
-            var thisRoom = GetRoomByRoomId(room?.RoomId);
+            var thisRoom = GetRoomByRoomId(room?.Id);
 
             if (thisRoom == null)
                 return null; //Never performs
@@ -197,7 +197,8 @@ namespace Server.GameLogic.LogicServices.Impl
                 thisRoom.Players.FirstOrDefault(x => x.Key == account.Id);
 
 
-            thisRoom.Players.TryUpdate(key, isReady, oldValue);
+            //todo: change this
+            //thisRoom.Players.TryUpdate(key, isReady, oldValue);
 
             if (thisRoom.Players.Values.All(x => x) && thisRoom.Players.Count == 2)
             {
@@ -226,7 +227,7 @@ namespace Server.GameLogic.LogicServices.Impl
 
                 thisRoom.CurrentRoundId = round.Id;
 
-                _roundCoordinator.ActiveRounds.TryAdd(thisRoom.RoomId, round);
+                _roundCoordinator.ActiveRounds.TryAdd(thisRoom.Id, round);
 
             }
 
@@ -238,9 +239,10 @@ namespace Server.GameLogic.LogicServices.Impl
             {
                 var room = GetRoomByRoomId(roomId);
 
-                var thisRound = _roundCoordinator.ActiveRounds.FirstOrDefault(x => x.Key.Equals(room.RoomId));
+                var thisRound = _roundCoordinator.ActiveRounds.FirstOrDefault(x => x.Key.Equals(room.Id));
 
-                if (thisRound.Value != null && thisRound.Value.IsFinished)
+                //todo:and this
+                /*if (thisRound.Value != null && thisRound.Value.IsFinished)
                 {
                     room.IsReady = false;
                     room.IsRoundEnded = false;
@@ -257,7 +259,7 @@ namespace Server.GameLogic.LogicServices.Impl
                     _roundCoordinator.ActiveRounds.TryRemove(thisRound);
 
                     await UpdateRoom(room);
-                }
+                }#1#
                 
                 return await UpdateRoom(room);
             }
@@ -293,4 +295,4 @@ namespace Server.GameLogic.LogicServices.Impl
         #endregion
         
     }
-}
+}*/

@@ -1,18 +1,15 @@
 ﻿using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.IO;
-using Newtonsoft.Json;
-using Server.Models;
 using Server.Services.Interfaces;
 
 namespace Server.Services
 {
     public class DeserializedObject<T> : IDeserializedObject<T> where T: class
     {
-        private static string _fileName;
+        private static string _fileName = "";
 
         /// <summary>
         /// Concurrent Dictionary. Heart of our project
@@ -39,23 +36,23 @@ namespace Server.Services
         /// <returns></returns>
         public async Task UpdateData()
         {
-            await Serialize();
+            //await Serialize();
         }
         
         /// <summary>
         /// Check if file is available. Returns true if it exists. Else false
         /// </summary>
         /// <returns>bool</returns>
-        private Task<bool> IsNeededFilesAvailable()
+        private static Task<bool> IsNeededFilesAvailable()
         { 
-            return Task.Run(()=> File.Exists(_fileName));
+            return Task.Factory.StartNew(()=> File.Exists(_fileName));
         }
         
         /// <summary>
         /// Method to deserialize data from T file
         /// </summary>
         /// <returns>ConcurrentDictionary</returns>
-        private async Task<ConcurrentDictionary<string, T>> Deserialize()
+        private static async Task<ConcurrentDictionary<string, T>> Deserialize()
         {
             _fileName = typeof(T).Name.Contains("Statistics") ? "Statistics" : typeof(T).Name;
 
@@ -75,8 +72,8 @@ namespace Server.Services
                     var decoded = Encoding.ASCII.GetString(fileText);
                     
                     
-                    var list = await Task.Run(() => 
-                        JsonConvert.DeserializeObject<ConcurrentDictionary<string,T>>(decoded));
+                    var list = await Task.Run(() =>
+                        JsonSerializer.Deserialize<ConcurrentDictionary<string,T>>(decoded));
                     return list;
                 }
                 catch (FileNotFoundException exception)
@@ -95,17 +92,17 @@ namespace Server.Services
         /// Method to serialize T objects
         /// </summary>
         /// <returns>Void</returns>
-        private async Task Serialize()
+        /*private async Task Serialize()
         {
             var streamManager = new RecyclableMemoryStreamManager();
 
             using var file = File.Open(_fileName, FileMode.OpenOrCreate);
             using var memoryStream = streamManager.GetStream();
             using var writer = new StreamWriter(memoryStream);
-            
-            var serializer = JsonSerializer.CreateDefault();
+
+            //var serializer = JsonSerializer;
                 
-            serializer.Serialize(writer, ConcurrentDictionary);      // FROM STACKOVERFLOW
+            var serializer = JsonSerializer.Serialize(writer, ConcurrentDictionary);      // FROM STACKOVERFLOW
                 
             await writer.FlushAsync().ConfigureAwait(false);
                 
@@ -115,6 +112,6 @@ namespace Server.Services
 
             await file.FlushAsync().ConfigureAwait(false);
             
-        }
+        }*/
     }
 }

@@ -1,6 +1,7 @@
-﻿using Server.GameLogic.Models.Impl;
+﻿/*
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Server.Models;
 
 namespace Server.GameLogic.LogicServices
 {
@@ -72,3 +73,4 @@ namespace Server.GameLogic.LogicServices
         Task<bool> DeleteRoom(string roomId);
     }
 }
+*/

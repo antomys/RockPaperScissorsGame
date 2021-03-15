@@ -1,13 +1,12 @@
 using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Server.GameLogic.LogicServices;
-using Server.GameLogic.LogicServices.Impl;
+using Server.Database;
 using Server.Services;
 using Server.Services.Interfaces;
 
@@ -25,13 +24,17 @@ namespace Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
+            services.AddDbContext<ApplicationDbContext>(
+                builder =>
+                {
+                    builder.UseSqlite(Configuration.GetConnectionString("sqlite"));
+                });
             services.AddSingleton(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
             services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
 
-            services.AddSingleton<IAccountManager, AccountManager>();
-            services.AddSingleton<IRoundCoordinator, RoundCoordinator>();
-            services.AddSingleton<IRoomCoordinator, RoomCoordinator>();
+            services.AddTransient<IAccountManager, AccountManager>();
+            //services.AddSingleton<IRoundCoordinator, RoundCoordinator>();
+            //services.AddSingleton<IRoomCoordinator, RoomCoordinator>();
             
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -68,7 +71,7 @@ namespace Server
                     {
                         context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     }
-                    else  if (await service.IsActive(sessionId))
+                    else  if (await service.IsActiveAsync(sessionId))
                     {
                         context.Response.StatusCode = (int) HttpStatusCode.OK;
                     }
@@ -77,15 +80,7 @@ namespace Server
                         context.Response.StatusCode = (int) HttpStatusCode.Forbidden;
                     }
                 });
-                
-                endpoints.Map("/status/", async context =>
-                {
-                    context.Response.StatusCode = (int) HttpStatusCode.OK;
-                    await context.Response.WriteAsync("alive");
-                });
-                
                 endpoints.MapControllers();
-                
             });
         }
     }
