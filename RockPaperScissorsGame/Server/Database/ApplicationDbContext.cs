@@ -15,5 +15,6 @@ namespace Server.Database
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Statistics> StatisticsEnumerable { get; set; }
         public DbSet<Round> Rounds { get; set; }
+        public DbSet<ActiveSessions> ActiveSessionsEnumerable { get; set; }
     }
 }

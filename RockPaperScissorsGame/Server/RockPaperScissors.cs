@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using Server.GameLogic.Models;
+using Server.Models;
 
-namespace Server.GameLogic
+namespace Server
 {
     public static class RockPaperScissors
     {

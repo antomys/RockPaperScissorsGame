@@ -1,8 +1,6 @@
-﻿namespace Server.GameLogic.Models
+﻿namespace Server.Models
 {
-    /// <summary>
-    /// Enumerator of available player operations
-    /// </summary>
+    
     public enum RequiredGameMove
     {
         Default = 0,

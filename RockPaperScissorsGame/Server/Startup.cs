@@ -1,4 +1,3 @@
-using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -29,10 +28,9 @@ namespace Server
                 {
                     builder.UseSqlite(Configuration.GetConnectionString("sqlite"));
                 });
-            services.AddSingleton(typeof(IDeserializedObject<>), typeof(DeserializedObject<>)); 
-            services.AddTransient(typeof(IStorage<>), typeof(Storage<>));
 
             services.AddTransient<IAccountManager, AccountManager>();
+            services.AddTransient<IRoomManager, RoomManager>();
             //services.AddSingleton<IRoundCoordinator, RoundCoordinator>();
             //services.AddSingleton<IRoomCoordinator, RoomCoordinator>();
             
@@ -61,25 +59,6 @@ namespace Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.Map("/status/{sessionId}", async context =>
-                {
-                    var service = context.RequestServices.GetRequiredService<IAccountManager>();  //todo: remove
-                    
-                    var sessionId = (string) context.Request.RouteValues["sessionId"];
-
-                    if (sessionId == null)
-                    {
-                        context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                    }
-                    else  if (await service.IsActiveAsync(sessionId))
-                    {
-                        context.Response.StatusCode = (int) HttpStatusCode.OK;
-                    }
-                    else
-                    {
-                        context.Response.StatusCode = (int) HttpStatusCode.Forbidden;
-                    }
-                });
                 endpoints.MapControllers();
             });
         }

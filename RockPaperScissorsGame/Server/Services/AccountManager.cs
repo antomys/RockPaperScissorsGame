@@ -2,11 +2,11 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Server.Contracts;
 using Server.Database;
 using Server.Exceptions.LogIn;
-using Server.Exceptions.Register;
+using Server.Exceptions.Registration;
 using Server.Models;
 using Server.Services.Interfaces;
 
@@ -23,20 +23,17 @@ namespace Server.Services
         private const int CoolDownTime = 45;
         
         //Where string is sessionId and Account is his account credentials
-        private ConcurrentDictionary<string, Account> AccountsActive { get; set; }
-
         public AccountManager(
             ILogger<AccountManager> logger,
             ApplicationDbContext applicationDbContext)
         {
             _logger = logger;
             _applicationDbContext = applicationDbContext;
-            AccountsActive = new ConcurrentDictionary<string, Account>();
         }
 
         public async Task<bool> RegisterAsync(string login, string password)
         {
-            if(string.IsNullOrEmpty(login))
+            if (string.IsNullOrEmpty(login))
                 throw new InvalidCredentialsException(nameof(login));
             if(string.IsNullOrEmpty(password))
                 throw new InvalidCredentialsException(nameof(password));
@@ -50,64 +47,46 @@ namespace Server.Services
             return true;
         }
 
-        Task<string> IAccountManager.LogInAsync(AccountDto accountDto)
+        public async Task<string> LogInAsync(string login, string password)
         {
-            throw new NotImplementedException();
-
-        }
-
-        public Task<Account> LogInAsync(AccountDto accountDto)
-        {
-            /*var login = _deserializedObject.ConcurrentDictionary.Values
-                .FirstOrDefault(x => x.Login == accountDto.Login && x.Password == accountDto.Password);
-
-            if (login == null)
-            {
-                _invalidTries.AddOrUpdate(accountDto.SessionId, 1, (s, i) => i + 1);
-
-                _lastTimes.AddOrUpdate(accountDto.SessionId, accountDto.LastRequest,
-                    ((s, time) => time = accountDto.LastRequest));
-
-                throw new InvalidCredentialsException($"{accountDto.Login}");
-            }
-
-            if (AccountsActive.Any(x => x.Value == login)
-                || AccountsActive.ContainsKey(accountDto.SessionId))
-
-            {
-                var thisAccount = AccountsActive.FirstOrDefault(x => x.Key == accountDto.SessionId).Value;
-                AccountsActive.TryUpdate(accountDto.SessionId, login, thisAccount);
-                //throw new UserAlreadySignedInException(nameof(login.Login));
-            }
-
-            AccountsActive.TryAdd(accountDto.SessionId, login);
-            _logger.LogTrace(""); //todo
-
-            return Task.FromResult(login);*/
-            throw new NotImplementedException();
-        }
-        
-        public async Task<bool> LogOutAsync(string sessionId)
-        {
-            //var tasks = Task.Factory
-            //    .StartNew(() => AccountsActive.ContainsKey(sessionId) && AccountsActive.TryRemove(sessionId, out _));
-
-            return await Task.FromResult(AccountsActive.ContainsKey(sessionId) && AccountsActive.TryRemove(sessionId, out _));
-
-        }
-
-        public async Task<bool> IsActiveAsync(string sessionId)
-        {
-            //var tasks = Task.Factory.StartNew(() => AccountsActive.ContainsKey(sessionId));
+            if (string.IsNullOrEmpty(login))
+                throw new InvalidCredentialsException(nameof(login));
+            if(string.IsNullOrEmpty(password))
+                throw new InvalidCredentialsException(nameof(password));
             
-            return await Task.FromResult(AccountsActive.ContainsKey(sessionId));
+            var thisAccount = _applicationDbContext.Accounts.FirstOrDefault(x=> x.Login == login && x.Password == password);
+            if (thisAccount == null) throw new InvalidCredentialsException(login +";"+ password);
+
+            //Async????
+            if (_applicationDbContext.ActiveSessionsEnumerable.Any(x=> x.AccountId == thisAccount.Id))
+                throw new UserAlreadySignedInException(nameof(login));
+            var sessionId = Guid.NewGuid().ToString();
+
+            //Am i able to to something like that?
+
+            await _applicationDbContext.ActiveSessionsEnumerable.AddAsync(new ActiveSessions(thisAccount.Id, sessionId));
+            await _applicationDbContext.SaveChangesAsync();
+            
+            return sessionId;
         }
         
-        public Account GetActiveAccountBySessionId(string sessionId)
+        public async Task<int> LogOutAsync(string sessionId)
         {
-            AccountsActive.TryGetValue(sessionId, out var account);
+            try
+            {
+                if (!_applicationDbContext.ActiveSessionsEnumerable.Any(x => x.SessionId == sessionId))
+                    return 0;
+                
+                var activeSession = new ActiveSessions { SessionId = sessionId };
+                _applicationDbContext.ActiveSessionsEnumerable.Remove(activeSession);
 
-            return account;
+                return await _applicationDbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException exception)
+            {
+                _logger.LogError(exception.Message);
+                return 0;
+            }
         }
     }
 }

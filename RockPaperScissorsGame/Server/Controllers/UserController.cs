@@ -5,9 +5,10 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Writers;
 using Server.Contracts;
 using Server.Exceptions.LogIn;
-using Server.Exceptions.Register;
+using Server.Exceptions.Registration;
 using Server.Models;
 using Server.Services.Interfaces;
 
@@ -39,13 +40,12 @@ namespace Server.Controllers
         [Route("login")]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<int>> Login(AccountDto accountDto)
+        public async Task<IActionResult> Login([FromBody]AccountDto accountDto)
         {
             try
             {
-                await _accountManager.LogInAsync(accountDto);
-                return Ok($"Signed In as {accountDto.Login}");
-
+                var sessionId = await _accountManager.LogInAsync(accountDto.Login,accountDto.Password);
+                return Ok(sessionId);
             }
             catch (ValidationException exception)
             {
@@ -61,10 +61,10 @@ namespace Server.Controllers
         }
         
         [HttpPost]
-        [Route("create")]
+        [Route("register")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<int>> CreateAccount([FromBody]AccountDto accountDto)
+        public async Task<ActionResult<int>> Register([FromBody]AccountDto accountDto)
         {
             try
             {
@@ -84,15 +84,15 @@ namespace Server.Controllers
         }
         
         [Route("logout")]
-        [HttpGet("logout/{sessionId}")]
-        [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(int), (int) HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<int>> LogOut(string sessionId)
+        [HttpDelete("logout/{sessionId}")]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> LogOut(string sessionId)
         {
             var result = await _accountManager.LogOutAsync(sessionId);
-            if (result)
-                return (int) HttpStatusCode.OK;
-            return (int) HttpStatusCode.Forbidden;
+            if (result == 1)
+                return Ok();
+            return BadRequest();
         }
     }
 }

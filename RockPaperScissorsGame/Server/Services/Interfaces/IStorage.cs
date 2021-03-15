@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Server.Exceptions.Register;
+using Server.Exceptions.Registration;
 
 namespace Server.Services.Interfaces
 {

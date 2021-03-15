@@ -1,90 +1,58 @@
-﻿/*using Server.Exceptions.LogIn;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Server.Database;
+using Server.Exceptions.LogIn;
+using Server.Exceptions.Room;
 using Server.GameLogic.Exceptions;
 using Server.Models;
 using Server.Services.Interfaces;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Server.GameLogic.Models;
 
-namespace Server.GameLogic.LogicServices.Impl
+namespace Server.Services
 {
-    public class RoomCoordinator : IRoomCoordinator
+    public class RoomManager : IRoomManager
     {
-        private readonly IAccountManager _accountManager;
-
-        private readonly IRoundCoordinator _roundCoordinator;
-
+        private readonly ApplicationDbContext _applicationDbContext;
+        
         private static readonly Random Random = new();
 
-        private Timer _timer;
-
-        public ConcurrentDictionary<string, Room> ActiveRooms { get; }
-
-        public RoomCoordinator(
-            IAccountManager accountManager,
-            IRoundCoordinator roundCoordinator)
+        //private Timer _timer;
+        public RoomManager(
+            ApplicationDbContext applicationDbContext)
         {
-            _accountManager = accountManager;
-            _roundCoordinator = roundCoordinator;
-            ActiveRooms = new ConcurrentDictionary<string, Room>();
-            _timer = new Timer(CheckRoomDate, null, 0, 10000);
+            _applicationDbContext = applicationDbContext;
+            //_timer = new Timer(CheckRoomDate, null, 0, 50000);
         }
 
         public async Task<Room> CreateRoom(string sessionId, bool isPrivate)
-        {
-            var tasks = Task.Factory.StartNew(() =>
+        { 
+            var thisPlayer = await GetAccountBySessionId(sessionId);
+
+            if(_applicationDbContext.Rooms
+                .Any(x=> x.FirstPlayerId == thisPlayer.Id || x.SecondPlayerId == thisPlayer.Id))
+                throw new TwinkGameRoomCreationException();
+
+            var newRoom = new Room
             {
-                var account = GetAccountBySessionId(sessionId);
+                Id = RandomString(),
+                FirstPlayerId = thisPlayer.Id,
+                IsReadyFirst = false,
+                SecondPlayerId = null,
+                IsReadySecond = false,
+                IsPrivate = isPrivate,
+                CreationTime = DateTime.Now,
+            };
+            
+            //_timer = new Timer(tm, null, 0, 10000); //todo: implement
+            await _applicationDbContext.Rooms.AddAsync(newRoom);
 
-                if (ActiveRooms.Any(x => x.Value.Players.Any(p => p.Key.Equals(account.Id))))
-                    throw new TwinkGameRoomCreationException();
+            await _applicationDbContext.SaveChangesAsync();
+            
+            return newRoom;
+            }
+        
 
-                var newRoom = new Room
-                {
-                    Id = RandomString(),
-                    Players = new Dictionary<string, bool>(),
-                    IsPrivate = isPrivate,
-                    IsReady = false,
-                    IsRoundEnded = false,
-                    IsFull = false,
-                    CreationTime = DateTime.Now
-                };
-
-                if (newRoom.Players.TryAdd(account.Id, false))
-                {
-                    ActiveRooms.TryAdd(newRoom.Id, newRoom);
-                }
-
-                //_timer = new Timer(tm, null, 0, 10000); //todo: implement
-                return newRoom;
-            });
-            return await tasks;
-        }
-
-        public async Task<Room> JoinPublicRoom(string sessionId)
-        {
-            var tasks = Task.Factory.StartNew(() =>
-            {
-                var thisRoom = ActiveRooms
-                    .FirstOrDefault(x =>
-                        x.Value.IsPrivate == false
-                        && x.Value.Players.Count < 2)
-                    .Value;
-
-                var thisAccount = GetAccountBySessionId(sessionId);
-
-                thisRoom.Players.TryAdd(thisAccount.Id, false);
-
-                return UpdateRoom(thisRoom).Result;
-            });
-            return await tasks;
-        }
-
-        public async Task<Room> CreateTrainingRoom(string sessionId)
+        /*public async Task<Room> CreateTrainingRoom(string sessionId)
         {
             var tasks = Task.Factory.StartNew(() =>
             {
@@ -112,56 +80,62 @@ namespace Server.GameLogic.LogicServices.Impl
                 return newRoom;
             });
             return await tasks;
+        }*/
+
+        public async Task<Room> JoinRoom(string sessionId, string roomType, string roomId = "")
+        {
+            if (string.IsNullOrEmpty(roomId) && roomType == "Private")
+                throw new InvalidRoomIdException(roomId);
+           
+            if (roomType == "Public" || string.IsNullOrEmpty(roomId) && roomType != "Private")
+            {
+                var room = _applicationDbContext.Rooms.FirstOrDefault(x => x.IsPrivate == false);
+                    if ( room== null)
+                        throw new NoPublicRoomsException("Public");
+                    return room;
+            }
+            //if (!_applicationDbContext.Rooms.Any(x => x.Id == roomId))
+                
+
+            var thisRoom = await _applicationDbContext.Rooms.FindAsync(roomId);
+            
+            if(thisRoom is null)
+                throw new RoomNotFoundException(roomId);
+
+            if (thisRoom.FirstPlayerId != null && thisRoom.SecondPlayerId != null)
+                throw new RoomIsFullException(roomId);
+
+            var thisAccount = await GetAccountBySessionId(sessionId);
+
+            if (thisRoom.FirstPlayerId == thisAccount.Id || thisRoom.SecondPlayerId == thisAccount.Id)
+                throw new RoomException("Already entered the room");
+            thisRoom.SecondPlayerId = thisAccount.Id;
+            _applicationDbContext.Update(thisRoom);
+
+            await _applicationDbContext.SaveChangesAsync();
+            return thisRoom;
+
         }
 
-        public async Task<Room> JoinPrivateRoom(string sessionId, string roomId)
-        {
-            var tasks = Task.Run(() =>
-            {
-                if (!ActiveRooms.TryGetValue(roomId, out var thisRoom))
-                    return null; //todo:exception;
-
-                if (thisRoom.Players.Count == 2)
-                    return null;
-
-                var newRoom = thisRoom;
-                var thisAccount = GetAccountBySessionId(sessionId);
-                newRoom.Players.TryAdd(thisAccount.Id, false);
-
-                if (newRoom.Players.Count > 1)
-                    newRoom.IsFull = true;
-
-                return ActiveRooms.TryUpdate(roomId,
-                    newRoom, thisRoom)
-                    ? newRoom
-                    : null; //todo: change to exception;
-            });
-
-            return await tasks;
-        }
-
-        private async void CheckRoomDate(object state)
-        {
-            var threads = Task.Factory.StartNew(() =>
-            {
-                if (ActiveRooms.IsEmpty) return;
-                foreach (var room in ActiveRooms)
+        /*private void CheckRoomDate(object state)
+        { 
+            //todo: probably redo
+            if (!_applicationDbContext.Rooms.Any()) return; 
+                foreach (var room in _applicationDbContext.Rooms)
                 {
-                    if (room.Value.CreationTime.AddMinutes(5) < DateTime.Now && room.Value.CurrentRoundId == null)
-                        ActiveRooms.TryRemove(room);
+                    if (room.CreationTime.AddMinutes(5) < DateTime.Now && room.RoundId == null)
+                        _applicationDbContext.Rooms.Remove(room);
                 }
-            });
-            await Task.WhenAll(threads);
-        }
+        }*/
 
-        public async Task<bool> DeleteRoom(string roomId)
+        /*public async Task<bool> DeleteRoom(string roomId)
         {
             var tasks = Task.Factory.StartNew(() =>
                 ActiveRooms.TryRemove(roomId, out _));
             return await tasks;
-        }
+        }*/
 
-        public async Task<Room> UpdateRoom(Room updated)
+        /*public async Task<Room> UpdateRoom(Room updated)
         {
             var thread = Task.Factory.StartNew(() =>
             {
@@ -177,8 +151,8 @@ namespace Server.GameLogic.LogicServices.Impl
                     : null;
             });
             return await thread;
-        }
-        public async Task<Room> UpdatePlayerStatus(string sessionId, bool isReady)
+        }*/
+        /*public async Task<Room> UpdatePlayerStatus(string sessionId, bool isReady)
         {
             var account = GetAccountBySessionId(sessionId);
 
@@ -232,8 +206,8 @@ namespace Server.GameLogic.LogicServices.Impl
             }
 
             return await UpdateRoom(thisRoom);
-        }
-        public async Task<Room> UpdateRoom(string roomId)
+        }*/
+        /*public async Task<Room> UpdateRoom(string roomId)
         {
             try
             {
@@ -268,7 +242,7 @@ namespace Server.GameLogic.LogicServices.Impl
                 return null;
             }
             
-        }
+        }*/
 
         #region PrivateMethods
         private static string RandomString()
@@ -277,22 +251,22 @@ namespace Server.GameLogic.LogicServices.Impl
             return new string(Enumerable.Repeat(chars, 5)
                 .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
-        private Account GetAccountBySessionId(string sessionId)
+        private async  Task<Account> GetAccountBySessionId(string sessionId)
         {
-            _accountManager.AccountsActive.TryGetValue(sessionId, out var account);
-            if (account != null) 
-                return account;
-            throw new UserNotFoundException(nameof(account));
+            var activeAccountSession = await  _applicationDbContext.ActiveSessionsEnumerable.FindAsync(sessionId);
+            if (activeAccountSession != null) 
+                return await _applicationDbContext.Accounts.FindAsync(activeAccountSession.AccountId);
+            throw new UserNotFoundException(nameof(sessionId));
 
         }
-        private Room GetRoomByRoomId(string roomId)
+        /*private Room GetRoomByRoomId(string roomId)
         {
             return ActiveRooms.TryGetValue(roomId, out var thisRoom)
                 ? thisRoom
                 : throw new UserNotFoundException();
-        }
+        }*/
 
         #endregion
         
     }
-}*/
+}

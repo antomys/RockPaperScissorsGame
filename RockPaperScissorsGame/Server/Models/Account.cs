@@ -32,5 +32,10 @@ namespace Server.Models
             Statistics = new Statistics(login);
         }
 
+        public Account()
+        {
+            
+        }
+
     }
 }
