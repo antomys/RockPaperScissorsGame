@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -280,7 +281,7 @@ namespace Client
                 logger.Info("Error occured. Probably there is either no room or it is already full");
             }
         }
-        /**/
+        /*#1#
         private async Task StartRoomMenu()
         {
             
@@ -312,7 +313,7 @@ namespace Client
                 Console.ReadKey();
             }
         }
-        /**/
+        /*#1#
         private async Task MakeYourMove()
         {
             var move = 0;
@@ -711,5 +712,6 @@ namespace Client
         }
     }
 }
+*/
 
         

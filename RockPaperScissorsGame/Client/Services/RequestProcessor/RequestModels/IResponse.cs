@@ -1,4 +1,4 @@
-﻿namespace Client.Services.RequestModels
+﻿namespace Client.Services.RequestProcessor.RequestModels
 {
     public interface IResponse
     {
