@@ -18,7 +18,6 @@ namespace Server.Mappings
                 {
                     Login = statistics.Login,
                     Score = statistics.Score
-                    
                 };
             
         }

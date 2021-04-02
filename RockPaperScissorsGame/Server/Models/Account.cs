@@ -1,26 +1,41 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Server.Models.Interfaces;
 
 namespace Server.Models
 {
+    [Table("Account")]
     public class Account : IAccount
     {
-        
-        /// <summary>
-        /// Id of account. Unique to everyone and similar with Statistics Id
-        /// </summary>
+        [Key]
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Id { get; init; }
         
-        /// <summary>
-        /// Nick name of Account
-        /// </summary>
+        [StringLength(20)]
+        [Required]
         public string Login { get; set; }
         
-        /// <summary>
-        /// Password of the Account
-        /// </summary>
+        [Required]
         [StringLength(20, MinimumLength=5, ErrorMessage = "Invalid password length")]
         public string Password { get; set; }
+        
+        [ForeignKey("StatisticsId")]
+        public Statistics Statistics { get; set; }
+
+        public Account(string login, string password)
+        {
+            Id = Guid.NewGuid().ToString();
+            Login = login;
+            Password = password;
+            Statistics = new Statistics(login);
+        }
+
+        public Account()
+        {
+            
+        }
 
     }
 }
