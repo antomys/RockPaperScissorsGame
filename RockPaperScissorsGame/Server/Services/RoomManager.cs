@@ -94,9 +94,7 @@ namespace Server.Services
                         throw new NoPublicRoomsException("Public");
                     return room;
             }
-            //if (!_applicationDbContext.Rooms.Any(x => x.Id == roomId))
-                
-
+   
             var thisRoom = await _applicationDbContext.Rooms.FindAsync(roomId);
             
             if(thisRoom is null)
