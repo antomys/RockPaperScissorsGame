@@ -5,19 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Client.Services.RequestProcessor.RequestModels;
 
 namespace Client.Services.RequestProcessor.Impl
 {
     public class RequestPerformer : IRequestPerformer
     {
-        private readonly IRequestHandler _requestHandler;
-        public RequestPerformer(
-            IRequestHandler requestHandler)
+        public RequestPerformer()
         {
-            _requestHandler = requestHandler;
+            RequestHandler = new RequestHandler();
         }
-        //public readonly IRequestHandler RequestHandler;
+        public readonly IRequestHandler RequestHandler;
         public async Task<IResponse> PerformRequestAsync(IRequestOptions requestOptions)
         {
             IResponse response = null;
@@ -25,7 +22,7 @@ namespace Client.Services.RequestProcessor.Impl
             if (!requestOptions.IsValid) throw new ArgumentOutOfRangeException(nameof(requestOptions));
                 try
                 {
-                    response = await _requestHandler.HandleRequestAsync(requestOptions);
+                    response = await RequestHandler.HandleRequestAsync(requestOptions);
                 }
                 catch (TimeoutException) //todo: Probably redo
                 {

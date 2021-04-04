@@ -1,6 +1,6 @@
-﻿/*using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Server.Models;
+using Server.GameLogic.Models.Impl;
 
 namespace Server.GameLogic.LogicServices
 {
@@ -34,4 +34,4 @@ namespace Server.GameLogic.LogicServices
         /// <returns>Round</returns>
         Task<Round> UpdateRound(string roomId);
     }
-}*/
+}

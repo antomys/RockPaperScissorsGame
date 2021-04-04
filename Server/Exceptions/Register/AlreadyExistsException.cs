@@ -1,4 +1,4 @@
-﻿namespace Server.Exceptions.Registration
+﻿namespace Server.Exceptions.Register
 {
     public class AlreadyExistsException : UnknownReasonException
     {

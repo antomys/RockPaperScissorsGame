@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Server.GameLogic.LogicServices;
+using Server.GameLogic.Models.Impl;
 using System;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Server.Exceptions.Room;
-using Server.Models;
-using Server.Services.Interfaces;
 
 namespace Server.Controllers
 {
@@ -15,22 +13,19 @@ namespace Server.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class RoomController : ControllerBase
     {
-        private readonly ILogger<RoomController> _logger;
-        private readonly IRoomManager _roomManager;
-
-        public RoomController(ILogger<RoomController> logger, IRoomManager roomManager)
+        private readonly IRoomCoordinator _roomManager;
+        
+        public RoomController(
+            IRoomCoordinator roomManager)
         {
-            _logger = logger;
             _roomManager = roomManager;
         }
 
         [HttpPost]
-        [Route("create/")]
+        [Route("create/{sessionId}&{isPrivate}")]
         [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Room>> CreateRoom(
-            [FromQuery]string sessionId, 
-            [FromQuery]bool isPrivate)
+        public async Task<ActionResult<Room>> CreateRoom(string sessionId, bool isPrivate)
         {
             try
             {
@@ -49,17 +44,14 @@ namespace Server.Controllers
         }
         
         [HttpPost]
-        [Route("join/")]
+        [Route("join/{sessionId}&{roomId}")]
         [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Room>> JoinRoom(
-            [FromQuery]string sessionId, 
-            [FromQuery]string roomId,
-            [FromHeader]string roomType)
+        public async Task<ActionResult<Room>> JoinPrivateRoom(string sessionId, string roomId)
         {
             try
             {
-                var resultRoom = await _roomManager.JoinRoom(sessionId,roomType, roomId);
+                var resultRoom = await _roomManager.JoinPrivateRoom(sessionId, roomId);
                 
                 if (resultRoom != null)
                 {
@@ -67,14 +59,13 @@ namespace Server.Controllers
                 }
                 return BadRequest();
             }
-            catch (RoomException exception)
+            catch (Exception exception)
             {
-                _logger.LogError(exception,exception.Message);
                 return BadRequest(exception.Message);
             }
         }
         
-        /*[HttpGet]
+        [HttpGet]
         [Route("join/{sessionId}")]
         [ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -166,6 +157,6 @@ namespace Server.Controllers
             {
                 return BadRequest(exception.Message);
             }
-        }*/
+        }
     }
 }

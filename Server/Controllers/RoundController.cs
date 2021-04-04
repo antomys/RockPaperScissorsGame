@@ -1,12 +1,11 @@
-﻿/*
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.GameLogic.LogicServices;
+using Server.GameLogic.Models.Impl;
 using System;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Server.Models;
 
 namespace Server.Controllers
 {
@@ -92,4 +91,3 @@ namespace Server.Controllers
         private readonly ILogger<RoundController> _logger;
     }
 }
-*/

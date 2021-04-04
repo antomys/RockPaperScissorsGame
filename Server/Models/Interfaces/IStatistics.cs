@@ -7,6 +7,7 @@ namespace Server.Models.Interfaces
         [JsonPropertyName("Id")]
         string Id { get; set; }
         
+        [JsonPropertyName("UserLogin")]
         string Login { get; set; }
         
         [JsonPropertyName("Wins")]

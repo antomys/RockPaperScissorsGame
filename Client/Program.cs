@@ -1,8 +1,6 @@
 ﻿using Client.Services.RequestProcessor.Impl;
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Client.Menus;
 
 namespace Client
 {
@@ -12,13 +10,8 @@ namespace Client
         {
             try
             {
-                var client = new HttpClient {BaseAddress = new Uri("http://localhost:5000/")};
-                var requestHandler = new RequestHandler(client);
-                var performer = new RequestPerformer(requestHandler);
-                //var emulator = new ClientAppEmulator(new RequestPerformer());
-
-                var startMenu = new StartMenu(performer);
-                return await startMenu.StartAsync();
+                var emulator = new ClientAppEmulator(new RequestPerformer());
+                return await emulator.StartAsync();
             }
             catch (Exception) //todo : do this need a message?
             {
