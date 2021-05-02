@@ -45,6 +45,7 @@ namespace Server
 
             app.UseHttpsRedirection();
 
+            app.UseMiddleware<LoggingMiddleware>();
             app.UseRouting();
 
             app.UseAuthorization();

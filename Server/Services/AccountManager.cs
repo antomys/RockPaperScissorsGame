@@ -41,57 +41,49 @@ namespace Server.Services
         /// <exception cref="LoginCooldownException">When too many false retries</exception>
         /// <exception cref="InvalidCredentialsException">When invalid data</exception>
         /// <exception cref="UserAlreadySignedInException">When used is already signed in</exception>
-        public async Task<Account> LogInAsync(AccountDto accountDto)
-        {
-            var tasks = Task.Factory.StartNew(() =>
+        public Task<string> LogInAsync(AccountDto accountDto)
+        { 
+            var invalidTryAccount = _invalidTries.FirstOrDefault(x => x.Key == accountDto.Login);
+
+            if (invalidTryAccount.Value >= 2)
             {
-                var invalidTryAccount = _invalidTries.FirstOrDefault(x => x.Key == accountDto.SessionId);
-
-                if (invalidTryAccount.Value >= 2)
+                if ((DateTime.Now - _lastTimes
+                        .FirstOrDefault(x => x.Key == accountDto.Login).Value)
+                    .TotalSeconds >= CoolDownTime)
                 {
-                    if ((DateTime.Now - _lastTimes.FirstOrDefault(x => x.Key == accountDto.SessionId).Value)
-                        .TotalSeconds >= CoolDownTime)
-                    {
-                        _invalidTries.TryRemove(invalidTryAccount);
-                    }
-                    else
-                    {
-                        // ReSharper disable once RedundantAssignment
-                        _lastTimes.AddOrUpdate(accountDto.SessionId, accountDto.LastRequest,
-                            ((s, time) => time = accountDto.LastRequest));
-                        throw new LoginCooldownException("CoolDown", CoolDownTime);
-                    }
+                    _invalidTries.TryRemove(invalidTryAccount);
                 }
-
-                var login = _deserializedObject.ConcurrentDictionary.Values
-                    .FirstOrDefault(x => x.Login == accountDto.Login && x.Password == accountDto.Password);
-
-                if (login == null)
+                else
                 {
-                    _invalidTries.AddOrUpdate(accountDto.SessionId, 1, (s, i) => i + 1);
-
-                    _lastTimes.AddOrUpdate(accountDto.SessionId, accountDto.LastRequest,
+                    _lastTimes.AddOrUpdate(accountDto.Login, accountDto.LastRequest,
                         ((s, time) => time = accountDto.LastRequest));
-
-                    throw new InvalidCredentialsException($"{accountDto.Login}");
+                    throw new LoginCooldownException("CoolDown", CoolDownTime);
                 }
+            }
 
-                if (AccountsActive.Any(x => x.Value == login)
-                    || AccountsActive.ContainsKey(accountDto.SessionId))
+            var login = _deserializedObject.ConcurrentDictionary.Values
+                .FirstOrDefault(x => x.Login == accountDto.Login && x.Password == accountDto.Password);
 
-                {
-                    var thisAccount = AccountsActive.FirstOrDefault(x => x.Key == accountDto.SessionId).Value;
-                    AccountsActive.TryUpdate(accountDto.SessionId, login, thisAccount);
-                    //throw new UserAlreadySignedInException(nameof(login.Login));
-                }
+            if (login == null)
+            {
+                _invalidTries.AddOrUpdate(accountDto.Login, 1, (s, i) => i + 1);
 
-                AccountsActive.TryAdd(accountDto.SessionId, login);
-                _logger.LogTrace(""); //todo
+                _lastTimes.AddOrUpdate(accountDto.Login, accountDto.LastRequest,
+                    ((s, time) => time = accountDto.LastRequest));
 
-                return login;
-            });
+                throw new InvalidCredentialsException($"{accountDto.Login}");
+            }
 
-            return await tasks;
+            if (AccountsActive.Any(x => x.Value == login))
+            {
+                throw new UserAlreadySignedInException(nameof(login.Login));
+            }
+
+            var sessionId = Guid.NewGuid().ToString();
+            AccountsActive.TryAdd(sessionId, login);
+            _logger.LogTrace($"{sessionId} to {login}"); //todo
+
+            return Task.FromResult(sessionId);
         }
 
         /// <summary>
@@ -105,7 +97,6 @@ namespace Server.Services
                 .StartNew(() => AccountsActive.ContainsKey(sessionId) && AccountsActive.TryRemove(sessionId, out _));
 
             return await tasks;
-
         }
 
         /// <summary>
@@ -116,7 +107,6 @@ namespace Server.Services
         public async Task<bool> IsActive(string sessionId)
         {
             var tasks = Task.Factory.StartNew(() => AccountsActive.ContainsKey(sessionId));
-
             return await tasks;
         }
 

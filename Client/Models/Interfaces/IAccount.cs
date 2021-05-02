@@ -2,7 +2,7 @@
 
 namespace Client.Models.Interfaces
 {
-    internal interface IAccount
+    public interface IAccount
     {
         public string Login { get; set; }
         public string Password { get; set; }

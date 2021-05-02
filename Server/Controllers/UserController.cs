@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Server.Contracts;
 using Server.Exceptions.LogIn;
 using Server.Exceptions.Register;
-using Server.GameLogic.LogicServices;
 using Server.GameLogic.LogicServices.Interfaces;
 using Server.Models;
 using Server.Services.Interfaces;
@@ -17,7 +16,6 @@ namespace Server.Controllers
 {
     [ApiController]
     [Route ("/user")]
-    
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     public class UserController : ControllerBase
@@ -51,12 +49,12 @@ namespace Server.Controllers
         [Route("login")]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<int>> Login(AccountDto accountDto)
+        public async Task<ActionResult<string>> Login(AccountDto accountDto)
         {
             try
             {
                 await _accountManager.LogInAsync(accountDto);
-                return Ok($"Signed In as {accountDto.Login}");
+                return Ok(accountDto);
 
             }
             catch (ValidationException exception)
@@ -78,7 +76,7 @@ namespace Server.Controllers
         /// <param name="accountDto">Data Transfer Object of account</param>
         /// <returns>HttpStatusCode and response string</returns>
         [HttpPost]
-        [Route("create")]
+        [Route("register")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<int>> CreateAccount(AccountDto accountDto)

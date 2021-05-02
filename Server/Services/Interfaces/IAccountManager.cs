@@ -21,7 +21,7 @@ namespace Server.Services.Interfaces
         /// <exception cref="LoginCooldownException">When too many false retries</exception>
         /// <exception cref="InvalidCredentialsException">When invalid data</exception>
         /// <exception cref="UserAlreadySignedInException">When used is already signed in</exception>
-        Task<Account> LogInAsync(AccountDto accountDto);
+        Task<string> LogInAsync(AccountDto accountDto);
         
         /// <summary>
         /// Async method to sign out of account

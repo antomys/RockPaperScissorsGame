@@ -4,9 +4,8 @@ using Newtonsoft.Json;
 
 namespace Client.Models
 {
-    internal class Account : IAccount
+    public class Account : IAccount
     {
-        
         [JsonProperty("Login")]
         public string Login { get; set; }
         
