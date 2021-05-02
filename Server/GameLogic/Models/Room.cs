@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Server.GameLogic.Models.Interfaces;
 
-namespace Server.GameLogic.Models.Impl
+namespace Server.GameLogic.Models
 {
     public class Room : IRoom
     {

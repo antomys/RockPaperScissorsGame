@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json.Serialization;
 
-namespace Server.GameLogic.Models
+namespace Server.GameLogic.Models.Interfaces
 {
     public interface IRound
     {

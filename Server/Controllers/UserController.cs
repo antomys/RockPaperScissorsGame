@@ -9,6 +9,7 @@ using Server.Contracts;
 using Server.Exceptions.LogIn;
 using Server.Exceptions.Register;
 using Server.GameLogic.LogicServices;
+using Server.GameLogic.LogicServices.Interfaces;
 using Server.Models;
 using Server.Services.Interfaces;
 

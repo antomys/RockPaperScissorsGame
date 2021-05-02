@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Server.GameLogic.LogicServices;
-using Server.GameLogic.Models.Impl;
 using System;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using Server.GameLogic.LogicServices.Interfaces;
+using Server.GameLogic.Models;
 
 namespace Server.Controllers
 {

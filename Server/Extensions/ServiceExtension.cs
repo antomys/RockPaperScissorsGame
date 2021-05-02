@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Server.GameLogic.LogicServices;
-using Server.GameLogic.LogicServices.Impl;
+using Server.GameLogic.LogicServices.Interfaces;
 using Server.Services;
 using Server.Services.Interfaces;
 

@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Server.Extensions;
 using Server.GameLogic.LogicServices;
-using Server.GameLogic.LogicServices.Impl;
 using Server.Services;
 using Server.Services.Interfaces;
 

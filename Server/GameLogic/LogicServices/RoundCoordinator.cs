@@ -2,12 +2,13 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using Server.GameLogic.LogicServices.Interfaces;
 using Server.GameLogic.Models;
-using Server.GameLogic.Models.Impl;
+using Server.GameLogic.Models.Interfaces;
 using Server.Models;
 using Server.Services.Interfaces;
 
-namespace Server.GameLogic.LogicServices.Impl
+namespace Server.GameLogic.LogicServices
 {
     public class RoundCoordinator : IRoundCoordinator
     {

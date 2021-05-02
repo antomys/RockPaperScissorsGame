@@ -1,8 +1,8 @@
-﻿using Server.GameLogic.Models.Impl;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Server.GameLogic.Models;
 
-namespace Server.GameLogic.LogicServices
+namespace Server.GameLogic.LogicServices.Interfaces
 {
     public interface IRoomCoordinator
     {

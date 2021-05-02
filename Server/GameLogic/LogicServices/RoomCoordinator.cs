@@ -1,16 +1,16 @@
-﻿using Server.Exceptions.LogIn;
-using Server.GameLogic.Exceptions;
-using Server.GameLogic.Models.Impl;
-using Server.Models;
-using Server.Services.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Server.Exceptions.LogIn;
+using Server.GameLogic.Exceptions;
+using Server.GameLogic.LogicServices.Interfaces;
 using Server.GameLogic.Models;
+using Server.Models;
+using Server.Services.Interfaces;
 
-namespace Server.GameLogic.LogicServices.Impl
+namespace Server.GameLogic.LogicServices
 {
     public class RoomCoordinator : IRoomCoordinator
     {
