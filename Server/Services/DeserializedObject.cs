@@ -79,7 +79,7 @@ namespace Server.Services
                         JsonConvert.DeserializeObject<ConcurrentDictionary<string,T>>(decoded));
                     return list;
                 }
-                catch (FileNotFoundException exception)
+                catch (FileNotFoundException)
                 {
                     File.Create(_fileName);
                     return new ConcurrentDictionary<string, T>();

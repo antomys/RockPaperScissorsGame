@@ -261,7 +261,7 @@ namespace Server.GameLogic.LogicServices
                 
                 return await UpdateRoom(room);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 return null;
             }

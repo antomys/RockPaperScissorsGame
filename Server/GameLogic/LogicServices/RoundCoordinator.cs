@@ -136,7 +136,7 @@ namespace Server.GameLogic.LogicServices
                             thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
                             thisRound.TimeFinished = DateTime.Now;
                         }
-                        _storageRounds.Add(thisRound);
+                        await _storageRounds.AddAsync(thisRound);
                         await FillStatistics(thisRound);
                     }
                     
@@ -216,7 +216,7 @@ namespace Server.GameLogic.LogicServices
                     }
                 }
 
-                var winRate = 0d;
+                double winRate;
                 if (loss == 0)
                     winRate = 0d;
                 else
@@ -238,90 +238,80 @@ namespace Server.GameLogic.LogicServices
         
         
         //*****************************
-        private async Task<Round> UpdateRound(Round updated)
-        {
-            var task = Task.Factory.StartNew(async () =>
-            {
-                var roomId =
-                    ActiveRounds.Where(x => x.Value
-                        .Equals(updated)).ToArray();
+        private async Task UpdateRound(Round updated)
+        { 
+            var roomId = 
+                ActiveRounds.Where(x => x.Value
+                    .Equals(updated)).ToArray();
                 
+            if (updated.IsFinished)
+            {
+                //if (!updated.PlayerMoves.All(x => x.Key != "Bot") || updated.IsDraw) return updated;
 
 
-                if (updated.IsFinished)
-                {
-                    //if (!updated.PlayerMoves.All(x => x.Key != "Bot") || updated.IsDraw) return updated;
+                //ActiveRounds.TryRemove(roomId[0].Key, out _);
 
+                await Task.FromResult(updated);
+                return;
+            }
+            ActiveRounds.TryGetValue(roomId[0].Key, out var oldRoom);
+            ActiveRounds.TryUpdate(roomId[0].Key, updated, oldRoom);
 
-                    //ActiveRounds.TryRemove(roomId[0].Key, out _);
+            await Task.FromResult(updated);
 
-                    return updated;
-                }
-                ActiveRounds.TryGetValue(roomId[0].Key, out var oldRoom);
-                ActiveRounds.TryUpdate(roomId[0].Key, updated, oldRoom);
-
-                return updated;
-            });
-            
-            return await await task;
         }
         
         //********************************
         public async Task<Round> UpdateRound(string roomId)
-        {
-            var task = Task.Factory.StartNew(async () =>
+        { 
+            ActiveRounds.TryGetValue(roomId, out var updated);
+            
+            if (updated == null) 
+                return null; //todo: add exception;
+            
+            await CheckTime(updated); 
+            if (updated.IsFinished)
             {
-                ActiveRounds.TryGetValue(roomId, out var updated);
+                //if(updated.PlayerMoves.Keys.Any(x=> x!="Bot"))
+                //await _storageRounds.AddAsync(updated);
 
-                if (updated == null)
-                    return null; //todo: add exception;
-                
-                //***************************************************************
-                var elapsedTime = DateTime.Now.Subtract(updated.TimeFinished);
-                if (elapsedTime.Seconds>= 20 &&
-                    updated.PlayerMoves.Any(x => x.Value.Equals(RequiredGameMove.Default)))
-                {
-                    var dictionary = updated.PlayerMoves;
-                    var first = dictionary.Keys.First();
-                    var last = dictionary.Keys.First();
-
-                    if (dictionary[first] == dictionary[last])
-                        updated.IsDraw = false;
-                    else if (dictionary[first] == RequiredGameMove.Default)
-                    {
-                        updated.LoserId = first;
-                        updated.WinnerId = last;
-                    }
-                    else
-                    {
-                        updated.LoserId = last;
-                        updated.WinnerId = first;
-                    }
-                    updated.TimeFinished = DateTime.Now;
-                    updated.IsFinished = true;
-                    
-                    await UpdateRound(updated);
-                    return updated;
-                }
-                //*****************************************************************
-                
-                if (updated.IsFinished)
-                {
-                    //if(updated.PlayerMoves.Keys.Any(x=> x!="Bot"))
-                        //await _storageRounds.AddAsync(updated);
-
-                    //ActiveRounds.TryRemove(roomId, out _);
-
-                    return updated;
-                }
-
-                ActiveRounds.TryGetValue(roomId, out var oldRoom); //Do something with this
-                ActiveRounds.TryUpdate(roomId, updated, oldRoom);
+                //ActiveRounds.TryRemove(roomId, out _);
 
                 return updated;
-            });
+            }
 
-            return await await task; //Task<Task<round>>??????????????????
+            ActiveRounds.TryGetValue(roomId, out var oldRoom); //Do something with this
+            ActiveRounds.TryUpdate(roomId, updated, oldRoom);
+
+            return updated;
+        }
+
+        private async Task CheckTime(Round updated)
+        {
+            var elapsedTime = DateTime.Now.Subtract(updated.TimeFinished);
+            if (elapsedTime.Seconds < 20 ||
+                !updated.PlayerMoves.Any(x => x.Value.Equals(RequiredGameMove.Default)))
+                return;
+            var dictionary = updated.PlayerMoves;
+            var first = dictionary.Keys.First();
+            var last = dictionary.Keys.First();
+
+            if (dictionary[first] == dictionary[last])
+                updated.IsDraw = false;
+            else if (dictionary[first] == RequiredGameMove.Default)
+            {
+                updated.LoserId = first;
+                updated.WinnerId = last;
+            }
+            else
+            {
+                updated.LoserId = last;
+                updated.WinnerId = first;
+            }
+            updated.TimeFinished = DateTime.Now;
+            updated.IsFinished = true;
+                    
+            await UpdateRound(updated);
         }
         public async Task<Round> GetCurrentActiveRoundForSpecialRoom(string roundId)
         {
