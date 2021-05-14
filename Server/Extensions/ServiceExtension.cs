@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Server.Bll.Services;
+using Server.Bll.Services.Interfaces;
 
 
 namespace Server.Extensions
@@ -8,7 +10,8 @@ namespace Server.Extensions
     {
         public static IServiceCollection AddServices(this IServiceCollection service)
         {
-           //return service.
+           return service.
+               AddSingleton<IAccountService, AccountService>();
            throw new NotImplementedException();
         }
     }

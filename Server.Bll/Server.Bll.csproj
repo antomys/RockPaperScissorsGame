@@ -9,4 +9,8 @@
       <PackageReference Include="Mapster.Async" Version="2.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Server.Dal\Server.Dal.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
+using Server.Bll.Models;
 
-namespace Server.Services.Interfaces
+namespace Server.Bll.Services.Interfaces
 {
     public interface IAccountService
     {
-        Task<bool> RegisterAsync();
-        Task<string> LogInAsync();
-        Task<bool> LogOutAsync();
+        Task<bool> RegisterAsync(AccountModel accountModel);
+        Task<string> LogInAsync(AccountModel accountModel);
+        Task<bool> LogOutAsync(string accountToken);
     }
 }

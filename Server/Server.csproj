@@ -24,7 +24,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Server.Bll\Server.Bll.csproj" />
       <ProjectReference Include="..\Server.Dal\Server.Dal.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Contracts\Dtos" />
     </ItemGroup>
 
 
