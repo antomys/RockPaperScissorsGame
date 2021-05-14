@@ -1,15 +1,12 @@
-using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Server.Dal.Context;
 using Server.Extensions;
-using Server.GameLogic.LogicServices;
-using Server.Services;
-using Server.Services.Interfaces;
 
 namespace Server
 {
@@ -21,19 +18,22 @@ namespace Server
         }
 
         private IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public static void ConfigureServices(IServiceCollection services)
+        
+        public void ConfigureServices(IServiceCollection services)
         {
-            services.AddServices();
+            services.AddServices()
+                .AddDbContext<ServerContext>(
+                    builder => builder.UseSqlite
+                        (Configuration.GetConnectionString("connectionString"),
+                        x=> x.MigrationsAssembly("Server.Dal")));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"});
             });
+            services.AddCors();
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -42,8 +42,11 @@ namespace Server
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server v1"));
             }
-
-            app.UseHttpsRedirection();
+            
+            app.UseCors(builder => builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithExposedHeaders("Authorization", "Accept", "Content-Type", "Origin"));
 
             app.UseMiddleware<LoggingMiddleware>();
             app.UseRouting();

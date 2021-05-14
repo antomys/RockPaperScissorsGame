@@ -38,6 +38,7 @@ namespace Server.Extensions
         {
             var requestInformation = $"Request information:\n" +
                                      $"Schema:{context.Request.Scheme}\n" +
+                                     $"Content-Type:{context.Request.ContentType}" +
                                      $"Host:{context.Request.Host}\n" +
                                      $"Path:{context.Request.Path}\n" +
                                      $"QueryString:{context.Request.QueryString}\n" +
