@@ -16,17 +16,17 @@ namespace Server.GameLogic.LogicServices
 
         private readonly IStorage<Statistics> _storageStatistics;
 
-        private readonly IAccountManager _accountManager;
+        private readonly IAccountService _accountService;
 
         public ConcurrentDictionary<string, Round> ActiveRounds { get; set; }
         
         public RoundCoordinator(
             IStorage<Round> storageRounds,
-            IAccountManager accountManager,
+            IAccountService accountService,
             IStorage<Statistics> storageStatistics)
         {
             _storageRounds = storageRounds;
-            _accountManager = accountManager;
+            _accountService = accountService;
             _storageStatistics = storageStatistics;
             ActiveRounds = new ConcurrentDictionary<string, Round>();
         }
@@ -36,7 +36,7 @@ namespace Server.GameLogic.LogicServices
         {
             var tasks = Task.Factory.StartNew(async () =>
             {
-                var accountId = _accountManager.GetActiveAccountBySessionId(sessionId).Id;
+                var accountId = _accountService.GetActiveAccountBySessionId(sessionId).Id;
                 ActiveRounds.TryGetValue(roomId, out var thisRound);
 
                 if (thisRound == null)
@@ -108,11 +108,11 @@ namespace Server.GameLogic.LogicServices
                         if (winner == "Bot")
                         {
                             thisRound.WinnerId = winner;
-                            thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==thisPlayerKey).Value.Login;
+                            thisRound.LoserId = _accountService.AccountsActive.FirstOrDefault(x=> x.Value.Id==thisPlayerKey).Value.Login;
                         }
                         else
                         {
-                            thisRound.WinnerId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
+                            thisRound.WinnerId = _accountService.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
                             thisRound.LoserId = "Bot";
                         }
                     }
@@ -132,8 +132,8 @@ namespace Server.GameLogic.LogicServices
                         else
                         {
                             thisRound.IsFinished = true;
-                            thisRound.WinnerId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
-                            thisRound.LoserId = _accountManager.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
+                            thisRound.WinnerId = _accountService.AccountsActive.FirstOrDefault(x=> x.Value.Id==winner).Value.Login;
+                            thisRound.LoserId = _accountService.AccountsActive.FirstOrDefault(x=> x.Value.Id==loserId).Value.Login;
                             thisRound.TimeFinished = DateTime.Now;
                         }
                         await _storageRounds.AddAsync(thisRound);
@@ -158,7 +158,7 @@ namespace Server.GameLogic.LogicServices
             var keys = thisRound.PlayerMoves.Keys;
             foreach (var key in keys) //FIX
             {
-                var thisAccountLogin = _accountManager.AccountsActive.FirstOrDefault(x => x.Value.Id == key);
+                var thisAccountLogin = _accountService.AccountsActive.FirstOrDefault(x => x.Value.Id == key);
                 var statistics = await _storageStatistics.GetAsync(key); //here is the problem.
                 
                 if (thisRound.WinnerId.Equals(thisAccountLogin.Value.Login))

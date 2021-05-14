@@ -14,7 +14,7 @@ namespace Server.GameLogic.LogicServices
 {
     public class RoomCoordinator : IRoomCoordinator
     {
-        private readonly IAccountManager _accountManager;
+        private readonly IAccountService _accountService;
 
         private readonly IRoundCoordinator _roundCoordinator;
 
@@ -25,10 +25,10 @@ namespace Server.GameLogic.LogicServices
         public ConcurrentDictionary<string, Room> ActiveRooms { get; }
 
         public RoomCoordinator(
-            IAccountManager accountManager,
+            IAccountService accountService,
             IRoundCoordinator roundCoordinator)
         {
-            _accountManager = accountManager;
+            _accountService = accountService;
             _roundCoordinator = roundCoordinator;
             ActiveRooms = new ConcurrentDictionary<string, Room>();
             _timer = new Timer(CheckRoomDate, null, 0, 10000);
@@ -277,7 +277,7 @@ namespace Server.GameLogic.LogicServices
         }
         private Account GetAccountBySessionId(string sessionId)
         {
-            _accountManager.AccountsActive.TryGetValue(sessionId, out var account);
+            _accountService.AccountsActive.TryGetValue(sessionId, out var account);
             if (account != null) 
                 return account;
             throw new UserNotFoundException(nameof(account));

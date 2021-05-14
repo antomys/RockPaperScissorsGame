@@ -6,7 +6,7 @@ using Server.Models;
 
 namespace Server.Services.Interfaces
 {
-    public interface IAccountManager
+    public interface IAccountService
     {
         /// <summary>
         /// List of all active account on the server
