@@ -8,19 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Server.Extensions
 {
-    /// <summary>
-    /// Middleware to log raw data
-    /// </summary>
     internal class LoggingMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="next"></param>
-        /// <param name="loggerFactory"></param>
+        
         public LoggingMiddleware(
             RequestDelegate next,
             ILoggerFactory loggerFactory)
@@ -28,12 +20,7 @@ namespace Server.Extensions
             _next = next;
             _logger = loggerFactory.CreateLogger<LoggingMiddleware>();
         }
-
-        /// <summary>
-        /// Invoke method of logging.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        
         public async Task Invoke(HttpContext context)
         {
             var requestInformation = $"Request information:\n" +
@@ -63,7 +50,6 @@ namespace Server.Extensions
 
         private static async Task<string> ObtainRequestBody(HttpRequest request)
         {
-            if (request.Body == null) return string.Empty;
             request.EnableBuffering();
             var encoding = GetEncodingFromContentType(request.ContentType);
             string bodyStr;
@@ -101,11 +87,9 @@ namespace Server.Extensions
             {
                 return Encoding.UTF8;
             }
-            if (string.IsNullOrEmpty(contentType.CharSet))
-            {
-                return Encoding.UTF8;
-            }
-            return Encoding.GetEncoding(contentType.CharSet, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback);
+            return string.IsNullOrEmpty(contentType.CharSet) 
+                ? Encoding.UTF8 
+                : Encoding.GetEncoding(contentType.CharSet, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback);
         }
         private static LogLevel GetLogLevel(int? statusCode)
         {
@@ -113,7 +97,7 @@ namespace Server.Extensions
         }
         private static int? GetStatusCode(HttpContext context)
         {
-            return context.Response?.StatusCode;
+            return context.Response.StatusCode;
         }
         
     }

@@ -22,15 +22,11 @@ namespace Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddServices()
-                .AddDbContext<ServerContext>(
-                    builder => builder.UseSqlite
-                        (Configuration.GetConnectionString("connectionString"),
-                        x=> x.MigrationsAssembly("Server.Dal")));
+                .AddDatabase(Configuration)
+                .AddSwagger();
+            
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"});
-            });
+           
             services.AddCors();
         }
         

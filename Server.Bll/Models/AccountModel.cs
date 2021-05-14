@@ -1,11 +1,9 @@
-﻿
-namespace Server.Dal.Entities
+﻿namespace Server.Bll.Models
 {
-    public class Account
+    public class AccountModel
     {
         public string Login { get; set; }
-        
+
         public string Password { get; set; }
-      
     }
 }
