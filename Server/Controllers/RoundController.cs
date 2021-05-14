@@ -1,94 +1,45 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Server.GameLogic.LogicServices;
 using System;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Server.GameLogic.LogicServices.Interfaces;
-using Server.GameLogic.Models;
 
 namespace Server.Controllers
 {
     [ApiController]
-    [Route("/round")]
+    [Route("[controller]/[action]")]
     [Produces(MediaTypeNames.Application.Json)]
     public class RoundController:ControllerBase
     {
+        private readonly ILogger<RoundController> _logger;
         public RoundController(
-               IRoundCoordinator roundManager,
-               ILogger<RoundController> logger)
+            ILogger<RoundController> logger)
         {
-            _roundManager = roundManager;
             _logger = logger;
         }
         [HttpGet]
-        [Route("get/{roomId}")]
-        [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Round>> GetActualActiveRoundForCurrentRoom(string roomId)
+        public async Task<IActionResult> GetRound()
         {
-            try
-            {
-                var resultedRound = await _roundManager.GetCurrentActiveRoundForSpecialRoom(roomId);
-                if (resultedRound != null)
-                {
-                    return resultedRound;
-                }
-                return BadRequest();
-            }
-            catch (Exception exception)
-            {
-                return BadRequest(exception.Message);
-            }
+            throw new NotImplementedException();
 
         }       
         [HttpGet]
-        [Route("get/update/{roomId}")]
-        [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Round>> UpdateCurrentRound(string roomId)
+        public async Task<IActionResult> UpdateCurrentRound()
         {
-            try
-            {
-                var resultedRound = await _roundManager.UpdateRound(roomId);
-                
-                if (resultedRound != null)
-                {
-                    return resultedRound;
-                }
-                return BadRequest();
-            }
-            catch (Exception exception)
-            {
-                return BadRequest(exception.Message);
-            }
-
+            throw new NotImplementedException();
         }
         
         [HttpPatch]
-        [Route("move/{roomId}&{sessionId}&{move}")]
-        [ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Round>> PlaceYourMoveToActiveRound(string roomId, string sessionId, int move)
+        public async Task<IActionResult> MakeMove()
         {
-            try
-            {
-                var resultedRound = await _roundManager.MakeMove(roomId,sessionId,move);
-                if (resultedRound != null)
-                {
-                    return resultedRound;
-                }
-                return BadRequest();
-            }
-            catch (Exception exception)
-            {
-                return BadRequest(exception.Message);
-            }
-
+            throw new NotImplementedException();
         }
-
-        private readonly IRoundCoordinator _roundManager;
-        private readonly ILogger<RoundController> _logger;
     }
 }
