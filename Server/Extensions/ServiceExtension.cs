@@ -12,7 +12,6 @@ namespace Server.Extensions
         {
            return service.
                AddSingleton<IAccountService, AccountService>();
-           throw new NotImplementedException();
         }
     }
 }

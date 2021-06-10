@@ -23,13 +23,14 @@ namespace Server.Extensions
         
         public async Task Invoke(HttpContext context)
         {
-            var requestInformation = $"Request information:\n" +
-                                     $"Schema:{context.Request.Scheme}\n" +
-                                     $"Content-Type:{context.Request.ContentType}" +
-                                     $"Host:{context.Request.Host}\n" +
-                                     $"Path:{context.Request.Path}\n" +
-                                     $"QueryString:{context.Request.QueryString}\n" +
-                                     $"Request Body:{await ObtainRequestBody(context.Request)}\n";
+            var requestInformation = 
+                "Request information:\n" + 
+                $"Schema:{context.Request.Scheme}\n" +
+                $"Content-Type:{context.Request.ContentType}" +
+                $"Host:{context.Request.Host}\n" +
+                $"Path:{context.Request.Path}\n" +
+                $"QueryString:{context.Request.QueryString}\n" +
+                $"Request Body:{await ObtainRequestBody(context.Request)}\n";
             _logger.LogWarning(requestInformation);
 
             var originalResponseBody = context.Response.Body;

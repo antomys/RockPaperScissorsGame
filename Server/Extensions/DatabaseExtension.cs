@@ -7,12 +7,14 @@ namespace Server.Extensions
 {
     public static class DatabaseExtension
     {
+        private const string DatabaseConnection = "DatabaseConnection";
+        private const string MigrationAssemblyName = "Server.Dal";
         public static IServiceCollection AddDatabase(this IServiceCollection service, IConfiguration configuration)
         {
             return service.AddDbContext<ServerContext>(
             builder => builder.UseSqlite
-            (configuration.GetConnectionString("connectionString"),
-                x=> x.MigrationsAssembly("Server.Dal")));
+            (configuration.GetConnectionString(DatabaseConnection),
+                x=> x.MigrationsAssembly(MigrationAssemblyName)));
         }
     }
 }

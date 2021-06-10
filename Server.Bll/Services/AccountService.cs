@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
@@ -11,9 +12,9 @@ namespace Server.Bll.Services
         private readonly MemoryCache _memoryCache = new MemoryCache(new MemoryCacheOptions());
         public Task<bool> RegisterAsync(AccountModel accountModel)
         {
-            if (accountModel is null)
-                throw new InvalidCredentialsException(nameof(accountModel));
-            
+            /*if (accountModel is null)
+                throw new InvalidCredentialsException(nameof(accountModel));*/
+            throw new NotImplementedException();
         }
 
         public Task<string> LogInAsync(AccountModel accountModel)
