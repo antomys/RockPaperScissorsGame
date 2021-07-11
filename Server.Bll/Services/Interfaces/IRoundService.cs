@@ -3,7 +3,7 @@ using Server.Bll.Models;
 
 namespace Server.Bll.Services.Interfaces
 {
-    public interface IRoundCoordinator
+    public interface IRoundService
     {
         Task<RoomPlayersModel> CreateRoundAsync();
         Task<RoundModel> MakeMoveAsync();

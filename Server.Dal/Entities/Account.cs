@@ -10,8 +10,8 @@ namespace Server.Dal.Entities
         /// Id of account. Unique to everyone and similar with Statistics Id
         /// </summary>
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string Id { get; init; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; init; }
         
         /// <summary>
         /// Nick name of Account
@@ -26,7 +26,7 @@ namespace Server.Dal.Entities
         /// <summary>
         /// Statistics id, connected to this account
         /// </summary>
-        public string StatisticsId { get; set; }
+        public int? StatisticsId { get; set; }
         
         /// <summary>
         /// Linked to this player statistics
@@ -34,7 +34,7 @@ namespace Server.Dal.Entities
         [ForeignKey("StatisticsId")]
         public virtual Statistics Statistics { get; set; }
         
-        public int RoomPlayerId { get; set; }
+        public int? RoomPlayerId { get; set; }
         
         [ForeignKey("RoomPlayerId")]
         public virtual RoomPlayers RoomPlayers { get; set; }

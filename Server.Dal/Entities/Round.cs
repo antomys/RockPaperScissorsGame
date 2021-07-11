@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,8 +8,8 @@ namespace Server.Dal.Entities
     public class Round
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string Id { get; init; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; init; }
         
         public int RoomPlayersId { get; set; }
         
@@ -19,14 +18,14 @@ namespace Server.Dal.Entities
         
         public bool IsFinished { get; set; }
         
-        public DateTime TimeFinished { get; set; }
+        public DateTimeOffset TimeFinished { get; set; }
         
-        public string WinnerId { get; set; }
+        public int WinnerId { get; set; }
         
         [ForeignKey("WinnerId")]
         public virtual Account Winner { get; set; }
         
-        public string LoserId { get; set; }
+        public int LoserId { get; set; }
         
         [ForeignKey("LoserId")]
         public virtual Account Loser { get; set; }

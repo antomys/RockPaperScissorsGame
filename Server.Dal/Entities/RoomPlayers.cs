@@ -9,9 +9,10 @@ namespace Server.Dal.Entities
     public class RoomPlayers
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         
-        public string RoomId { get; set; }
+        public int RoomId { get; set; }
         
         [ForeignKey("RoomId")]
         public virtual Room Room { get; set; }
@@ -22,10 +23,9 @@ namespace Server.Dal.Entities
         
         public int SecondPlayerMove { get; set; }
 
-        public string RoundId { get; set; }
+        public int RoundId { get; set; }
         
         [ForeignKey("RoundId")]
-        [AllowNull]
         public virtual Round Round { get; set; }
     }
 }

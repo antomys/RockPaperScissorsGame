@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Server.Exceptions.LogIn
+namespace Server.Bll.Exceptions
 {
     public class LoginErrorException : Exception
     {

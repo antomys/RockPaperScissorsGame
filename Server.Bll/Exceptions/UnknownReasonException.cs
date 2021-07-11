@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Server.Exceptions.Register
+namespace Server.Bll.Exceptions
 {
     public class UnknownReasonException : Exception
     {

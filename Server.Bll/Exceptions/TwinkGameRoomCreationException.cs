@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Server.GameLogic.Exceptions
+namespace Server.Bll.Exceptions
 {
     public class TwinkGameRoomCreationException:Exception
     {

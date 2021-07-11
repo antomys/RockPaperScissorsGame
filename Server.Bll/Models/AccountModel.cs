@@ -1,4 +1,4 @@
-﻿namespace Server.Bll.Models
+namespace Server.Bll.Models
 {
     public class AccountModel
     {

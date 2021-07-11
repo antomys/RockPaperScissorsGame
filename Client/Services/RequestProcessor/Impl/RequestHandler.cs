@@ -49,7 +49,7 @@ namespace Client.Services.RequestProcessor.Impl
             }
             catch (HttpRequestException) //todo: probably redo
             {
-                return new Response(false, 500, "Server is not responding!");
+                return new Response(false, 500, "Server.Host is not responding!");
             }
         }
         private static HttpMethod MapMethod(RequestMethod method)

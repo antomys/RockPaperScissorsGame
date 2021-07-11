@@ -11,13 +11,13 @@ namespace Server.Dal.Entities
         /// </summary>
 
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
         
         /// <summary>
         /// Id of linked account
         /// </summary>
-        public string AccountId { get; set; }
+        public int AccountId { get; set; }
         
         /// <summary>
         /// Linked account

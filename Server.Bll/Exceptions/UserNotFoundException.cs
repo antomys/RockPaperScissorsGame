@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Server.Exceptions.LogIn
+﻿namespace Server.Bll.Exceptions
 {
     public class UserNotFoundException : LoginErrorException
     {

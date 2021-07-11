@@ -1,4 +1,4 @@
-﻿namespace Server.Exceptions.LogIn
+﻿namespace Server.Bll.Exceptions
 {
     public class InvalidCredentialsException : LoginErrorException
     {

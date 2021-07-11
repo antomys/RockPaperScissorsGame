@@ -11,13 +11,13 @@ namespace Server.Dal.Entities
         /// Id of the room. Consists of 5 randomized chars
         /// </summary>
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string RoomId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
         
         /// <summary>
         /// Id of current round
         /// </summary>
-        public string RoundId { get; set; }
+        public int RoundId { get; set; }
         
         /// <summary>
         /// Round, linked to this room
