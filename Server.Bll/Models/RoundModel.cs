@@ -8,7 +8,7 @@ namespace Server.Bll.Models
 
         public bool IsFinished { get; set; }
 
-        public DateTime TimeFinished { get; set; }
+        public DateTimeOffset TimeFinished { get; set; }
 
         public AccountModel Winner { get; set; }
 

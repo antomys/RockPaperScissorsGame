@@ -1,4 +1,4 @@
-namespace Server.Authentication.Models
+namespace Server.Authentication.Models.Interfaces
 {
     /// <summary>
     ///  Interface for ApplicationUser class

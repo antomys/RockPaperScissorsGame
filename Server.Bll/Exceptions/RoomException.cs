@@ -5,9 +5,9 @@ namespace Server.Bll.Exceptions
         public int Code { get;}
         public string Message { get; }
 
-        public RoomException(string message, int code, string template)
+        public RoomException(string template, int code)
         {
-            Message = string.Format(template,message);
+            Message = template;
             Code = code;
         }
     }

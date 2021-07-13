@@ -64,7 +64,6 @@ namespace Server.Authentication.Services
 
                 await _repository.SaveChangesAsync();
                 
-                account = await _accounts.FirstOrDefaultAsync(x => x.Login == login);
                 var accountStatistics = new Statistics
                 {
                     AccountId = account.Id

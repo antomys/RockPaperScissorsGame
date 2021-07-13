@@ -14,7 +14,7 @@ namespace Server.Dal.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.5");
+                .HasAnnotation("ProductVersion", "5.0.7");
 
             modelBuilder.Entity("Server.Dal.Entities.Account", b =>
                 {
@@ -28,15 +28,10 @@ namespace Server.Dal.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("RoomPlayerId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int?>("StatisticsId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RoomPlayerId");
 
                     b.HasIndex("StatisticsId");
 
@@ -49,7 +44,7 @@ namespace Server.Dal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreationTime")
+                    b.Property<DateTimeOffset>("CreationTime")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsFull")
@@ -64,10 +59,13 @@ namespace Server.Dal.Migrations
                     b.Property<bool>("IsRoundEnded")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("RoomPlayerId")
+                    b.Property<string>("RoomCode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("RoomPlayerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("RoundId")
+                    b.Property<int?>("RoundId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -86,13 +84,19 @@ namespace Server.Dal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("FirstPlayerId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("FirstPlayerMove")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("RoomId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("RoundId")
+                    b.Property<int?>("RoundId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SecondPlayerId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("SecondPlayerMove")
@@ -100,9 +104,14 @@ namespace Server.Dal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId");
+                    b.HasIndex("FirstPlayerId");
+
+                    b.HasIndex("RoomId")
+                        .IsUnique();
 
                     b.HasIndex("RoundId");
+
+                    b.HasIndex("SecondPlayerId");
 
                     b.ToTable("RoomPlayers");
                 });
@@ -116,7 +125,7 @@ namespace Server.Dal.Migrations
                     b.Property<bool>("IsFinished")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("LoserId")
+                    b.Property<int?>("LoserId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("RoomPlayersId")
@@ -125,7 +134,7 @@ namespace Server.Dal.Migrations
                     b.Property<DateTimeOffset>("TimeFinished")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("WinnerId")
+                    b.Property<int?>("WinnerId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -184,15 +193,9 @@ namespace Server.Dal.Migrations
 
             modelBuilder.Entity("Server.Dal.Entities.Account", b =>
                 {
-                    b.HasOne("Server.Dal.Entities.RoomPlayers", "RoomPlayers")
-                        .WithMany("Accounts")
-                        .HasForeignKey("RoomPlayerId");
-
                     b.HasOne("Server.Dal.Entities.Statistics", "Statistics")
                         .WithMany()
                         .HasForeignKey("StatisticsId");
-
-                    b.Navigation("RoomPlayers");
 
                     b.Navigation("Statistics");
                 });
@@ -202,14 +205,11 @@ namespace Server.Dal.Migrations
                     b.HasOne("Server.Dal.Entities.RoomPlayers", "RoomPlayers")
                         .WithOne()
                         .HasForeignKey("Server.Dal.Entities.Room", "RoomPlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Server.Dal.Entities.Round", "Round")
                         .WithMany()
-                        .HasForeignKey("RoundId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoundId");
 
                     b.Navigation("RoomPlayers");
 
@@ -218,30 +218,40 @@ namespace Server.Dal.Migrations
 
             modelBuilder.Entity("Server.Dal.Entities.RoomPlayers", b =>
                 {
+                    b.HasOne("Server.Dal.Entities.Account", "FirstPlayer")
+                        .WithMany("FirstPlayer")
+                        .HasForeignKey("FirstPlayerId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Server.Dal.Entities.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
+                        .WithOne()
+                        .HasForeignKey("Server.Dal.Entities.RoomPlayers", "RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Server.Dal.Entities.Round", "Round")
                         .WithMany()
-                        .HasForeignKey("RoundId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoundId");
+
+                    b.HasOne("Server.Dal.Entities.Account", "SecondPlayer")
+                        .WithMany("SecondPlayer")
+                        .HasForeignKey("SecondPlayerId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("FirstPlayer");
 
                     b.Navigation("Room");
 
                     b.Navigation("Round");
+
+                    b.Navigation("SecondPlayer");
                 });
 
             modelBuilder.Entity("Server.Dal.Entities.Round", b =>
                 {
                     b.HasOne("Server.Dal.Entities.Account", "Loser")
                         .WithMany()
-                        .HasForeignKey("LoserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LoserId");
 
                     b.HasOne("Server.Dal.Entities.RoomPlayers", "RoomPlayers")
                         .WithMany()
@@ -251,9 +261,7 @@ namespace Server.Dal.Migrations
 
                     b.HasOne("Server.Dal.Entities.Account", "Winner")
                         .WithMany()
-                        .HasForeignKey("WinnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("WinnerId");
 
                     b.Navigation("Loser");
 
@@ -273,9 +281,11 @@ namespace Server.Dal.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.RoomPlayers", b =>
+            modelBuilder.Entity("Server.Dal.Entities.Account", b =>
                 {
-                    b.Navigation("Accounts");
+                    b.Navigation("FirstPlayer");
+
+                    b.Navigation("SecondPlayer");
                 });
 #pragma warning restore 612, 618
         }

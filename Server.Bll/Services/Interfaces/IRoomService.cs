@@ -1,13 +1,16 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
+using OneOf;
+using Server.Bll.Exceptions;
 using Server.Bll.Models;
 
 namespace Server.Bll.Services.Interfaces
 {
-    public interface IRoomCoordinator
+    public interface IRoomService
     {
-        Task<RoomModel> CreateRoom();
-        Task<RoomModel> JoinRoom();
-        Task<RoomModel> UpdateRoom();
-        Task<bool> DeleteRoom();
+        Task<OneOf<RoomModel, RoomException>> CreateRoom(int userId, bool isPrivate = false);
+        Task<OneOf<RoomModel, RoomException>> JoinRoom(int userId, string roomCode);
+        Task<OneOf<RoomModel, RoomException>> GetRoom(int roomId);
+        Task<int?> UpdateRoom(RoomModel room);
+        Task<int?> DeleteRoom(int userId, int roomId);
     }
 }

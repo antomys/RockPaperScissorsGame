@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Server.Dal.Entities
@@ -34,9 +35,7 @@ namespace Server.Dal.Entities
         [ForeignKey("StatisticsId")]
         public virtual Statistics Statistics { get; set; }
         
-        public int? RoomPlayerId { get; set; }
-        
-        [ForeignKey("RoomPlayerId")]
-        public virtual RoomPlayers RoomPlayers { get; set; }
+        public virtual ICollection<RoomPlayers> FirstPlayer { get; set; }
+        public virtual ICollection<RoomPlayers> SecondPlayer { get; set; }
     }
 }

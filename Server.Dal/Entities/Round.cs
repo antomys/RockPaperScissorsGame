@@ -20,12 +20,12 @@ namespace Server.Dal.Entities
         
         public DateTimeOffset TimeFinished { get; set; }
         
-        public int WinnerId { get; set; }
+        public int? WinnerId { get; set; }
         
         [ForeignKey("WinnerId")]
         public virtual Account Winner { get; set; }
         
-        public int LoserId { get; set; }
+        public int? LoserId { get; set; }
         
         [ForeignKey("LoserId")]
         public virtual Account Loser { get; set; }

@@ -27,6 +27,9 @@ namespace Server
                 .AddSwagger()
                 .AddAuthentications();
             
+            // Adding services
+            services.AddServices();
+            
             services.AddControllers();
            
             services.AddCors();

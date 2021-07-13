@@ -7,7 +7,7 @@ namespace Server.Authentication.Models
     /// <summary>
     /// Application user 
     /// </summary>
-    public class AuthUser: IAuthUser
+    public class ApplicationUser: IApplicationUser
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -15,13 +15,13 @@ namespace Server.Authentication.Models
         /// Constructor
         /// </summary>
         /// <param name="httpContextAccessor">http accessor</param>
-        public AuthUser(IHttpContextAccessor httpContextAccessor)
+        public ApplicationUser(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
-        /// This user шв
+        /// This user id
         /// </summary>
         public int Id => GetUserId();
         

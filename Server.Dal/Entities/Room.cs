@@ -15,9 +15,14 @@ namespace Server.Dal.Entities
         public int Id { get; set; }
         
         /// <summary>
+        /// Special code to join a room
+        /// </summary>
+        public string RoomCode { get; set; }
+        
+        /// <summary>
         /// Id of current round
         /// </summary>
-        public int RoundId { get; set; }
+        public int? RoundId { get; set; }
         
         /// <summary>
         /// Round, linked to this room
@@ -25,7 +30,7 @@ namespace Server.Dal.Entities
         [ForeignKey("RoundId")]
         public virtual Round Round { get; set; }
         
-        public int RoomPlayerId { get; set; }
+        public int? RoomPlayerId { get; set; }
         
         [ForeignKey("RoomPlayerId")]
         public virtual RoomPlayers RoomPlayers { get; set; }
@@ -48,7 +53,7 @@ namespace Server.Dal.Entities
         /// <summary>
         /// Creation date. After 5 minutes of inactivity will be deleted
         /// </summary>
-        public DateTime CreationTime { get; set; }  
+        public DateTimeOffset CreationTime { get; set; }  
         
         /// <summary>
         /// Flag is current count has ended
