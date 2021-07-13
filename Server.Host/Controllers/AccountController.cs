@@ -36,7 +36,6 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Login(AccountDto accountDto)

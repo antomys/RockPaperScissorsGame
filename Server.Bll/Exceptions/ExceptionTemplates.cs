@@ -1,0 +1,9 @@
+namespace Server.Bll.Exceptions
+{
+    public static class ExceptionTemplates
+    {
+        public const string Unknown = "Unknown error occured. Please try again";
+        public const string TwinkRoom = "Failed to create one more game when you are sitting in another room.";
+        
+    }
+}
