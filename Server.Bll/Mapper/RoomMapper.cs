@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using Server.Bll.Models;
 using Server.Dal.Entities;
 
@@ -23,7 +23,7 @@ namespace Server.Bll.Mapper
                     IsPrivate = room.IsPrivate,
                     IsReady = room.IsReady,
                     IsFull = room.IsFull,
-                    CreationTime = room.CreationTime,
+                    CreationTime = new DateTime(room.CreationTimeTicks),
                     IsRoundEnded = room.IsRoundEnded,
                 };
             if (room.RoomPlayers.FirstPlayer != null)
@@ -51,7 +51,7 @@ namespace Server.Bll.Mapper
                 IsPrivate = room.IsPrivate,
                 IsReady = room.IsReady,
                 IsFull = room.IsFull,
-                CreationTime = room.CreationTime,
+                CreationTime = new DateTime(room.CreationTimeTicks),
                 IsRoundEnded = room.IsRoundEnded,
             };
         }

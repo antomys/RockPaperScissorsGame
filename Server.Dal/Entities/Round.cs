@@ -18,7 +18,7 @@ namespace Server.Dal.Entities
         
         public bool IsFinished { get; set; }
         
-        public DateTimeOffset TimeFinished { get; set; }
+        public long TimeFinishedTicks { get; set; }
         
         public int? WinnerId { get; set; }
         

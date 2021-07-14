@@ -44,8 +44,8 @@ namespace Server.Dal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset>("CreationTime")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreationTimeTicks")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsFull")
                         .HasColumnType("INTEGER");
@@ -131,8 +131,8 @@ namespace Server.Dal.Migrations
                     b.Property<int>("RoomPlayersId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset>("TimeFinished")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("TimeFinishedTicks")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("WinnerId")
                         .HasColumnType("INTEGER");

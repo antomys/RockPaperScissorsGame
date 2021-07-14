@@ -14,7 +14,7 @@ using Server.Dal.Entities;
 
 namespace Server.Bll.Services
 {
-    public class RoomService : IRoomService
+    public class RoomService : IRoomService, IHostedRoomService
     {
         private readonly DbSet<Room> _rooms;
         private readonly ServerContext _repository;
@@ -38,7 +38,7 @@ namespace Server.Bll.Services
                 RoomCode = Guid.NewGuid().ToString("n")[..8],
                 IsReady = false,
                 IsFull = false,
-                CreationTime = DateTimeOffset.Now,
+                CreationTimeTicks = DateTimeOffset.Now.Ticks,
                 IsRoundEnded = false,
             }; 
             await _rooms.AddAsync(room);
@@ -70,6 +70,8 @@ namespace Server.Bll.Services
             if (foundRoom == null)
                 return new RoomException(ExceptionTemplates.RoomNotExists, 400);
 
+            if (foundRoom.RoomPlayers.FirstPlayerId == userId || foundRoom.RoomPlayers.SecondPlayerId == userId)
+                return new RoomException(ExceptionTemplates.AlreadyInRoom, 400);
             if (foundRoom.RoomPlayers.FirstPlayerId != 0 && foundRoom.RoomPlayers.SecondPlayerId != 0)
                 return new RoomException(ExceptionTemplates.RoomFull, 400);
 
@@ -100,7 +102,7 @@ namespace Server.Bll.Services
                 ? room.Adapt<RoomModel>() 
                 : new RoomException(ExceptionTemplates.RoomNotExists, 400);
         }
-
+        
         public async Task<int?> UpdateRoom(RoomModel room)
         {
             var thisRoom = await _rooms.FindAsync(room.Id);
@@ -135,5 +137,46 @@ namespace Server.Bll.Services
             await _repository.SaveChangesAsync();
             return 200;
         }
+
+        /// <summary>
+        /// ONLY TO BE USED WITH I HOSTED SERVICE. REMOVES RANGE OF ROOMS
+        /// </summary>
+        /// <param name="rooms"></param>
+        /// <returns></returns>
+        [Obsolete(message:"Should be carefully used")]
+        public async Task<bool> RemoveRoomRange(Room[] rooms)
+        {
+            try
+            {
+                _rooms.RemoveRange(rooms);
+
+                await _repository.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        /// Only to use with IHOSTEDSERVICE!        
+        /// </summary>
+        /// <param name="timeSpan"></param>
+        /// <returns></returns>
+        [Obsolete(message:"Should be carefully used")]
+        public async Task<Room[]> GetRoomsByDate(TimeSpan timeSpan)
+        {
+            var currentDate = DateTimeOffset.Now.Ticks;
+            return await _rooms
+                .Where(x => x.CreationTimeTicks + timeSpan.Ticks < currentDate
+                && x.RoundId == null)
+                .ToArrayAsync();
+        }
+    }
+
+    public interface IHostedRoomService
+    {
+        Task<Room[]> GetRoomsByDate(TimeSpan timeSpan);
+        Task<bool> RemoveRoomRange(Room[] rooms);
     }
 }

@@ -71,7 +71,5 @@ namespace Server.Dal.Entities
         /// </summary>
         public int? Score { get; set; }
         
-        
-        
     }
 }

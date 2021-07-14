@@ -53,7 +53,7 @@ namespace Server.Dal.Entities
         /// <summary>
         /// Creation date. After 5 minutes of inactivity will be deleted
         /// </summary>
-        public DateTimeOffset CreationTime { get; set; }  
+        public long CreationTimeTicks { get; set; }  
         
         /// <summary>
         /// Flag is current count has ended
