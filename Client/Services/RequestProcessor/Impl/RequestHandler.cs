@@ -7,21 +7,26 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Client.Services.RequestProcessor.RequestModels;
 
 namespace Client.Services.RequestProcessor.Impl
 {
     public class RequestHandler : IRequestHandler
     {
-        private HttpClient _client;
+        private readonly HttpClient _client;
+
+        public RequestHandler(HttpClient httpClient)
+        {
+            _client = httpClient;
+        }
         public async Task<IResponse> HandleRequestAsync(IRequestOptions requestOptions)
         {
             var handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;
-            _client = new HttpClient(handler);
             if (requestOptions == null) throw new ArgumentNullException(nameof(requestOptions));
             if (!requestOptions.IsValid) throw new ArgumentOutOfRangeException(nameof(requestOptions));
 
-            using var msg = new HttpRequestMessage(MapMethod(requestOptions.Method), new Uri(requestOptions.Address));
+            using var msg = new HttpRequestMessage(MapMethod(requestOptions.Method), new Uri(_client.BaseAddress+requestOptions.Address));
             try
             {
                 if (MapMethod(requestOptions.Method) == HttpMethod.Delete)
@@ -44,7 +49,7 @@ namespace Client.Services.RequestProcessor.Impl
             }
             catch (HttpRequestException) //todo: probably redo
             {
-                return new Response(false, 500, "Server is not responding!");
+                return new Response(false, 500, "Server.Host is not responding!");
             }
         }
         private static HttpMethod MapMethod(RequestMethod method)

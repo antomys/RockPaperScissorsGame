@@ -1,80 +1,77 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Client.Models;
 using Client.Validations;
 
 namespace Client.Services
 {
-    class StringPlaceholder
+    internal class StringPlaceholder
     {
-        private StringDestination destination;
+        private readonly StringDestination _destination;
         public StringPlaceholder()
         {
-            destination = StringDestination.Login;
+            _destination = StringDestination.Login;
         }
         public StringPlaceholder(StringDestination destination)
         {
-            this.destination = destination;
+            this._destination = destination;
         }
-        public string BuildNewSpecialDestinationString(string msg, bool isNeedConfirmation = false)
+        public string BuildString(string msg, bool isNeedConfirmation = false)
         {
             string output;
             while (true)
             {
-                bool passwordNotConfirmed = true;
-                if(destination == StringDestination.PassportType || destination == StringDestination.Email)
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor($"What is your {msg}?", ConsoleColor.Yellow);
+                var passwordNotConfirmed = true;
+                if(_destination == StringDestination.PassportType || _destination == StringDestination.Email)
+                    TextWrite.Print($"What is your {msg}?", ConsoleColor.Yellow);
                 else
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor($"Try to come up with  {msg}?", ConsoleColor.Yellow);
+                    TextWrite.Print($"Try to come up with  {msg}?", ConsoleColor.Yellow);
                 Console.Write($"{msg}--> ");
                 output = Console.ReadLine()
                     ?.Trim()
                     .Replace(" ", "");
                 if (String.IsNullOrEmpty(output))
                 {
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Wrong data!", ConsoleColor.Red);
+                    TextWrite.Print("Wrong data!", ConsoleColor.Red);
                     continue;
                 }
-                if(destination == StringDestination.Password && output.Length < 6)
+                switch (_destination)
                 {
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Wrong password length!", ConsoleColor.Red);
-                    continue;
+                    case StringDestination.Password when output.Length < 6:
+                        TextWrite.Print("Wrong password length!", ConsoleColor.Red);
+                        continue;
+                    case StringDestination.Email when !StringValidator.IsEmailValid(output):
+                        TextWrite.Print("This email is not valid!", ConsoleColor.Red);
+                        continue;
                 }
-                if (destination == StringDestination.Email && !StringValidator.IsEmailValid(output))
-                {
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor("This email is not valid!", ConsoleColor.Red);
-                    continue;
-                }
-                if (destination == StringDestination.Password)
+
+                if (_destination == StringDestination.Password)
                 {
                     if (isNeedConfirmation == true)
                         break;
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor("You need to confirm password!", ConsoleColor.Yellow);
-                    string confirmationPassword;
+                    TextWrite.Print("You need to confirm password!", ConsoleColor.Yellow);
                     do
                     {
                         Console.Write("Confirmation--> ");
-                        confirmationPassword = Console.ReadLine()
+                        var confirmationPassword = Console.ReadLine()
                             ?.Trim()
                             .Replace(" ", "");
-                        if (String.IsNullOrEmpty(output))
+                        if (string.IsNullOrEmpty(output))
                         {
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor("Wrong data!", ConsoleColor.Red);
+                            TextWrite.Print("Wrong data!", ConsoleColor.Red);
                             continue;
                         }
                         if (output == confirmationPassword)
                         {
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor("Password confirmed", ConsoleColor.Green);
+                            TextWrite.Print("Password confirmed", ConsoleColor.Green);
                             passwordNotConfirmed = false;
                         }
                         else
-                            ColorTextWriterService.PrintLineMessageWithSpecialColor("Passwords dont match!",ConsoleColor.Red);
+                            TextWrite.Print("Passwords dont match!",ConsoleColor.Red);
                     } while (passwordNotConfirmed);
                 }
-                if (destination == StringDestination.PassportType && StringValidator.IsStringContainsDigits(output))
+                if (_destination == StringDestination.PassportType && StringValidator.IsStringContainsDigits(output))
                 {
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor("You cannot enter nameType with digits!", ConsoleColor.Red);
+                    TextWrite.Print("You cannot enter nameType with digits!", ConsoleColor.Red);
                     continue;
                 }
                 break;

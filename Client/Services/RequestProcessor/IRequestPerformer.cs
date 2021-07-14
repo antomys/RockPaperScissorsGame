@@ -2,6 +2,7 @@
 using Client.Services.RequestProcessor.RequestModels.Impl;
 using System;
 using System.Threading.Tasks;
+using Client.Services.RequestProcessor.RequestModels;
 
 namespace Client.Services.RequestProcessor
 {

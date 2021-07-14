@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -135,63 +136,7 @@ namespace Client
             }
 
         }
-        private async Task PlayerMenu()
-        {
-            while (true)
-            {
-                ColorTextWriterService.PrintLineMessageWithSpecialColor($"***\nHello, {_playerAccount.Login}\n" +
-                    "Please choose option", ConsoleColor.Cyan);
-                ColorTextWriterService.PrintLineMessageWithSpecialColor("1.\tPlay with bot\n" +
-                    "2\tCreate room\n" +
-                    "3\tJoin Private room\n" +
-                    "4\tJoin Public room\n" +
-                    "5\tShow Statistics\n" +
-                    "6\tLog out", ConsoleColor.Yellow);
 
-                ColorTextWriterService.PrintLineMessageWithSpecialColor("\nPlease select an item from the list", ConsoleColor.Green);
-
-                Console.Write("Select -> ");
-                var passed = int.TryParse(Console.ReadLine(), out int playersMenuInput);
-                if (!passed)
-                {
-                    logger.Trace($"Not passed argument to player Menu");
-                    ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
-                    continue;
-                }
-                switch (playersMenuInput)
-                {
-                    case 1:
-                        Console.Clear();
-                        await JoinRoomWithBot();
-                        break;
-                    case 2:
-                        Console.Clear();
-                        await CreationRoom();
-                        break;
-                    case 3:
-                        Console.Clear();
-                        await JoinPrivateRoom();
-                        break;
-                    case 4:
-                        Console.Clear();
-                        await JoinPublicRoom();
-                        break;
-                    case 5:
-                        Console.Clear();
-                        var statistics = await PersonalStatistics(_sessionId);
-                        Console.WriteLine(statistics+"\n\nPress any key to go back.");
-                        Console.ReadKey();
-                        break;
-                    case 6:
-                        Console.Clear();
-                        await Logout();
-                        return;
-                    default:
-                        ColorTextWriterService.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
-                        continue;
-                }
-            }
-        }
         private async Task JoinRoomWithBot()
         {
             logger.Trace("JoinRoomWithBot method");
@@ -280,7 +225,7 @@ namespace Client
                 logger.Info("Error occured. Probably there is either no room or it is already full");
             }
         }
-        /**/
+        /*#1#
         private async Task StartRoomMenu()
         {
             
@@ -312,7 +257,7 @@ namespace Client
                 Console.ReadKey();
             }
         }
-        /**/
+        /*#1#
         private async Task MakeYourMove()
         {
             var move = 0;
@@ -711,5 +656,6 @@ namespace Client
         }
     }
 }
+*/
 
         
