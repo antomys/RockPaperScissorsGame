@@ -11,7 +11,9 @@ namespace Server.Extensions
     {
         public static IServiceCollection AddServices(this IServiceCollection service)
         {
-            service.AddTransient<IApplicationUser, ApplicationUser>()
+            service
+                .AddTransient<IApplicationUser, ApplicationUser>()
+                .AddTransient<IStatisticsService,StatisticsService>()
                 .AddHostedService<CleanerHostedService>();
             service.AddHttpContextAccessor();
 

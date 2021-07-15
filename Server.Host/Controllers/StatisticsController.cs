@@ -1,41 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Server.Authentication.Models.Interfaces;
+using Server.Bll.Models;
+using Server.Bll.Services.Interfaces;
 using Server.Contracts;
 
 namespace Server.Controllers
 {
     
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("api/v1/stats")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class StatisticsController : ControllerBase
     {
-        private readonly ILogger<StatisticsController> _logger;
-
-
-        public StatisticsController(
-            ILogger<StatisticsController> logger)
+        private readonly IStatisticsService _statisticsService;
+        private readonly IApplicationUser _applicationUser;
+        private int UserId => _applicationUser.Id;
+        public StatisticsController(IStatisticsService statisticsService, IApplicationUser applicationUser)
         {
-            _logger = logger;
+            _statisticsService = statisticsService;
+            _applicationUser = applicationUser;
         }
 
-        [HttpGet]
-        [Route("overallStatistics")]
+        [HttpGet("all")]
         [ProducesResponseType(typeof(IEnumerable<StatisticsDto>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public  ActionResult<IEnumerable<StatisticsDto>> GetOverallStatistics()
+        public async Task<IEnumerable<StatisticsModel>> GetOverallStatistics()
         {
-            throw new NotImplementedException();
+            return await _statisticsService.GetAllStatistics();
         }
         
-        [HttpGet]
+        [HttpGet("personal")]
+        [Authorize]
         //[ProducesResponseType(typeof(Statistics), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public  ActionResult<IActionResult> GetPersonalStatistics()
+        public async Task<IActionResult> GetPersonalStatistics()
         {
-            throw new NotImplementedException();
+            return Ok(await _statisticsService.GetPersonalStatistics(UserId));
         }
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Server.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("api/v1/round")]
     [Produces(MediaTypeNames.Application.Json)]
     public class RoundController:ControllerBase
     {
@@ -18,7 +18,7 @@ namespace Server.Controllers
         {
             _logger = logger;
         }
-        [HttpGet]
+        [HttpGet("get")]
         //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetRound()
@@ -26,7 +26,7 @@ namespace Server.Controllers
             throw new NotImplementedException();
 
         }       
-        [HttpGet]
+        [HttpGet("update")]
         //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> UpdateCurrentRound()

@@ -12,7 +12,7 @@ using Server.Bll.Services.Interfaces;
 namespace Server.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("api/v1/room/")]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class RoomController : ControllerBase
@@ -28,7 +28,7 @@ namespace Server.Controllers
             _applicationUser = applicationUser;
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CreateRoom()
@@ -40,7 +40,7 @@ namespace Server.Controllers
                 exception => BadRequest(exception));
         }
         
-        [HttpPost]
+        [HttpPost("join")]
         //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> JoinRoom([FromQuery] string roomCode)
@@ -51,7 +51,7 @@ namespace Server.Controllers
                 exception => BadRequest(exception));
         }
         
-        [HttpGet]
+        [HttpGet("update")]
         //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> UpdateRoom([FromBody] RoomModel roomModel)
@@ -65,7 +65,7 @@ namespace Server.Controllers
             };
         }
         
-        [HttpDelete]
+        [HttpDelete("delete")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> DeleteRoom([FromQuery] int roomId)
         {
