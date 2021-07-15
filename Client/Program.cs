@@ -12,16 +12,17 @@ namespace Client
         {
             try
             {
-                var client = new HttpClient {BaseAddress = new Uri("http://localhost:5000/")};
-                var requestHandler = new RequestHandler(client);
-                var performer = new RequestPerformer(requestHandler);
-                //var emulator = new ClientAppEmulator(new RequestPerformer());
-
-                var startMenu = new StartMenu(performer);
+                var client = new HttpClient {BaseAddress = new Uri("http://localhost:5000/api/v1/")};
+                var clientHandler = new HttpClientHandler();
+                var requestHandler = new RequestHandler(client, clientHandler);
+                var requestPerformer = new RequestPerformer(requestHandler);
+                
+                var startMenu = new StartMenu(requestPerformer);
                 return await startMenu.StartAsync();
             }
             catch (Exception) //todo : do this need a message?
             {
+                Console.WriteLine("Unknown error occured. Crash.");
                 return -1;
             }
         }

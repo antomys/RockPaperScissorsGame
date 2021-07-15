@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Client.Extensions;
 using Client.Models;
 using Client.Services;
 using Client.Services.RequestProcessor;
@@ -18,7 +20,7 @@ namespace Client.Menus
             _performer = performer;
         }
 
-        public async Task<bool> Register()
+        public async Task<bool> RegisterAsync()
         {
             TextWrite.Print("\nWe are glad to welcome you in the registration form!\n" +
                 "Please enter the required details\n" +
@@ -27,83 +29,74 @@ namespace Client.Menus
             {
                 Login = new StringPlaceholder().BuildString("Login"),
                 Password =
-                    new StringPlaceholder(StringDestination.Password).BuildString("Password"),
-                LastRequest = DateTime.Now
+                    new StringPlaceholder(StringDestination.Password).BuildString("Password")
             };
 
             var options = new RequestOptions
             {
                 ContentType = "application/json",
                 Body = JsonConvert.SerializeObject(registrationAccount),
-                Address = "user/register",
+                Address = "account/register",
                 IsValid = true,
                 Method = Services.RequestModels.RequestMethod.Post,
                 Name = "Registration"
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            if (reachedResponse.Code == (int) HttpStatusCode.Created)
+
+            if (reachedResponse.TryParseJson<ErrorModel>(out var errorModel))
             {
-                
-                TextWrite.Print(reachedResponse.Content, ConsoleColor.Green);
-                return true;
+                TextWrite.Print(errorModel.Message, ConsoleColor.Red);
+                return false;
             }
-            
-            TextWrite.Print(reachedResponse.Content, ConsoleColor.Red);
-            return false;
+
+            TextWrite.Print("Successfully registered!", ConsoleColor.Green);
+            return true;
         }
         
-        public async Task<(string sessionId, Account inputAccount)> LogIn()
+        public async Task<(string token, Account inputAccount)> LoginAsync()
         {
             var inputAccount = new Account
             {
                 Login = new StringPlaceholder().BuildString("Login"),
                 Password =
-                    new StringPlaceholder(StringDestination.Password).BuildString("Password", true),
-                LastRequest = DateTime.Now
+                    new StringPlaceholder(StringDestination.Password).BuildString("Password", true)
             };
             var options = new RequestOptions
             {
                 ContentType = "application/json",
                 Body = JsonConvert.SerializeObject(inputAccount),
-                Address = "user/login",
+                Address = "account/login",
                 IsValid = true,
                 Method = Services.RequestModels.RequestMethod.Post,
                 Name = "Login"
             };
             var reachedResponse = await _performer.PerformRequestAsync(options);
-            if (reachedResponse.Code == (int) HttpStatusCode.OK)
+
+            if (reachedResponse.TryParseJson<TokenModel>(out var tokenModel))
             {
-                TextWrite.Print(reachedResponse.Content, ConsoleColor.Green);
-                
-                //returns sessionId
-                var sessionId = reachedResponse.Content.Replace("\"","").Trim();
-                TextWrite.Print($"Successfully signed in! session id : {sessionId}", ConsoleColor.DarkGreen);
-                return (sessionId, inputAccount);
+                TextWrite.Print($"Successfully signed in.", ConsoleColor.DarkGreen);
+                return (tokenModel.Token, inputAccount);
             }
 
-            TextWrite.Print(reachedResponse.Content, ConsoleColor.Red);
-
+            var error = JsonConvert.DeserializeObject<ErrorModel>(reachedResponse.Content);
+            if(error is null) return (null, null);
+            
+            TextWrite.Print(error.Message, ConsoleColor.Red);
             return (null, null);
         }
 
-        public async Task<bool> Logout(string sessionId)
+        public async Task<bool> LogoutAsync(string token)
         {
             var options = new RequestOptions
             {
-                Address = $"user/logout/{sessionId}",
+                Headers = new Dictionary<string, string>{{"Authorization",token}},
+                Address = $"user/logout/{token}",
                 IsValid = true,
                 Method = Services.RequestModels.RequestMethod.Get
             };
-            var reachedResponse = await _performer.PerformRequestAsync(options);
-            if (reachedResponse.Code == 200)
-            {
-                TextWrite.Print("Successfully signed out", ConsoleColor.Green);
-                return true;
-            }
-
-            TextWrite.Print(reachedResponse.Content, ConsoleColor.Red);
-
-            return false;
+            await _performer.PerformRequestAsync(options);
+            TextWrite.Print("Successfully signed out", ConsoleColor.Green);
+            return true;
         }
     }
 }

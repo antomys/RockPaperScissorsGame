@@ -16,19 +16,16 @@ namespace Server.Dal.Entities
         [ForeignKey("RoomPlayersId")]
         public virtual RoomPlayers RoomPlayers { get; set; }
         
-        public bool IsFinished { get; set; }
-        
-        public long TimeFinishedTicks { get; set; }
-        
         public int? WinnerId { get; set; }
-        
         [ForeignKey("WinnerId")]
         public virtual Account Winner { get; set; }
         
         public int? LoserId { get; set; }
-        
         [ForeignKey("LoserId")]
         public virtual Account Loser { get; set; }
+        
+        public long TimeFinishedTicks { get; set; }
+        public bool IsFinished { get; set; }
         
     }
 }

@@ -11,8 +11,13 @@ namespace Client.Models
         
         [JsonProperty("Password")]
         public string Password { get; set; }
-        
-        [JsonProperty("LastRequest")]
-        public DateTime LastRequest { get; set; }
+    }
+
+    public class TokenModel
+    {
+        [JsonProperty("Token")]
+        public string Token { get; set; }
+        [JsonProperty("Login")]
+        public string Login { get; set; }
     }
 }

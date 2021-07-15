@@ -9,6 +9,7 @@ namespace Client.Services.RequestProcessor.RequestModels.Impl
 {
     public class RequestOptions : IRequestOptions
     {
+        public Dictionary<string, string> Headers { get; set; }
         public string Name { get; set; }
 
         public string Address { get; set; }

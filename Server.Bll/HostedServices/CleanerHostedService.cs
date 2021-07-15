@@ -26,7 +26,11 @@ namespace Server.Bll.HostedServices
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(GenerateDailyQuests, _serviceProvider, TimeSpan.FromSeconds(10), TimeSpan.FromMinutes(1));
+            _timer = new Timer(
+                GenerateDailyQuests, 
+                _serviceProvider,
+                TimeSpan.FromSeconds(10), 
+                TimeSpan.FromSeconds(10));
             return Task.CompletedTask;
         }
 

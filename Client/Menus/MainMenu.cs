@@ -18,14 +18,16 @@ namespace Client.Menus
         {
             while (true)
             {
-                TextWrite.Print($"***\nHello, {_playerAccount.Login}\n" + 
-                                             "Please choose option", ConsoleColor.Cyan);
-                TextWrite.Print("1.\tPlay with bot\n" +
-                                             "2\tCreate room\n" +
-                                             "3\tJoin Private room\n" + 
-                                             "4\tJoin Public room\n" + 
-                                             "5\tShow Statistics\n" + 
-                                             "6\tLog out", ConsoleColor.Yellow);
+                TextWrite.Print(
+                    $"***\nHello, {_playerAccount.Login}\n" + 
+                    "Please choose option", ConsoleColor.Cyan);
+                TextWrite.Print(
+                    "1.\tPlay with bot\n" +
+                    "2\tCreate room\n" + 
+                    "3\tJoin room\n" + 
+                    "4\tSearch open room\n" + 
+                    "5\tShow Statistics\n" + 
+                    "6\tLog out", ConsoleColor.Yellow);
         
                 TextWrite.Print("\nPlease select an item from the list", ConsoleColor.Green);
         

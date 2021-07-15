@@ -10,7 +10,7 @@ using Server.Contracts.Requests;
 namespace Server.Controllers
 {
     [ApiController]
-    [Route ("[controller]/[action]")]
+    [Route ("api/v1/account/")]
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     public class AccountController : ControllerBase
@@ -21,7 +21,7 @@ namespace Server.Controllers
         {
             _authService = authService;
         }       
-        [HttpPost]
+        [HttpPost("register")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
@@ -35,7 +35,7 @@ namespace Server.Controllers
                 exception => BadRequest(exception));
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Login(AccountDto accountDto)
@@ -50,6 +50,7 @@ namespace Server.Controllers
             );
         }
         
+        [HttpGet("logout")]
         [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(int), (int) HttpStatusCode.BadRequest)]
         public ActionResult<int> Logout(string sessionId)

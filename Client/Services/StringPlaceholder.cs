@@ -13,7 +13,7 @@ namespace Client.Services
         }
         public StringPlaceholder(StringDestination destination)
         {
-            this._destination = destination;
+            _destination = destination;
         }
         public string BuildString(string msg, bool isNeedConfirmation = false)
         {
@@ -21,15 +21,16 @@ namespace Client.Services
             while (true)
             {
                 var passwordNotConfirmed = true;
-                if(_destination == StringDestination.PassportType || _destination == StringDestination.Email)
-                    TextWrite.Print($"What is your {msg}?", ConsoleColor.Yellow);
-                else
-                    TextWrite.Print($"Try to come up with  {msg}?", ConsoleColor.Yellow);
+                TextWrite.Print(
+                    _destination is StringDestination.PassportType or StringDestination.Email
+                        ? $"What is your {msg}?"
+                        : $"Try to come up with {msg}?", ConsoleColor.Yellow);
                 Console.Write($"{msg}--> ");
+                
                 output = Console.ReadLine()
                     ?.Trim()
                     .Replace(" ", "");
-                if (String.IsNullOrEmpty(output))
+                if (string.IsNullOrEmpty(output))
                 {
                     TextWrite.Print("Wrong data!", ConsoleColor.Red);
                     continue;
@@ -46,7 +47,7 @@ namespace Client.Services
 
                 if (_destination == StringDestination.Password)
                 {
-                    if (isNeedConfirmation == true)
+                    if (isNeedConfirmation)
                         break;
                     TextWrite.Print("You need to confirm password!", ConsoleColor.Yellow);
                     do
