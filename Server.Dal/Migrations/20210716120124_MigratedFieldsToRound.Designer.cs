@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Dal.Context;
 
 namespace Server.Dal.Migrations
 {
     [DbContext(typeof(ServerContext))]
-    partial class ServerContextModelSnapshot : ModelSnapshot
+    [Migration("20210716120124_MigratedFieldsToRound")]
+    partial class MigratedFieldsToRound
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,8 +146,7 @@ namespace Server.Dal.Migrations
 
                     b.HasIndex("LoserId");
 
-                    b.HasIndex("RoomPlayersId")
-                        .IsUnique();
+                    b.HasIndex("RoomPlayersId");
 
                     b.HasIndex("WinnerId");
 
@@ -258,9 +259,9 @@ namespace Server.Dal.Migrations
                         .HasForeignKey("LoserId");
 
                     b.HasOne("Server.Dal.Entities.RoomPlayers", "RoomPlayers")
-                        .WithOne()
-                        .HasForeignKey("Server.Dal.Entities.Round", "RoomPlayersId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .WithMany()
+                        .HasForeignKey("RoomPlayersId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Server.Dal.Entities.Account", "Winner")

@@ -1,12 +1,10 @@
 using System;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Server.Bll.Exceptions;
-using Server.Bll.Mapper;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 using Server.Dal.Context;
@@ -18,19 +16,19 @@ namespace Server.Bll.Services
     {
         private readonly DbSet<Room> _rooms;
         private readonly ServerContext _repository;
-        
+
         public RoomService(ServerContext repository)
         {
             _repository = repository;
             _rooms = _repository.Rooms;
         }
 
-        public async Task<OneOf<RoomModel, RoomException>> CreateRoom(int userId, bool isPrivate = false)
+        public async Task<OneOf<RoomModel, CustomException>> CreateRoom(int userId, bool isPrivate = false)
         {
             var doesRoomExist = await _repository.RoomPlayersEnumerable
                 .FirstOrDefaultAsync(x=>x.FirstPlayerId == userId || x.SecondPlayerId == userId);
             if (doesRoomExist != null)
-                return new RoomException(ExceptionTemplates.TwinkRoom, (int) HttpStatusCode.BadRequest);
+                return new CustomException(ExceptionTemplates.TwinkRoom);
             
             var room = new Room
             {
@@ -58,22 +56,64 @@ namespace Server.Bll.Services
             _rooms.Update(room);
             
             await _repository.SaveChangesAsync();
-            return room.ToRoomModel();
+            return room.Adapt<RoomModel>();
         }
 
-        public async Task<OneOf<RoomModel, RoomException>> JoinRoom(int userId, string roomCode)
+        public async Task<OneOf<RoomModel, CustomException>> JoinRoom(int userId, bool isPrivate, string roomCode)
         {
+            if (isPrivate)
+            {
+                var randomRoom = await _rooms
+                    .Include(x => x.RoomPlayers)
+                    .Where(x => !x.IsFull).FirstOrDefaultAsync();
+                if (randomRoom is null)
+                    return new CustomException(ExceptionTemplates.NoAvailableRooms);
+                
+                if (randomRoom.RoomPlayers.FirstPlayerId == userId || randomRoom.RoomPlayers.SecondPlayerId == userId)
+                    return new CustomException(ExceptionTemplates.AlreadyInRoom);
+
+                if (randomRoom.RoomPlayers.FirstPlayerId is 0 or null)
+                    randomRoom.RoomPlayers.FirstPlayerId = userId;
+                if (randomRoom.RoomPlayers.SecondPlayerId is 0 or null)
+                    randomRoom.RoomPlayers.SecondPlayerId = userId;
+
+                if ((randomRoom.RoomPlayers.FirstPlayerId != 0 ||
+                     randomRoom.RoomPlayers.FirstPlayerId != null) &&
+                    (randomRoom.RoomPlayers.SecondPlayerId != 0 ||
+                     randomRoom.RoomPlayers.SecondPlayerId != null))
+                {
+                    randomRoom.IsFull = true;
+                    randomRoom.IsReady = true;
+                    
+                    var round = new Round
+                    {
+                        Id = 0,
+                        RoomPlayersId = randomRoom.RoomPlayers.Id,
+                        FirstPlayerMove = 0,
+                        SecondPlayerMove = 0,
+                        LastMoveTicks = DateTimeOffset.Now.Ticks,
+                        IsFinished = false
+                    };
+                    await _repository.Rounds.AddAsync(round);
+
+                    randomRoom.RoundId = round.Id;
+                    randomRoom.RoomPlayers.RoundId = round.Id;
+                }
+                _rooms.Update(randomRoom);
+                await _repository.SaveChangesAsync();
+                return randomRoom.Adapt<RoomModel>();
+            }
             var foundRoom = await _rooms
                 .Include(x=>x.RoomPlayers).
                 FirstOrDefaultAsync(x => x.RoomCode == roomCode);
 
             if (foundRoom == null)
-                return new RoomException(ExceptionTemplates.RoomNotExists, 400);
+                return new CustomException(ExceptionTemplates.RoomNotExists);
 
             if (foundRoom.RoomPlayers.FirstPlayerId == userId || foundRoom.RoomPlayers.SecondPlayerId == userId)
-                return new RoomException(ExceptionTemplates.AlreadyInRoom, 400);
+                return new CustomException(ExceptionTemplates.AlreadyInRoom);
             if (foundRoom.RoomPlayers.FirstPlayerId != 0 && foundRoom.RoomPlayers.SecondPlayerId != 0)
-                return new RoomException(ExceptionTemplates.RoomFull, 400);
+                return new CustomException(ExceptionTemplates.RoomFull);
 
             if (foundRoom.RoomPlayers.FirstPlayerId != 0)
             {
@@ -85,7 +125,7 @@ namespace Server.Bll.Services
             }
 
             if (foundRoom.RoomPlayers.SecondPlayerId == 0) 
-                return new RoomException(ExceptionTemplates.Unknown, 400);
+                return new CustomException(ExceptionTemplates.Unknown);
             
             foundRoom.RoomPlayers.SecondPlayerId = userId;
             _rooms.Update(foundRoom);
@@ -94,13 +134,13 @@ namespace Server.Bll.Services
             return foundRoom.Adapt<RoomModel>();
         }
 
-        public async Task<OneOf<RoomModel, RoomException>> GetRoom(int roomId)
+        public async Task<OneOf<RoomModel, CustomException>> GetRoom(int roomId)
         {
             var room = await _rooms.FindAsync(roomId);
 
             return room != null 
                 ? room.Adapt<RoomModel>() 
-                : new RoomException(ExceptionTemplates.RoomNotExists, 400);
+                : new CustomException(ExceptionTemplates.RoomNotExists);
         }
         
         public async Task<int?> UpdateRoom(RoomModel room)
@@ -114,10 +154,11 @@ namespace Server.Bll.Services
             thisRoom.IsPrivate = updatedRoom.IsPrivate;
             thisRoom.IsReady = updatedRoom.IsReady;
             thisRoom.RoundId = updatedRoom.RoundId;
-            
-            return _repository.Entry(thisRoom).Properties.Any(x => x.IsModified) 
-                ? 400 
-                : 200;
+
+            if (!_repository.Entry(thisRoom).Properties.Any(x => x.IsModified)) return 400;
+            _repository.Update(thisRoom);
+            return 200;
+
         }
 
         public async Task<int?> DeleteRoom(int userId, int roomId)
@@ -139,44 +180,30 @@ namespace Server.Bll.Services
         }
 
         /// <summary>
-        /// ONLY TO BE USED WITH I HOSTED SERVICE. REMOVES RANGE OF ROOMS
+        /// Only to use with I HOSTED SERVICE!        
         /// </summary>
-        /// <param name="rooms"></param>
+        /// <param name="roomOutDate"></param>
+        /// <param name="roundOutDate"></param>
         /// <returns></returns>
         [Obsolete(message:"Should be carefully used")]
-        public async Task<bool> RemoveRoomRange(Room[] rooms)
-        {
-            try
-            {
-                _rooms.RemoveRange(rooms);
-
-                await _repository.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-        /// <summary>
-        /// Only to use with IHOSTEDSERVICE!        
-        /// </summary>
-        /// <param name="timeSpan"></param>
-        /// <returns></returns>
-        [Obsolete(message:"Should be carefully used")]
-        public async Task<Room[]> GetRoomsByDate(TimeSpan timeSpan)
+        public async Task<int> RemoveEntityRangeByDate(TimeSpan roomOutDate, TimeSpan roundOutDate)
         {
             var currentDate = DateTimeOffset.Now.Ticks;
-            return await _rooms
-                .Where(x => x.CreationTimeTicks + timeSpan.Ticks < currentDate
-                && x.RoundId == null)
+            var rooms = await _rooms
+                .Where(x => x.CreationTimeTicks + roomOutDate.Ticks < currentDate && x.RoundId == null)
                 .ToArrayAsync();
-        }
-    }
+            
+            /*var allRound = await _repository.Rounds
+                .Where(x => x.LastMoveTicks + roundOutDate.Ticks < currentDate)
+                .ToArrayAsync();*/
+            
+            _rooms.RemoveRange(rooms);
+            //_repository.Rounds.RemoveRange(allRound);
+            
+            await _repository.SaveChangesAsync();
 
-    public interface IHostedRoomService
-    {
-        Task<Room[]> GetRoomsByDate(TimeSpan timeSpan);
-        Task<bool> RemoveRoomRange(Room[] rooms);
+            return rooms.Length; //+ allRound.Length;
+
+        }
     }
 }

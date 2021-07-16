@@ -37,8 +37,12 @@ namespace Server.Dal.Context
                 .WithMany(user => user.SecondPlayer)
                 .HasForeignKey(invite => invite.SecondPlayerId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Round>()
+                .HasOne(x => x.RoomPlayers)
+                .WithOne()
+                .OnDelete(DeleteBehavior.NoAction);
+            
         }
     }
-    
-    
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Server.Bll.Services;
+using Server.Bll.Services.Interfaces;
 
 namespace Server.Bll.HostedServices
 {
@@ -27,23 +28,24 @@ namespace Server.Bll.HostedServices
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _timer = new Timer(
-                GenerateDailyQuests, 
+                CleanJunk, 
                 _serviceProvider,
                 TimeSpan.FromSeconds(10), 
                 TimeSpan.FromSeconds(10));
             return Task.CompletedTask;
         }
 
-        private async void GenerateDailyQuests(object state)
+        private async void CleanJunk(object state)
         {
-            _logger.LogInformation("Starting Cleaner service");
+            _logger.LogInformation("Starting Cleaning.");
             var factory = (IServiceScopeFactory) state;
             using var scope = factory.CreateScope();
             var roomService = scope.ServiceProvider.GetRequiredService<IHostedRoomService>();
-            var rooms = await roomService.GetRoomsByDate(TimeSpan.FromMinutes(5));
-            if (rooms is not {Length: > 0}) return;
-            await roomService.RemoveRoomRange(rooms);
-            _logger.LogInformation("Cleaned {0} entities of room",rooms.Length);
+
+            var rooms = await roomService
+                .RemoveEntityRangeByDate(TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(20));
+            
+            _logger.LogInformation("Cleaned {0} entities",rooms);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
