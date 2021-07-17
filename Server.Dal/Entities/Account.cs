@@ -12,7 +12,7 @@ namespace Server.Dal.Entities
         /// </summary>
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; init; }
+        public int Id { get; set; }
         
         /// <summary>
         /// Nick name of Account
@@ -27,7 +27,7 @@ namespace Server.Dal.Entities
         /// <summary>
         /// Statistics id, connected to this account
         /// </summary>
-        public int? StatisticsId { get; set; }
+        public int StatisticsId { get; set; }
         
         /// <summary>
         /// Linked to this player statistics

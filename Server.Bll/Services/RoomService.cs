@@ -34,21 +34,17 @@ namespace Server.Bll.Services
             {
                 IsPrivate = isPrivate,
                 RoomCode = Guid.NewGuid().ToString("n")[..8],
-                IsReady = false,
                 IsFull = false,
                 CreationTimeTicks = DateTimeOffset.Now.Ticks,
-                IsRoundEnded = false,
             }; 
             await _rooms.AddAsync(room);
             await _repository.SaveChangesAsync();
             
-            var thisUser = await _repository.Accounts.FindAsync(userId);
-
             var newRoomPlayers = new RoomPlayers
             {
                 RoomId = room.Id,
                 FirstPlayerId = userId,
-                FirstPlayer = thisUser
+                PlayersCount = 1
             };
             
             await _repository.RoomPlayersEnumerable.AddAsync(newRoomPlayers);
@@ -69,36 +65,31 @@ namespace Server.Bll.Services
                 if (randomRoom is null)
                     return new CustomException(ExceptionTemplates.NoAvailableRooms);
                 
-                if (randomRoom.RoomPlayers.FirstPlayerId == userId || randomRoom.RoomPlayers.SecondPlayerId == userId)
+                if (randomRoom.RoomPlayers.FirstPlayerId == userId 
+                    || randomRoom.RoomPlayers.SecondPlayerId == userId)
                     return new CustomException(ExceptionTemplates.AlreadyInRoom);
 
-                if (randomRoom.RoomPlayers.FirstPlayerId is 0 or null)
-                    randomRoom.RoomPlayers.FirstPlayerId = userId;
-                if (randomRoom.RoomPlayers.SecondPlayerId is 0 or null)
-                    randomRoom.RoomPlayers.SecondPlayerId = userId;
-
-                if ((randomRoom.RoomPlayers.FirstPlayerId != 0 ||
-                     randomRoom.RoomPlayers.FirstPlayerId != null) &&
-                    (randomRoom.RoomPlayers.SecondPlayerId != 0 ||
-                     randomRoom.RoomPlayers.SecondPlayerId != null))
+                if (randomRoom.RoomPlayers.PlayersCount < 2)
                 {
-                    randomRoom.IsFull = true;
-                    randomRoom.IsReady = true;
-                    
-                    var round = new Round
-                    {
-                        Id = 0,
-                        RoomPlayersId = randomRoom.RoomPlayers.Id,
-                        FirstPlayerMove = 0,
-                        SecondPlayerMove = 0,
-                        LastMoveTicks = DateTimeOffset.Now.Ticks,
-                        IsFinished = false
-                    };
-                    await _repository.Rounds.AddAsync(round);
-
-                    randomRoom.RoundId = round.Id;
-                    randomRoom.RoomPlayers.RoundId = round.Id;
+                    randomRoom.RoomPlayers.SecondPlayerId = userId;
                 }
+                
+                randomRoom.IsFull = true;
+
+                var round = new Round
+                {
+                    Id = 0,
+                    RoomPlayersId = randomRoom.RoomPlayers.Id,
+                    FirstPlayerMove = 0,
+                    SecondPlayerMove = 0,
+                    LastMoveTicks = DateTimeOffset.Now.Ticks,
+                    IsFinished = false
+                };
+                
+                await _repository.Rounds.AddAsync(round);
+
+                randomRoom.RoundId = round.Id;
+
                 _rooms.Update(randomRoom);
                 await _repository.SaveChangesAsync();
                 return randomRoom.Adapt<RoomModel>();
@@ -152,7 +143,6 @@ namespace Server.Bll.Services
 
             thisRoom.IsFull = updatedRoom.IsFull;
             thisRoom.IsPrivate = updatedRoom.IsPrivate;
-            thisRoom.IsReady = updatedRoom.IsReady;
             thisRoom.RoundId = updatedRoom.RoundId;
 
             if (!_repository.Entry(thisRoom).Properties.Any(x => x.IsModified)) return 400;
@@ -193,16 +183,16 @@ namespace Server.Bll.Services
                 .Where(x => x.CreationTimeTicks + roomOutDate.Ticks < currentDate && x.RoundId == null)
                 .ToArrayAsync();
             
-            /*var allRound = await _repository.Rounds
+            var allRound = await _repository.Rounds
                 .Where(x => x.LastMoveTicks + roundOutDate.Ticks < currentDate)
-                .ToArrayAsync();*/
+                .ToArrayAsync();
             
             _rooms.RemoveRange(rooms);
-            //_repository.Rounds.RemoveRange(allRound);
+            _repository.Rounds.RemoveRange(allRound);
             
             await _repository.SaveChangesAsync();
 
-            return rooms.Length; //+ allRound.Length;
+            return rooms.Length + allRound.Length;
 
         }
     }

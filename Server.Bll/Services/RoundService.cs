@@ -56,7 +56,6 @@ namespace Server.Bll.Services
             await _serverContext.AddAsync(newRound);
 
             foundRoom.RoundId = newRound.Id;
-            foundRoom.RoomPlayers.RoundId = newRound.Id;
             await _serverContext.SaveChangesAsync();
 
             return newRound.Adapt<RoundModel>();

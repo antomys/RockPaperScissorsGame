@@ -11,6 +11,7 @@ namespace Server.Dal.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        public int PlayersCount { get; set; }
         public int RoomId { get; set; }
         [ForeignKey("RoomId")]
         public virtual Room Room { get; set; }
@@ -20,9 +21,5 @@ namespace Server.Dal.Entities
         public int? SecondPlayerId { get; set; }
         [ForeignKey("SecondPlayerId")]
         public virtual Account SecondPlayer { get; set; }
-        public int? RoundId { get; set; }
-        [ForeignKey("RoundId")]
-        public virtual Round Round { get; set; }
-        
     }
 }

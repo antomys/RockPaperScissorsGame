@@ -39,12 +39,7 @@ namespace Server.Dal.Entities
         /// Flag is this room is private
         /// </summary>
         public bool IsPrivate { get; set; }
-        
-        /// <summary>
-        /// Flag if everyone in this room is ready
-        /// </summary>
-        public bool IsReady { get; set; }  
-        
+
         /// <summary>
         /// Flag if room is full
         /// </summary>
@@ -53,12 +48,6 @@ namespace Server.Dal.Entities
         /// <summary>
         /// Creation date. After 5 minutes of inactivity will be deleted
         /// </summary>
-        public long CreationTimeTicks { get; set; }  
-        
-        /// <summary>
-        /// Flag is current count has ended
-        /// </summary>
-        public bool IsRoundEnded { get; set; }
-        
+        public long CreationTimeTicks { get; set; }
     }
 }
