@@ -31,21 +31,29 @@ namespace Server.Controllers
         [HttpPost("create")]
         //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> CreateRoom()
+        public async Task<IActionResult> CreateRoom([FromQuery] bool isPrivate)
         {
-            var newRoom = await _roomService.CreateRoom(UserId);
+            var newRoom = await _roomService.CreateRoom(UserId, isPrivate);
 
             return newRoom.Match<IActionResult>(
                 Ok,
                 exception => BadRequest(exception));
         }
-        
-        [HttpPost("join")]
+
+        [HttpPost("join/public")]
+        public async Task<IActionResult> JoinPublicRoom()
+        {
+            var result = await _roomService.JoinRoom(UserId, true,null);
+            return result.Match<IActionResult>(
+                Ok,
+                exception => BadRequest(exception));
+        }
+        [HttpPost("join/private")]
         //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> JoinRoom([FromQuery] string roomCode)
+        public async Task<IActionResult> JoinPrivateRoom([FromQuery] string roomCode)
         {
-            var result = await _roomService.JoinRoom(UserId, roomCode);
+            var result = await _roomService.JoinRoom(UserId, false, roomCode);
             return result.Match<IActionResult>(
                 Ok,
                 exception => BadRequest(exception));

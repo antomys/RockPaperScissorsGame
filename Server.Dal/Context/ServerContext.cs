@@ -16,6 +16,10 @@ namespace Server.Dal.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Round>()
+                .HasQueryFilter(x => !x.IsFinished);
+            
             modelBuilder.Entity<RoomPlayers>()
                 .HasOne(invite => invite.FirstPlayer)
                 .WithMany(user => user.FirstPlayer)
@@ -37,8 +41,12 @@ namespace Server.Dal.Context
                 .WithMany(user => user.SecondPlayer)
                 .HasForeignKey(invite => invite.SecondPlayerId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Round>()
+                .HasOne(x => x.RoomPlayers)
+                .WithOne()
+                .OnDelete(DeleteBehavior.NoAction);
+            
         }
     }
-    
-    
 }

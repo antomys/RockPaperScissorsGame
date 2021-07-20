@@ -1,9 +1,9 @@
 ﻿namespace Client.Models.Interfaces
 {
-    internal interface IOverallStatistics
+    public interface IOverallStatistics
     {
-        string Login { get; set; }
-        
+        Account Account { get; set; }
         int Score { get; set; }
+        
     }
 }

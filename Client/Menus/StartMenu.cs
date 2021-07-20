@@ -10,11 +10,13 @@ namespace Client.Menus
     public class StartMenu
     {
         private readonly IAccountMenu _accountMenu;
+        private readonly IStatisticsService _statisticsService;
 
         private string SessionId { get; set; }
 
         public StartMenu(IRequestPerformer performer)
         {
+            _statisticsService = new StatisticsService(performer);
             _accountMenu = new AccountMenu(performer);
         }
         
@@ -75,7 +77,9 @@ namespace Client.Menus
                         }
                         Console.Clear();
                         break;
-                    case 3:
+                    case 3: 
+                        var result = await _statisticsService.GetAllStatistics();
+                        await _statisticsService.PrintStatistics(result);
                         /*var statistics = await OverallStatistics();
                         if(statistics == null)
                             Console.WriteLine("No statistics so far");

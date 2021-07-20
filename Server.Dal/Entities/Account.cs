@@ -12,7 +12,7 @@ namespace Server.Dal.Entities
         /// </summary>
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; init; }
+        public int Id { get; set; }
         
         /// <summary>
         /// Nick name of Account

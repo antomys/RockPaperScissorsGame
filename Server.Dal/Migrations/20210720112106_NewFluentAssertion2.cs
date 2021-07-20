@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Server.Dal.Migrations
 {
-    public partial class NULLABLES : Migration
+    public partial class NewFluentAssertion2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,12 +12,10 @@ namespace Server.Dal.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    PlayersCount = table.Column<int>(type: "INTEGER", nullable: false),
                     RoomId = table.Column<int>(type: "INTEGER", nullable: false),
                     FirstPlayerId = table.Column<int>(type: "INTEGER", nullable: true),
-                    FirstPlayerMove = table.Column<int>(type: "INTEGER", nullable: false),
-                    SecondPlayerId = table.Column<int>(type: "INTEGER", nullable: true),
-                    SecondPlayerMove = table.Column<int>(type: "INTEGER", nullable: false),
-                    RoundId = table.Column<int>(type: "INTEGER", nullable: true)
+                    SecondPlayerId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -32,10 +29,13 @@ namespace Server.Dal.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     RoomPlayersId = table.Column<int>(type: "INTEGER", nullable: false),
-                    IsFinished = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TimeFinished = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    FirstPlayerMove = table.Column<int>(type: "INTEGER", nullable: false),
+                    SecondPlayerMove = table.Column<int>(type: "INTEGER", nullable: false),
                     WinnerId = table.Column<int>(type: "INTEGER", nullable: true),
-                    LoserId = table.Column<int>(type: "INTEGER", nullable: true)
+                    LoserId = table.Column<int>(type: "INTEGER", nullable: true),
+                    LastMoveTicks = table.Column<long>(type: "INTEGER", nullable: false),
+                    TimeFinishedTicks = table.Column<long>(type: "INTEGER", nullable: false),
+                    IsFinished = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,8 +44,7 @@ namespace Server.Dal.Migrations
                         name: "FK_Rounds_RoomPlayers_RoomPlayersId",
                         column: x => x.RoomPlayersId,
                         principalTable: "RoomPlayers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -58,10 +57,8 @@ namespace Server.Dal.Migrations
                     RoundId = table.Column<int>(type: "INTEGER", nullable: true),
                     RoomPlayerId = table.Column<int>(type: "INTEGER", nullable: true),
                     IsPrivate = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsReady = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsFull = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CreationTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    IsRoundEnded = table.Column<bool>(type: "INTEGER", nullable: false)
+                    CreationTimeTicks = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,15 +84,15 @@ namespace Server.Dal.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     AccountId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Wins = table.Column<int>(type: "INTEGER", nullable: true),
-                    Loss = table.Column<int>(type: "INTEGER", nullable: true),
-                    Draws = table.Column<int>(type: "INTEGER", nullable: true),
-                    WinLossRatio = table.Column<double>(type: "REAL", nullable: true),
+                    Wins = table.Column<int>(type: "INTEGER", nullable: false),
+                    Loss = table.Column<int>(type: "INTEGER", nullable: false),
+                    Draws = table.Column<int>(type: "INTEGER", nullable: false),
+                    WinLossRatio = table.Column<double>(type: "REAL", nullable: false),
                     TimeSpent = table.Column<string>(type: "TEXT", nullable: true),
-                    UsedRock = table.Column<int>(type: "INTEGER", nullable: true),
-                    UsedPaper = table.Column<int>(type: "INTEGER", nullable: true),
-                    UsedScissors = table.Column<int>(type: "INTEGER", nullable: true),
-                    Score = table.Column<int>(type: "INTEGER", nullable: true)
+                    UsedRock = table.Column<int>(type: "INTEGER", nullable: false),
+                    UsedPaper = table.Column<int>(type: "INTEGER", nullable: false),
+                    UsedScissors = table.Column<int>(type: "INTEGER", nullable: false),
+                    Score = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -140,11 +137,6 @@ namespace Server.Dal.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RoomPlayers_RoundId",
-                table: "RoomPlayers",
-                column: "RoundId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RoomPlayers_SecondPlayerId",
                 table: "RoomPlayers",
                 column: "SecondPlayerId");
@@ -168,7 +160,8 @@ namespace Server.Dal.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Rounds_RoomPlayersId",
                 table: "Rounds",
-                column: "RoomPlayersId");
+                column: "RoomPlayersId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rounds_WinnerId",
@@ -201,14 +194,6 @@ namespace Server.Dal.Migrations
                 principalTable: "Rooms",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_RoomPlayers_Rounds_RoundId",
-                table: "RoomPlayers",
-                column: "RoundId",
-                principalTable: "Rounds",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Rounds_Accounts_LoserId",
@@ -259,10 +244,6 @@ namespace Server.Dal.Migrations
 
             migrationBuilder.DropForeignKey(
                 name: "FK_RoomPlayers_Rooms_RoomId",
-                table: "RoomPlayers");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_RoomPlayers_Rounds_RoundId",
                 table: "RoomPlayers");
 
             migrationBuilder.DropTable(

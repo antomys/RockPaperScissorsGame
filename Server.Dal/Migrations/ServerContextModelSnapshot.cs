@@ -53,12 +53,6 @@ namespace Server.Dal.Migrations
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsReady")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsRoundEnded")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("RoomCode")
                         .HasColumnType("TEXT");
 
@@ -87,19 +81,13 @@ namespace Server.Dal.Migrations
                     b.Property<int?>("FirstPlayerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("FirstPlayerMove")
+                    b.Property<int>("PlayersCount")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("RoomId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("RoundId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int?>("SecondPlayerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SecondPlayerMove")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -108,8 +96,6 @@ namespace Server.Dal.Migrations
 
                     b.HasIndex("RoomId")
                         .IsUnique();
-
-                    b.HasIndex("RoundId");
 
                     b.HasIndex("SecondPlayerId");
 
@@ -122,13 +108,22 @@ namespace Server.Dal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("FirstPlayerMove")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsFinished")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("LastMoveTicks")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("LoserId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("RoomPlayersId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SecondPlayerMove")
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("TimeFinishedTicks")
@@ -141,7 +136,8 @@ namespace Server.Dal.Migrations
 
                     b.HasIndex("LoserId");
 
-                    b.HasIndex("RoomPlayersId");
+                    b.HasIndex("RoomPlayersId")
+                        .IsUnique();
 
                     b.HasIndex("WinnerId");
 
@@ -229,10 +225,6 @@ namespace Server.Dal.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Server.Dal.Entities.Round", "Round")
-                        .WithMany()
-                        .HasForeignKey("RoundId");
-
                     b.HasOne("Server.Dal.Entities.Account", "SecondPlayer")
                         .WithMany("SecondPlayer")
                         .HasForeignKey("SecondPlayerId")
@@ -241,8 +233,6 @@ namespace Server.Dal.Migrations
                     b.Navigation("FirstPlayer");
 
                     b.Navigation("Room");
-
-                    b.Navigation("Round");
 
                     b.Navigation("SecondPlayer");
                 });
@@ -254,9 +244,9 @@ namespace Server.Dal.Migrations
                         .HasForeignKey("LoserId");
 
                     b.HasOne("Server.Dal.Entities.RoomPlayers", "RoomPlayers")
-                        .WithMany()
-                        .HasForeignKey("RoomPlayersId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithOne()
+                        .HasForeignKey("Server.Dal.Entities.Round", "RoomPlayersId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Server.Dal.Entities.Account", "Winner")

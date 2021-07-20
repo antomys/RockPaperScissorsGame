@@ -1,10 +1,8 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
-namespace Server.Host.Extensions
+namespace Server.Extensions
 {
     /// <summary>
     /// Swagger extension
