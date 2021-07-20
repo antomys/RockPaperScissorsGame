@@ -16,6 +16,10 @@ namespace Server.Dal.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Round>()
+                .HasQueryFilter(x => !x.IsFinished);
+            
             modelBuilder.Entity<RoomPlayers>()
                 .HasOne(invite => invite.FirstPlayer)
                 .WithMany(user => user.FirstPlayer)

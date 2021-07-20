@@ -16,17 +16,21 @@ namespace Server.Bll.Services
     {
         private readonly DbSet<Room> _rooms;
         private readonly ServerContext _repository;
+        private readonly IRoundService _roundService;
 
-        public RoomService(ServerContext repository)
+        public RoomService(ServerContext repository, 
+            IRoundService roundService)
         {
             _repository = repository;
+            _roundService = roundService;
             _rooms = _repository.Rooms;
         }
 
         public async Task<OneOf<RoomModel, CustomException>> CreateRoom(int userId, bool isPrivate = false)
         {
             var doesRoomExist = await _repository.RoomPlayersEnumerable
-                .FirstOrDefaultAsync(x=>x.FirstPlayerId == userId || x.SecondPlayerId == userId);
+                .FirstOrDefaultAsync(x=>x.FirstPlayerId == userId 
+                                        || x.SecondPlayerId == userId);
             if (doesRoomExist != null)
                 return new CustomException(ExceptionTemplates.TwinkRoom);
             
@@ -57,72 +61,49 @@ namespace Server.Bll.Services
 
         public async Task<OneOf<RoomModel, CustomException>> JoinRoom(int userId, bool isPrivate, string roomCode)
         {
+            Room thisRoom;
+            
             if (isPrivate)
             {
-                var randomRoom = await _rooms
+                thisRoom = await _rooms
                     .Include(x => x.RoomPlayers)
                     .Where(x => !x.IsFull).FirstOrDefaultAsync();
-                if (randomRoom is null)
-                    return new CustomException(ExceptionTemplates.NoAvailableRooms);
-                
-                if (randomRoom.RoomPlayers.FirstPlayerId == userId 
-                    || randomRoom.RoomPlayers.SecondPlayerId == userId)
-                    return new CustomException(ExceptionTemplates.AlreadyInRoom);
-
-                if (randomRoom.RoomPlayers.PlayersCount < 2)
-                {
-                    randomRoom.RoomPlayers.SecondPlayerId = userId;
-                }
-                
-                randomRoom.IsFull = true;
-
-                var round = new Round
-                {
-                    Id = 0,
-                    RoomPlayersId = randomRoom.RoomPlayers.Id,
-                    FirstPlayerMove = 0,
-                    SecondPlayerMove = 0,
-                    LastMoveTicks = DateTimeOffset.Now.Ticks,
-                    IsFinished = false
-                };
-                
-                await _repository.Rounds.AddAsync(round);
-
-                randomRoom.RoundId = round.Id;
-
-                _rooms.Update(randomRoom);
-                await _repository.SaveChangesAsync();
-                return randomRoom.Adapt<RoomModel>();
             }
-            var foundRoom = await _rooms
-                .Include(x=>x.RoomPlayers).
-                FirstOrDefaultAsync(x => x.RoomCode == roomCode);
-
-            if (foundRoom == null)
+            else
+            {
+                thisRoom = await _rooms
+                    .Include(x=>x.RoomPlayers).
+                    FirstOrDefaultAsync(x => x.RoomCode == roomCode);
+            }
+            
+            if (thisRoom == null)
                 return new CustomException(ExceptionTemplates.RoomNotExists);
 
-            if (foundRoom.RoomPlayers.FirstPlayerId == userId || foundRoom.RoomPlayers.SecondPlayerId == userId)
+            if (thisRoom.RoomPlayers.FirstPlayerId == userId || thisRoom.RoomPlayers.SecondPlayerId == userId)
                 return new CustomException(ExceptionTemplates.AlreadyInRoom);
-            if (foundRoom.RoomPlayers.FirstPlayerId != 0 && foundRoom.RoomPlayers.SecondPlayerId != 0)
+            if (thisRoom.RoomPlayers.FirstPlayerId != 0 && thisRoom.RoomPlayers.SecondPlayerId != 0)
                 return new CustomException(ExceptionTemplates.RoomFull);
 
-            if (foundRoom.RoomPlayers.FirstPlayerId != 0)
+            if (thisRoom.RoomPlayers.FirstPlayerId != 0)
             {
-                foundRoom.RoomPlayers.FirstPlayerId = userId;
-                _rooms.Update(foundRoom);
+                thisRoom.RoomPlayers.FirstPlayerId = userId;
+                _rooms.Update(thisRoom);
 
                 await _repository.SaveChangesAsync();
-                return foundRoom.Adapt<RoomModel>();
+                return thisRoom.Adapt<RoomModel>();
             }
 
-            if (foundRoom.RoomPlayers.SecondPlayerId == 0) 
+            if (thisRoom.RoomPlayers.SecondPlayerId == 0) 
                 return new CustomException(ExceptionTemplates.Unknown);
             
-            foundRoom.RoomPlayers.SecondPlayerId = userId;
-            _rooms.Update(foundRoom);
+            thisRoom.RoomPlayers.SecondPlayerId = userId;
 
+            if (thisRoom.RoomPlayers.FirstPlayerId != 0 && thisRoom.RoomPlayers.SecondPlayerId != 0)
+                await _roundService.CreateRoundAsync(userId, thisRoom.Id);
+            
+            _rooms.Update(thisRoom);
             await _repository.SaveChangesAsync();
-            return foundRoom.Adapt<RoomModel>();
+            return thisRoom.Adapt<RoomModel>();
         }
 
         public async Task<OneOf<RoomModel, CustomException>> GetRoom(int roomId)
