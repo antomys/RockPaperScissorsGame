@@ -27,7 +27,7 @@ namespace Server.Dal.Entities
         /// <summary>
         /// Statistics id, connected to this account
         /// </summary>
-        public int StatisticsId { get; set; }
+        public int? StatisticsId { get; set; }
         
         /// <summary>
         /// Linked to this player statistics

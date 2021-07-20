@@ -28,7 +28,7 @@ namespace Server.Dal.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("StatisticsId")
+                    b.Property<int?>("StatisticsId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -191,9 +191,7 @@ namespace Server.Dal.Migrations
                 {
                     b.HasOne("Server.Dal.Entities.Statistics", "Statistics")
                         .WithMany()
-                        .HasForeignKey("StatisticsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StatisticsId");
 
                     b.Navigation("Statistics");
                 });

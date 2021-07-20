@@ -27,6 +27,7 @@ namespace Server.Controllers
         }
 
         [HttpGet("all")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<StatisticsDto>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         public async Task<IEnumerable<StatisticsModel>> GetOverallStatistics()

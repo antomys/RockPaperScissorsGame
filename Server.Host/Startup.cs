@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Server.Authentication.Extensions;
 using Server.Dal.Context;
 using Server.Extensions;
-using Server.Host.Extensions;
 
 namespace Server
 {

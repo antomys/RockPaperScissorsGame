@@ -1,40 +1,56 @@
-﻿using Newtonsoft.Json;
-
-namespace Client.Models.Interfaces
+﻿namespace Client.Models.Interfaces
 {
-    internal interface IStatistics
+    public interface IStatistics
     {
-        [JsonProperty("Id")]
-        string Id { get; set; }
-        
-        [JsonProperty("UserLogin")]
-        string Login { get; set; }
-        
-        [JsonProperty("Wins")]
+        /// <summary>
+        /// This user account
+        /// </summary>
+        Account Account { get; set; }
+        /// <summary>
+        ///     Total amount of Wins
+        /// </summary>
         int Wins { get; set; }
-        
-        [JsonProperty("Loss")]
+
+        /// <summary>
+        ///     Total amount of Loses
+        /// </summary>
         int Loss { get; set; }
-        
-        [JsonProperty("Draws")]
+
+        /// <summary>
+        ///     Total amount of Draws. OBSOLETE
+        /// </summary>
+
         int Draws { get; set; }
-        
-        [JsonProperty("WinToLossRatio")]
+
+        /// <summary>
+        ///     Ratio Wins to Losses. Win/Loss * 100
+        /// </summary>
         double WinLossRatio { get; set; }
-        
-        [JsonProperty("TimeSpent")]
+
+        /// <summary>
+        ///     Ratio for the last 7 days
+        /// </summary>
         string TimeSpent { get; set; }
-        
-        [JsonProperty("UsedRock")]
+
+        /// <summary>
+        ///     Times used rock
+        /// </summary>
         int UsedRock { get; set; }
-        
-        [JsonProperty("UsedPaper")]
+
+        /// <summary>
+        ///     Times used Paper
+        /// </summary>
         int UsedPaper { get; set; }
-        
-        [JsonProperty("UsedScissors")]
+
+        /// <summary>
+        ///     Times used Scissors
+        /// </summary>
         int UsedScissors { get; set; }
-        
-        [JsonProperty("Score")]
+
+        /// <summary>
+        ///     Total amount of Points. 1 win = 4 points. 1 lose = -2 points.
+        /// </summary>
         int Score { get; set; }
+        
     }
 }

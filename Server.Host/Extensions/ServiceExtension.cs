@@ -15,6 +15,7 @@ namespace Server.Extensions
             service
                 .AddTransient<IApplicationUser, ApplicationUser>()
                 .AddTransient<IStatisticsService,StatisticsService>()
+                .AddTransient<ILongPollingService,LongPollingService>()
                 .AddHostedService<CleanerHostedService>();
             service.AddHttpContextAccessor();
 
