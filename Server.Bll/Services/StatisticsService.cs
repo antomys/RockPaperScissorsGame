@@ -19,13 +19,15 @@ namespace Server.Bll.Services
 
         public async Task<IEnumerable<StatisticsModel>> GetAllStatistics()
         {
-            return await _repository.StatisticsEnumerable.ProjectToType<StatisticsModel>().ToArrayAsync();
+            return await _repository.StatisticsEnumerable.ProjectToType<StatisticsModel>()
+                .ToArrayAsync();
         }
 
         public async Task<StatisticsModel> GetPersonalStatistics(int userId)
         {
             var statistics = await _repository.StatisticsEnumerable
-                .Include(x=>x.Account).FirstOrDefaultAsync(x=>x.Id == userId);
+                .Include(x=>x.Account)
+                .FirstOrDefaultAsync(x=>x.Id == userId);
             return statistics.Adapt<StatisticsModel>();
         }
     }
