@@ -1,11 +1,9 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Server.Authentication.Models.Interfaces;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
@@ -21,16 +19,13 @@ namespace Server.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class RoundController:ControllerBase
     {
-        private readonly ILogger<RoundController> _logger;
         private readonly IApplicationUser _applicationUser;
         private readonly IRoundService _roundService;
         private int UserId => _applicationUser.Id;
         public RoundController(
-            ILogger<RoundController> logger, 
             IRoundService roundService, 
             IApplicationUser applicationUser)
         {
-            _logger = logger;
             _roundService = roundService;
             _applicationUser = applicationUser;
         }
@@ -39,7 +34,7 @@ namespace Server.Controllers
         /// </summary>
         /// <param name="roomId">id of the room</param>
         /// <returns></returns>
-        [HttpGet("create")]
+        [HttpPost("create")]
         //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CreateRound(int roomId)
