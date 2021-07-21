@@ -5,7 +5,7 @@ using Client.Models.Interfaces;
 
 namespace Client.Models
 {
-    internal class Room : IRoom
+    public class Room : IRoom
     {
         [JsonProperty("RoomId")]
         public string RoomId { get; set; }

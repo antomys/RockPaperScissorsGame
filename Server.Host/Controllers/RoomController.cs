@@ -31,9 +31,13 @@ namespace Server.Controllers
         [HttpPost("create")]
         //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> CreateRoom([FromQuery] bool isPrivate)
+        public async Task<IActionResult> CreateRoom([FromQuery] bool isPrivate, 
+            [FromHeader(Name="X-Training")] bool isTraining = false)
         {
-            var newRoom = await _roomService.CreateRoom(UserId, isPrivate);
+            if (isTraining)
+                throw new NotImplementedException();
+            var newRoom = await _roomService
+                .CreateRoom(UserId, isPrivate);
 
             return newRoom.Match<IActionResult>(
                 Ok,

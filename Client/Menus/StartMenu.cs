@@ -11,11 +11,13 @@ namespace Client.Menus
     {
         private readonly IAccountMenu _accountMenu;
         private readonly IStatisticsService _statisticsService;
+        private readonly IRequestPerformer _requestPerformer;
 
         private string SessionId { get; set; }
 
         public StartMenu(IRequestPerformer performer)
         {
+            _requestPerformer = performer;
             _statisticsService = new StatisticsService(performer);
             _accountMenu = new AccountMenu(performer);
         }
@@ -67,13 +69,13 @@ namespace Client.Menus
                         Console.Clear();
                         break;
                     case 2:
-                        Account inputAccount;
+                        TokenModel inputAccount;
                         (SessionId, inputAccount) = await _accountMenu.LoginAsync();
                         if (!string.IsNullOrEmpty(SessionId))
                         {
-                            Console.ReadKey();
                             Console.Clear();
-                            await new MainMenu(inputAccount).PlayerMenu();
+                            await new MainMenu(inputAccount,_requestPerformer,_statisticsService)
+                                .PlayerMenu();
                         }
                         Console.Clear();
                         break;

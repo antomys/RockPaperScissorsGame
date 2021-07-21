@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Client.Models.Interfaces;
+using Client.Models;
 using Client.Services;
+using Client.Services.RequestProcessor;
 
 namespace Client.Menus
 {
     public class MainMenu : IMainMenu
     {
-        private readonly IAccount _playerAccount;
+        private readonly TokenModel _playerAccount;
+        private readonly IRoomService _roomService;
+        private readonly IStatisticsService _statisticsService;
 
-        public MainMenu(IAccount account)
+        public MainMenu(TokenModel account, 
+            IRequestPerformer requestPerformer, 
+            IStatisticsService statisticsService)
         {
             _playerAccount = account;
+            _statisticsService = statisticsService;
+            _roomService = new RoomService(_playerAccount, requestPerformer);
         }
 
         public async Task PlayerMenu()
@@ -38,38 +45,43 @@ namespace Client.Menus
                     TextWrite.Print("Unsupported input", ConsoleColor.Red);
                     continue;
                 }
-                /*switch (playersMenuInput)
+                switch (playersMenuInput)
                 {
                     case 1:
                         Console.Clear();
-                        await JoinRoomWithBot();
+                        //await JoinRoomWithBot();
+                        var room = await _roomService.CreateRoom(true, true);
+                        if (room is null)
+                            return;
+                        //todo: redirect somewhere
                         break;
                     case 2:
                         Console.Clear();
-                        await CreationRoom();
+                        //await CreationRoom();
                         break;
                     case 3:
                         Console.Clear();
-                        await JoinPrivateRoom();
+                        //await JoinPrivateRoom();
                         break;
                     case 4:
                         Console.Clear();
-                        await JoinPublicRoom();
+                        //await JoinPublicRoom();
                         break;
                     case 5:
                         Console.Clear();
-                        var statistics = await PersonalStatistics(_sessionId);
+                        var statistics = await _statisticsService
+                            .GetPersonalStatistics(_playerAccount.BearerToken);
                         Console.WriteLine(statistics+"\n\nPress any key to go back.");
                         Console.ReadKey();
                         break;
                     case 6:
                         Console.Clear();
-                        await Logout();
+                        //await Logout();
                         return;
                     default:
-                        TextWrite.PrintLineMessageWithSpecialColor("Unsupported input", ConsoleColor.Red);
+                        TextWrite.Print("Unsupported input", ConsoleColor.Red);
                         continue;
-                }*/
+                }
             }
         }
     }

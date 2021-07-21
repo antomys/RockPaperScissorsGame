@@ -40,7 +40,7 @@ namespace Client.Services
         {
             var options = new RequestOptions
             {
-                Headers = new Dictionary<string, string>{{"Authentication",token}},
+                Headers = new Dictionary<string, string>{{"Authorization",token}},
                 ContentType = "none",
                 Address = "stats/personal",
                 IsValid = true,

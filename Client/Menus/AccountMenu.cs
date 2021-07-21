@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using Client.Extensions;
 using Client.Models;
@@ -53,7 +52,7 @@ namespace Client.Menus
             return true;
         }
         
-        public async Task<(string token, Account inputAccount)> LoginAsync()
+        public async Task<(string token, TokenModel inputAccount)> LoginAsync()
         {
             var inputAccount = new Account
             {
@@ -75,7 +74,7 @@ namespace Client.Menus
             if (reachedResponse.TryParseJson<TokenModel>(out var tokenModel))
             {
                 TextWrite.Print($"Successfully signed in.", ConsoleColor.DarkGreen);
-                return (tokenModel.Token, inputAccount);
+                return (tokenModel.Token, tokenModel);
             }
 
             var error = JsonConvert.DeserializeObject<ErrorModel>(reachedResponse.Content);

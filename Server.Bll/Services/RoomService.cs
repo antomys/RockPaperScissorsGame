@@ -26,7 +26,8 @@ namespace Server.Bll.Services
             _rooms = _repository.Rooms;
         }
 
-        public async Task<OneOf<RoomModel, CustomException>> CreateRoom(int userId, bool isPrivate = false)
+        public async Task<OneOf<RoomModel, CustomException>> 
+            CreateRoom(int userId, bool isPrivate = false, bool isTraining = false)
         {
             var doesRoomExist = await _repository.RoomPlayersEnumerable
                 .FirstOrDefaultAsync(x=>x.FirstPlayerId == userId 
@@ -39,18 +40,22 @@ namespace Server.Bll.Services
                 IsPrivate = isPrivate,
                 RoomCode = Guid.NewGuid().ToString("n")[..8],
                 IsFull = false,
-                CreationTimeTicks = DateTimeOffset.Now.Ticks,
+                CreationTimeTicks = DateTimeOffset.Now.Ticks
             }; 
             await _rooms.AddAsync(room);
             await _repository.SaveChangesAsync();
-            
             var newRoomPlayers = new RoomPlayers
             {
                 RoomId = room.Id,
                 FirstPlayerId = userId,
                 PlayersCount = 1
             };
-            
+            if (isTraining)
+            {
+                var bot = await _repository.Accounts.FirstAsync(x => x.Login == "BOT");
+                newRoomPlayers.SecondPlayerId = bot.Id;
+            }
+
             await _repository.RoomPlayersEnumerable.AddAsync(newRoomPlayers);
             room.RoomPlayers = newRoomPlayers;
             _rooms.Update(room);
@@ -58,7 +63,7 @@ namespace Server.Bll.Services
             await _repository.SaveChangesAsync();
             return room.Adapt<RoomModel>();
         }
-
+        
         public async Task<OneOf<RoomModel, CustomException>> JoinRoom(int userId, bool isPrivate, string roomCode)
         {
             Room thisRoom;

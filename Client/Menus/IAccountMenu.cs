@@ -6,7 +6,7 @@ namespace Client.Menus
     public interface IAccountMenu
     {
         Task<bool> RegisterAsync();
-        Task<(string token, Account inputAccount)> LoginAsync();
+        Task<(string token, TokenModel inputAccount)> LoginAsync();
         Task<bool> LogoutAsync(string token);
     }
 }

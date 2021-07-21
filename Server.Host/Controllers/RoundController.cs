@@ -59,13 +59,5 @@ namespace Server.Controllers
                 Ok,
                 exception => BadRequest(exception));
         }
-        
-        /*[HttpPatch]
-        //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> MakeMove()
-        {
-            throw new NotImplementedException();
-        }*/
     }
 }
