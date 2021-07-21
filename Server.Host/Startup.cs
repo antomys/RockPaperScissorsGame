@@ -38,6 +38,7 @@ namespace Server
             ServerContext serverContext)
         {
             serverContext?.Database.Migrate();
+            serverContext?.EnsureBotCreated();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

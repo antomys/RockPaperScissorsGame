@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OneOf;
 using Server.Authentication.Models.Interfaces;
+using Server.Bll.Exceptions;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 
@@ -34,10 +36,8 @@ namespace Server.Controllers
         public async Task<IActionResult> CreateRoom([FromQuery] bool isPrivate, 
             [FromHeader(Name="X-Training")] bool isTraining = false)
         {
-            if (isTraining)
-                throw new NotImplementedException();
             var newRoom = await _roomService
-                .CreateRoom(UserId, isPrivate);
+                .CreateRoom(UserId, isPrivate, isTraining);
 
             return newRoom.Match<IActionResult>(
                 Ok,
