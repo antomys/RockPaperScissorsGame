@@ -43,7 +43,7 @@ namespace Server.Authentication
         /// <returns></returns>
         public SymmetricSecurityKey GetSymmetricSecurityKey()
         {
-            return new(Encoding.ASCII.GetBytes(PrivateKey));
+            return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(PrivateKey));
         }
     }
 }

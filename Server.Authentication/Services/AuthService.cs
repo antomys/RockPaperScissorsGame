@@ -24,11 +24,10 @@ namespace Server.Authentication.Services
         private readonly AttemptValidationService _attemptValidationService;
         private readonly AuthOptions _authOptions;
         private readonly ILogger<AuthService> _logger;
+        
         private readonly SemaphoreSlim _semaphore = new(1, 1);
-
         private readonly DbSet<Account> _accounts;
         
-
         public AuthService(
             ILogger<AuthService> logger,
             IOptions<AuthOptions> authOptions, 
@@ -46,22 +45,31 @@ namespace Server.Authentication.Services
         public async Task<OneOf<int,UserException>>  
             RegisterAsync(string login, string password)
         {
-            if (login == null) return new UserException(UserExceptionsTemplates.UserInvalidCredentials ,nameof(login));
-            if (password == null) return new UserException(UserExceptionsTemplates.UserInvalidCredentials ,nameof(password));
+            if (string.IsNullOrWhiteSpace(login))
+            {
+                return new UserException(UserExceptionsTemplates.UserInvalidCredentials, nameof(login));
+            }
+            
+            if (string.IsNullOrEmpty(password))
+            {
+                return new UserException(UserExceptionsTemplates.UserInvalidCredentials, nameof(password));
+            }
             
             var release = await _semaphore.WaitAsync(1000);
             try
             {
                 if (await _accounts.CountAsync(x=>x.Login == login) > 0)
-                    return new UserException(UserExceptionsTemplates.UserAlreadyExists,login);
+                {
+                    return new UserException(UserExceptionsTemplates.UserAlreadyExists, login);
+                }
 
                 var account = new Account
                 {
                     Login = login,
                     Password = password.EncodeBase64()
                 };
+                
                 await _accounts.AddAsync(account);
-
                 await _repository.SaveChangesAsync();
                 
                 var accountStatistics = new Statistics
@@ -75,7 +83,7 @@ namespace Server.Authentication.Services
             }
             catch
             {
-                _logger.LogWarning("Unable to process account for {0}", login);
+                _logger.LogWarning("Unable to process account for {Login}", login);
                 return new UserException(UserExceptionsTemplates.UnknownError,string.Empty);
             }
             finally
@@ -86,7 +94,6 @@ namespace Server.Authentication.Services
         }
         
         /// <inheritdoc/>
-        //public async Task<(AccountOutputModel,DateTimeOffset)> 
         public async Task<OneOf<AccountOutputModel, UserException>> LoginAsync(string login, string password)
         {
             var userAccount = await _accounts.FirstOrDefaultAsync(x => x.Login == login);
@@ -96,17 +103,22 @@ namespace Server.Authentication.Services
                 return new UserException(UserExceptionsTemplates.UserNotFound,login);
             }
            
-            if (await _attemptValidationService.IsCoolDown(login, out var coolRequestDate))
-                return new UserException(UserExceptionsTemplates.UserCoolDown,login,coolRequestDate);
+            if (_attemptValidationService.IsCoolDown(login, out var coolRequestDate))
+            {
+                return new UserException(UserExceptionsTemplates.UserCoolDown, login, coolRequestDate);
+            }
 
             if (userAccount.Password.IsHashEqual(login))
-                return new AccountOutputModel 
+            {
+                return new AccountOutputModel
                 {
                     Token = BuildToken(userAccount),
                     Login = userAccount.Login
                 };
+            }
             
-            await _attemptValidationService.InsertFailAttempt(login);
+            _attemptValidationService.InsertFailAttempt(login);
+            
             return new UserException(UserExceptionsTemplates.UserInvalidCredentials, login);
         }
 
@@ -148,6 +160,7 @@ namespace Server.Authentication.Services
                     "Token",
                     ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
+            
             return claimsIdentity;
         }
     }

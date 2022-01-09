@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Authentication.Services;
-using Server.Contracts;
-using Server.Contracts.Requests;
+using Server.Host.Contracts;
+using Server.Host.Contracts.Requests;
 
-namespace Server.Controllers
+namespace Server.Host.Controllers
 {
     [ApiController]
     [Route ("api/v1/account/")]

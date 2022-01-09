@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Server.Contracts.Requests
+namespace Server.Host.Contracts.Requests
 {
     public class LoginRequest
     {

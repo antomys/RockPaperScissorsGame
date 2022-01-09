@@ -8,7 +8,7 @@ using Server.Authentication.Models.Interfaces;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 
-namespace Server.Controllers
+namespace Server.Host.Controllers
 {
     /// <summary>
     /// API Round Controller

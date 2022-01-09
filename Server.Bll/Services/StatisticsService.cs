@@ -28,6 +28,7 @@ namespace Server.Bll.Services
             var statistics = await _repository.StatisticsEnumerable
                 .Include(x=>x.Account)
                 .FirstOrDefaultAsync(x=>x.Id == userId);
+            
             return statistics.Adapt<StatisticsModel>();
         }
     }

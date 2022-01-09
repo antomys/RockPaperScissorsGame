@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Bll.Services;
 
-namespace Server.Controllers
+namespace Server.Host.Controllers
 {
     [ApiController]
     [Route("api/v1")]

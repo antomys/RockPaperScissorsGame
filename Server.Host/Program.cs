@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace Server
+namespace Server.Host
 {
     public static class Program
     {
@@ -13,7 +13,7 @@ namespace Server
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args) => 
-            Host.CreateDefaultBuilder(args)
+            Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(loggingBuilder =>
                 {
                     loggingBuilder.ClearProviders();

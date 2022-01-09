@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Server.Contracts
+namespace Server.Host.Contracts
 {
     public class StatisticsDto
     {

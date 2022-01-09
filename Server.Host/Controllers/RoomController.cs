@@ -1,17 +1,14 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OneOf;
 using Server.Authentication.Models.Interfaces;
-using Server.Bll.Exceptions;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 
-namespace Server.Controllers
+namespace Server.Host.Controllers
 {
     [ApiController]
     [Route("api/v1/room/")]

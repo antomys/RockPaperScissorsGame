@@ -7,7 +7,7 @@ namespace Server.Authentication
         public static string DecodeBase64(this string encodedData)
         {
             var encodedDataAsBytes
-                = System.Convert.FromBase64String(encodedData);
+                = Convert.FromBase64String(encodedData);
             return
                 System.Text.Encoding.ASCII.GetString(encodedDataAsBytes);
         }
@@ -16,12 +16,13 @@ namespace Server.Authentication
         {
             var dataArray = System.Text.Encoding.ASCII.GetBytes(decodedData);
 
-            return System.Convert.ToBase64String(dataArray);
+            return Convert.ToBase64String(dataArray);
         }
 
         public static bool IsHashEqual(this string base64Data, string initialData)
         {
             var baseDecoded = EncodeBase64(initialData);
+            
             return base64Data.Equals(baseDecoded, StringComparison.OrdinalIgnoreCase);
         }
     }

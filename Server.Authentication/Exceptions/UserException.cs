@@ -1,5 +1,5 @@
 using System;
-using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace Server.Authentication.Exceptions
 {
@@ -10,13 +10,13 @@ namespace Server.Authentication.Exceptions
         
         public UserException(string messageType, string message, DateTimeOffset dateTimeOffset)
         {
-            Code = (int) HttpStatusCode.BadRequest;
-            Message = string.Format(messageType, message, dateTimeOffset);
+            Code = StatusCodes.Status400BadRequest;
+            Message = string.Format(messageType, message, dateTimeOffset.ToString("f"));
         }
 
         public UserException(string invalidCredentialsForUser, string loginName)
         {
-            Code = (int) HttpStatusCode.BadRequest;
+            Code = StatusCodes.Status400BadRequest;
             Message = string.Format(invalidCredentialsForUser, loginName);
         }
     }

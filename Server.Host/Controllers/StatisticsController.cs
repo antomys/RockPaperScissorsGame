@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Authentication.Models.Interfaces;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
-using Server.Contracts;
+using Server.Host.Contracts;
 
-namespace Server.Controllers
+namespace Server.Host.Controllers
 {
     
     [ApiController]

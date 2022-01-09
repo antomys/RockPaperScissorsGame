@@ -37,7 +37,7 @@ namespace Server.Bll.HostedServices
 
         private async void CleanJunk(object state)
         {
-            _logger.LogInformation("Starting Cleaning.");
+            _logger.LogInformation("Starting Cleaning");
             var factory = (IServiceScopeFactory) state;
             using var scope = factory.CreateScope();
             var roomService = scope.ServiceProvider.GetRequiredService<IHostedRoomService>();
@@ -45,12 +45,13 @@ namespace Server.Bll.HostedServices
             var rooms = await roomService
                 .RemoveEntityRangeByDate(TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(20));
             
-            _logger.LogInformation("Cleaned {0} entities",rooms);
+            _logger.LogInformation("Cleaned {0} entities", rooms.ToString());
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _timer?.Dispose();
+            
             return Task.CompletedTask;
         }
     }

@@ -2,11 +2,10 @@
 using Server.Authentication.Models;
 using Server.Authentication.Models.Interfaces;
 using Server.Bll.HostedServices;
-using Server.Bll.Models;
 using Server.Bll.Services;
 using Server.Bll.Services.Interfaces;
 
-namespace Server.Extensions
+namespace Server.Host.Extensions
 {
     public static class ServiceExtension
     {

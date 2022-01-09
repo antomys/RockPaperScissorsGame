@@ -6,9 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Server.Authentication.Extensions;
 using Server.Dal.Context;
-using Server.Extensions;
+using Server.Dal.Extensions;
+using Server.Host.Extensions;
 
-namespace Server
+namespace Server.Host
 {
     public class Startup
     {

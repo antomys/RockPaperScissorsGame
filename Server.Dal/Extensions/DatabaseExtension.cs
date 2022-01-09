@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Dal.Context;
 
-namespace Server.Extensions
+namespace Server.Dal.Extensions
 {
     public static class DatabaseExtension
     {

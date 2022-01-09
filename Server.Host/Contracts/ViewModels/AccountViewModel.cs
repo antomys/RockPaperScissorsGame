@@ -1,4 +1,4 @@
-﻿namespace Server.Contracts.ViewModels
+﻿namespace Server.Host.Contracts.ViewModels
 {
     public class AccountViewModel
     {

@@ -30,10 +30,12 @@ namespace Server.Bll.Services
             CreateRoom(int userId, bool isPrivate = false, bool isTraining = false)
         {
             var doesRoomExist = await _repository.RoomPlayersEnumerable
-                .FirstOrDefaultAsync(x=>x.FirstPlayerId == userId 
+                .FirstOrDefaultAsync(x => x.FirstPlayerId == userId 
                                         || x.SecondPlayerId == userId);
             if (doesRoomExist != null)
+            {
                 return new CustomException(ExceptionTemplates.TwinkRoom);
+            }
             
             var room = new Room
             {
@@ -42,14 +44,17 @@ namespace Server.Bll.Services
                 IsFull = false,
                 CreationTimeTicks = DateTimeOffset.Now.Ticks
             }; 
+            
             await _rooms.AddAsync(room);
             await _repository.SaveChangesAsync();
+            
             var newRoomPlayers = new RoomPlayers
             {
                 RoomId = room.Id,
                 FirstPlayerId = userId,
                 PlayersCount = 1
             };
+            
             if (isTraining)
             {
                 var bot = await _repository.Accounts.FirstAsync(x => x.Login == "BOT");
@@ -61,6 +66,7 @@ namespace Server.Bll.Services
             _rooms.Update(room);
             
             await _repository.SaveChangesAsync();
+            
             return room.Adapt<RoomModel>();
         }
         
@@ -82,29 +88,41 @@ namespace Server.Bll.Services
             }
             
             if (thisRoom == null)
+            {
                 return new CustomException(ExceptionTemplates.RoomNotExists);
+            }
 
             if (thisRoom.RoomPlayers.FirstPlayerId == userId || thisRoom.RoomPlayers.SecondPlayerId == userId)
+            {
                 return new CustomException(ExceptionTemplates.AlreadyInRoom);
+            }
+            
             if (thisRoom.RoomPlayers.FirstPlayerId != 0 && thisRoom.RoomPlayers.SecondPlayerId != 0)
+            {
                 return new CustomException(ExceptionTemplates.RoomFull);
-
+            }
+            
             if (thisRoom.RoomPlayers.FirstPlayerId != 0)
             {
                 thisRoom.RoomPlayers.FirstPlayerId = userId;
                 _rooms.Update(thisRoom);
 
                 await _repository.SaveChangesAsync();
+                
                 return thisRoom.Adapt<RoomModel>();
             }
 
-            if (thisRoom.RoomPlayers.SecondPlayerId == 0) 
+            if (thisRoom.RoomPlayers.SecondPlayerId == 0)
+            {
                 return new CustomException(ExceptionTemplates.Unknown);
+            }
             
             thisRoom.RoomPlayers.SecondPlayerId = userId;
 
             if (thisRoom.RoomPlayers.FirstPlayerId != 0 && thisRoom.RoomPlayers.SecondPlayerId != 0)
+            {
                 await _roundService.CreateRoundAsync(userId, thisRoom.Id);
+            }
             
             _rooms.Update(thisRoom);
             await _repository.SaveChangesAsync();
@@ -113,7 +131,7 @@ namespace Server.Bll.Services
 
         public async Task<OneOf<RoomModel, CustomException>> GetRoom(int roomId)
         {
-            var room = await _rooms.FindAsync(roomId);
+            var room = await _rooms.FindAsync(roomId.ToString());
 
             return room != null 
                 ? room.Adapt<RoomModel>() 
@@ -123,18 +141,26 @@ namespace Server.Bll.Services
         public async Task<int?> UpdateRoom(RoomModel room)
         {
             var thisRoom = await _rooms.FindAsync(room.Id);
+            
             if ( thisRoom == null)
+            {
                 return 400;
+            }
+           
             var updatedRoom = room.Adapt<Room>();
 
             thisRoom.IsFull = updatedRoom.IsFull;
             thisRoom.IsPrivate = updatedRoom.IsPrivate;
             thisRoom.RoundId = updatedRoom.RoundId;
 
-            if (!_repository.Entry(thisRoom).Properties.Any(x => x.IsModified)) return 400;
+            if (!_repository.Entry(thisRoom).Properties.Any(x => x.IsModified))
+            {
+                return 400;
+            }
+            
             _repository.Update(thisRoom);
+            
             return 200;
-
         }
 
         public async Task<int?> DeleteRoom(int userId, int roomId)
@@ -142,16 +168,26 @@ namespace Server.Bll.Services
             var thisRoom = await _rooms
                 .Include(x=>x.RoomPlayers)
                 .FirstOrDefaultAsync(x=>x.Id == roomId);
+            
             if (thisRoom == null)
+            {
                 return 400;
+            }
+            
             if (thisRoom.RoomPlayers.FirstPlayerId != userId)
+            {
                 return 400;
+            }
+           
             if (thisRoom.RoomPlayers.SecondPlayerId != userId)
+            {
                 return 400;
+            }
             
             _rooms.Remove(thisRoom);
 
             await _repository.SaveChangesAsync();
+            
             return 200;
         }
 
@@ -165,6 +201,7 @@ namespace Server.Bll.Services
         public async Task<int> RemoveEntityRangeByDate(TimeSpan roomOutDate, TimeSpan roundOutDate)
         {
             var currentDate = DateTimeOffset.Now.Ticks;
+           
             var rooms = await _rooms
                 .Where(x => x.CreationTimeTicks + roomOutDate.Ticks < currentDate && x.RoundId == null)
                 .ToArrayAsync();
@@ -179,7 +216,6 @@ namespace Server.Bll.Services
             await _repository.SaveChangesAsync();
 
             return rooms.Length + allRound.Length;
-
         }
     }
 }

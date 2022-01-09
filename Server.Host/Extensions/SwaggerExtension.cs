@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
-namespace Server.Extensions
+namespace Server.Host.Extensions
 {
     /// <summary>
     /// Swagger extension

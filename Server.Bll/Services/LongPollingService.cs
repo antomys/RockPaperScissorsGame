@@ -15,19 +15,16 @@ namespace Server.Bll.Services
 
         public async Task<bool> CheckRoomState(int roomId)
         {
-            var thisRoom = await _serverContext.Rooms.FindAsync(roomId);
+            var thisRoom = await _serverContext.Rooms.FindAsync(roomId.ToString());
+            
             return thisRoom != null;
         }
 
         public async Task<bool> CheckRoundState(int roundId)
         {
-            var thisRound = await _serverContext.Rounds.FindAsync(roundId);
+            var thisRound = await _serverContext.Rounds.FindAsync(roundId.ToString());
+            
             return thisRound is {WinnerId: null};
         }
-    }
-    public interface ILongPollingService
-    {
-        Task<bool> CheckRoomState(int roomId);
-        Task<bool> CheckRoundState(int roundId);
     }
 }
