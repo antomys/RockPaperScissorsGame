@@ -2,29 +2,28 @@ using System.Threading.Tasks;
 using Server.Bll.Services.Interfaces;
 using Server.Dal.Context;
 
-namespace Server.Bll.Services
+namespace Server.Bll.Services;
+
+internal sealed class LongPollingService : ILongPollingService
 {
-    public class LongPollingService : ILongPollingService
+    private readonly ServerContext _serverContext;
+
+    public LongPollingService(ServerContext serverContext)
     {
-        private readonly ServerContext _serverContext;
+        _serverContext = serverContext;
+    }
 
-        public LongPollingService(ServerContext serverContext)
-        {
-            _serverContext = serverContext;
-        }
-
-        public async Task<bool> CheckRoomState(int roomId)
-        {
-            var thisRoom = await _serverContext.Rooms.FindAsync(roomId.ToString());
+    public async Task<bool> CheckRoomState(int roomId)
+    {
+        var thisRoom = await _serverContext.Rooms.FindAsync(roomId.ToString());
             
-            return thisRoom != null;
-        }
+        return thisRoom != null;
+    }
 
-        public async Task<bool> CheckRoundState(int roundId)
-        {
-            var thisRound = await _serverContext.Rounds.FindAsync(roundId.ToString());
+    public async Task<bool> CheckRoundState(int roundId)
+    {
+        var thisRound = await _serverContext.Rounds.FindAsync(roundId.ToString());
             
-            return thisRound is {WinnerId: null};
-        }
+        return thisRound is {WinnerId: null};
     }
 }

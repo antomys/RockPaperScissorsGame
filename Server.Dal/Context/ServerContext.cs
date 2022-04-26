@@ -46,6 +46,5 @@ public sealed class ServerContext : DbContext
             .HasOne(x => x.RoomPlayers)
             .WithOne()
             .OnDelete(DeleteBehavior.NoAction);
-            
     }
 }

@@ -6,30 +6,29 @@ using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 using Server.Dal.Context;
 
-namespace Server.Bll.Services
+namespace Server.Bll.Services;
+
+internal sealed class StatisticsService : IStatisticsService
 {
-    public class StatisticsService : IStatisticsService
+    private readonly ServerContext _repository;
+
+    public StatisticsService(ServerContext repository)
     {
-        private readonly ServerContext _repository;
+        _repository = repository;
+    }
 
-        public StatisticsService(ServerContext repository)
-        {
-            _repository = repository;
-        }
+    public async Task<IEnumerable<StatisticsModel>> GetAllStatistics()
+    {
+        return await _repository.StatisticsEnumerable.ProjectToType<StatisticsModel>()
+            .ToArrayAsync();
+    }
 
-        public async Task<IEnumerable<StatisticsModel>> GetAllStatistics()
-        {
-            return await _repository.StatisticsEnumerable.ProjectToType<StatisticsModel>()
-                .ToArrayAsync();
-        }
-
-        public async Task<StatisticsModel> GetPersonalStatistics(int userId)
-        {
-            var statistics = await _repository.StatisticsEnumerable
-                .Include(x=>x.Account)
-                .FirstOrDefaultAsync(x=>x.Id == userId);
+    public async Task<StatisticsModel> GetPersonalStatistics(int userId)
+    {
+        var statistics = await _repository.StatisticsEnumerable
+            .Include(x=>x.Account)
+            .FirstOrDefaultAsync(x=>x.Id == userId);
             
-            return statistics.Adapt<StatisticsModel>();
-        }
+        return statistics.Adapt<StatisticsModel>();
     }
 }

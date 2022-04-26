@@ -31,6 +31,7 @@ internal sealed class LoggingMiddleware
             $"Path:{context.Request.Path}\n" +
             $"QueryString:{context.Request.QueryString}\n" +
             $"Request Body:{await ObtainRequestBody(context.Request)}\n";
+        
         _logger.LogWarning(requestInformation);
 
         var originalResponseBody = context.Response.Body;

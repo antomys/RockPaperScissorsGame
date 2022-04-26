@@ -3,12 +3,11 @@ using Server.Bll.Models;
 using OneOf;
 using Server.Bll.Exceptions;
 
-namespace Server.Bll.Services.Interfaces
+namespace Server.Bll.Services.Interfaces;
+
+public interface IRoundService
 {
-    public interface IRoundService
-    {
-        Task<OneOf<RoundModel, CustomException>> CreateRoundAsync(int userId, int roomId);
-        Task<RoundModel> MakeMoveAsync();
-        Task<OneOf<RoundModel, CustomException>> UpdateRoundAsync(int userId, RoundModel roundModel);
-    }
+    Task<OneOf<RoundModel, CustomException>> CreateRoundAsync(int userId, int roomId);
+    Task<RoundModel> MakeMoveAsync();
+    Task<OneOf<RoundModel, CustomException>> UpdateRoundAsync(int userId, RoundModel roundModel);
 }

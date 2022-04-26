@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Bll.Services;
+using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
 

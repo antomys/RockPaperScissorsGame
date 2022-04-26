@@ -1,8 +1,7 @@
 
-namespace Server.Bll.Models
+namespace Server.Bll.Models;
+
+public sealed class AccountModel
 {
-    public class AccountModel
-    {
-        public string Login { get; set; }
-    }
+    public string Login { get; set; }
 }
