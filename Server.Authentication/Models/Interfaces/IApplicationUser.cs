@@ -1,13 +1,12 @@
-namespace Server.Authentication.Models.Interfaces
+namespace Server.Authentication.Models.Interfaces;
+
+/// <summary>
+///  Interface for ApplicationUser class
+/// </summary>
+public interface IApplicationUser
 {
     /// <summary>
-    ///  Interface for ApplicationUser class
+    /// User request id from token
     /// </summary>
-    public interface IApplicationUser
-    {
-        /// <summary>
-        /// User request id from token
-        /// </summary>
-        int Id { get; }
-    }
+    int Id { get; }
 }

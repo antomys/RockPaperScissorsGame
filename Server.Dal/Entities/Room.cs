@@ -1,53 +1,51 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Server.Dal.Entities
-{
-    [Table("Rooms")]
-    public class Room
-    {
-        /// <summary>
-        /// Id of the room. Consists of 5 randomized chars
-        /// </summary>
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        
-        /// <summary>
-        /// Special code to join a room
-        /// </summary>
-        public string RoomCode { get; set; }
-        
-        /// <summary>
-        /// Id of current round
-        /// </summary>
-        public int? RoundId { get; set; }
-        
-        /// <summary>
-        /// Round, linked to this room
-        /// </summary>
-        [ForeignKey("RoundId")]
-        public virtual Round Round { get; set; }
-        
-        public int? RoomPlayerId { get; set; }
-        
-        [ForeignKey("RoomPlayerId")]
-        public virtual RoomPlayers RoomPlayers { get; set; }
-        
-        /// <summary>
-        /// Flag is this room is private
-        /// </summary>
-        public bool IsPrivate { get; set; }
+namespace Server.Dal.Entities;
 
-        /// <summary>
-        /// Flag if room is full
-        /// </summary>
-        public bool IsFull { get; set; }
+[Table("Rooms")]
+public class Room
+{
+    /// <summary>
+    /// Id of the room. Consists of 5 randomized chars
+    /// </summary>
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
         
-        /// <summary>
-        /// Creation date. After 5 minutes of inactivity will be deleted
-        /// </summary>
-        public long CreationTimeTicks { get; set; }
-    }
+    /// <summary>
+    /// Special code to join a room
+    /// </summary>
+    public string RoomCode { get; set; }
+        
+    /// <summary>
+    /// Id of current round
+    /// </summary>
+    public int? RoundId { get; set; }
+        
+    /// <summary>
+    /// Round, linked to this room
+    /// </summary>
+    [ForeignKey("RoundId")]
+    public virtual Round Round { get; set; }
+        
+    public int? RoomPlayerId { get; set; }
+        
+    [ForeignKey("RoomPlayerId")]
+    public virtual RoomPlayers RoomPlayers { get; set; }
+        
+    /// <summary>
+    /// Flag is this room is private
+    /// </summary>
+    public bool IsPrivate { get; set; }
+
+    /// <summary>
+    /// Flag if room is full
+    /// </summary>
+    public bool IsFull { get; set; }
+        
+    /// <summary>
+    /// Creation date. After 5 minutes of inactivity will be deleted
+    /// </summary>
+    public long CreationTimeTicks { get; set; }
 }

@@ -1,34 +1,29 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Server.Authentication.Models;
-using Server.Authentication.Models.Interfaces;
 using Server.Bll.HostedServices;
 using Server.Bll.Services;
 using Server.Bll.Services.Interfaces;
 
-namespace Server.Host.Extensions
+namespace Server.Host.Extensions;
+
+public static class ServiceExtension
 {
-    public static class ServiceExtension
+    public static IServiceCollection AddServices(this IServiceCollection service)
     {
-        public static IServiceCollection AddServices(this IServiceCollection service)
-        {
-            service
-                .AddTransient<IApplicationUser, ApplicationUser>()
-                .AddTransient<IStatisticsService,StatisticsService>()
-                .AddTransient<ILongPollingService,LongPollingService>()
-                .AddHostedService<CleanerHostedService>();
-            service.AddHttpContextAccessor();
+        service
+            .AddTransient<IStatisticsService,StatisticsService>()
+            .AddTransient<ILongPollingService,LongPollingService>()
+            .AddHostedService<CleanerHostedService>();
+        service.AddHttpContextAccessor();
 
-            // In this way I am registering multiple interfaces to one Transient instance of RoomService;
-            service
-                .AddTransient<RoomService>()
-                .AddTransient<IRoomService>(provider => provider.GetRequiredService<RoomService>())
-                .AddTransient<IHostedRoomService>(provider => provider.GetRequiredService<RoomService>());
+        // In this way I am registering multiple interfaces to one Transient instance of RoomService;
+        service
+            .AddTransient<RoomService>()
+            .AddTransient<IRoomService>(provider => provider.GetRequiredService<RoomService>())
+            .AddTransient<IHostedRoomService>(provider => provider.GetRequiredService<RoomService>());
 
-            service
-                .AddTransient<IRoundService, RoundService>();
+        service
+            .AddTransient<IRoundService, RoundService>();
 
-            return service;
-
-        }
+        return service;
     }
 }

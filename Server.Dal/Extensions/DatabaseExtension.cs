@@ -3,19 +3,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Dal.Context;
 
-namespace Server.Dal.Extensions
+namespace Server.Dal.Extensions;
+
+public static class DatabaseExtension
 {
-    public static class DatabaseExtension
+    private const string DatabaseConnection = "DatabaseConnection";
+    private const string MigrationAssemblyName = "Server.Dal";
+    public static IServiceCollection AddDatabase(this IServiceCollection service, IConfiguration configuration)
     {
-        private const string DatabaseConnection = "DatabaseConnection";
-        private const string MigrationAssemblyName = "Server.Dal";
-        public static IServiceCollection AddDatabase(this IServiceCollection service, IConfiguration configuration)
-        {
-            return service.AddDbContext<ServerContext>(
-                builder => builder.UseSqlite
-                (configuration.GetConnectionString(DatabaseConnection),
-                    x => x.MigrationsAssembly(MigrationAssemblyName)), 
-                ServiceLifetime.Transient);
-        }
+        return service.AddDbContext<ServerContext>(
+            builder => builder.UseSqlite
+            (configuration.GetConnectionString(DatabaseConnection),
+                optionsBuilder => optionsBuilder.MigrationsAssembly(MigrationAssemblyName)), 
+            ServiceLifetime.Transient);
     }
 }

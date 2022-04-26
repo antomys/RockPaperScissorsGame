@@ -2,35 +2,34 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Server.Authentication.Models.Interfaces;
 
-namespace Server.Authentication.Models
+namespace Server.Authentication.Models;
+
+/// <summary>
+/// Application user 
+/// </summary>
+internal sealed class AuthUser: IAuthUser
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
     /// <summary>
-    /// Application user 
+    /// Constructor
     /// </summary>
-    public class AuthUser: IAuthUser
+    /// <param name="httpContextAccessor">http accessor</param>
+    public AuthUser(IHttpContextAccessor httpContextAccessor)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        _httpContextAccessor = httpContextAccessor;
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="httpContextAccessor">http accessor</param>
-        public AuthUser(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        /// <summary>
-        /// This user шв
-        /// </summary>
-        public int Id => GetUserId();
+    /// <summary>
+    /// This user шв
+    /// </summary>
+    public int Id => GetUserId();
         
-        private int GetUserId()
-        {
-            var request = _httpContextAccessor.HttpContext
-                ?.User.Claims.FirstOrDefault(x => x.Type == "id");
+    private int GetUserId()
+    {
+        var request = _httpContextAccessor.HttpContext
+            ?.User.Claims.FirstOrDefault(x => x.Type == "id");
 
-            return int.TryParse(request?.Value, out var id) ? id : 0;
-        }
+        return int.TryParse(request?.Value, out var id) ? id : 0;
     }
 }

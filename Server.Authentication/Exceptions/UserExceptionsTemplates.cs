@@ -1,11 +1,10 @@
-namespace Server.Authentication.Exceptions
+namespace Server.Authentication.Exceptions;
+
+internal static class UserExceptionsTemplates
 {
-    public static class UserExceptionsTemplates
-    {
-        public const string UserCoolDown = "User [{0}] has been cooled down till [{1}].";
-        public const string UserInvalidCredentials = "Invalid Crenedtials for user [{0}].";
-        public const string UserNotFound = "User with login [{0}] is not found.";
-        public const string UserAlreadyExists = "User with login [{0}] already exists.";
-        public const string UnknownError = "Unknown error occured. Please try again.";
-    }
+    internal const string UserCoolDown = "User [{0}] has been cooled down till [{1}].";
+    internal const string UserInvalidCredentials = "Invalid Crenedtials for user [{0}].";
+    internal const string UserNotFound = "User with login [{0}] is not found.";
+    internal const string UserAlreadyExists = "User with login [{0}] already exists.";
+    internal const string UnknownError = "Unknown error occured. Please try again.";    
 }

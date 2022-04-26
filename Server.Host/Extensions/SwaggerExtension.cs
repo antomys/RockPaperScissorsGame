@@ -2,60 +2,59 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
-namespace Server.Host.Extensions
+namespace Server.Host.Extensions;
+
+/// <summary>
+/// Swagger extension
+/// </summary>
+public static class SwaggerExtension
 {
     /// <summary>
-    /// Swagger extension
+    /// Registers swagger.
     /// </summary>
-    public static class SwaggerExtension
+    /// <param name="services">Service collection.</param>
+    /// <returns>Service collection.</returns>
+    public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
-        /// <summary>
-        /// Registers swagger.
-        /// </summary>
-        /// <param name="services">Service collection.</param>
-        /// <returns>Service collection.</returns>
-        public static IServiceCollection AddSwagger(this IServiceCollection services)
+        if (services == null) throw new ArgumentNullException(nameof(services));
+            
+        //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            
+        services.AddSwaggerGen(options =>
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            
-            //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            
-            services.AddSwaggerGen(options =>
-            {
-                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                //options.IncludeXmlComments(xmlPath);
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "RPC Host", Version = "v1" });
+            //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            //options.IncludeXmlComments(xmlPath);
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "RPC Host", Version = "v1" });
 
-                options.AddSecurityRequirement(
-                    new OpenApiSecurityRequirement
+            options.AddSecurityRequirement(
+                new OpenApiSecurityRequirement
+                {
                     {
+                        new OpenApiSecurityScheme
                         {
-                            new OpenApiSecurityScheme
+                            Reference = new OpenApiReference
                             {
-                                Reference = new OpenApiReference
-                                {
-                                    Id = "Bearer",
-                                    Type = ReferenceType.SecurityScheme
-                                },
+                                Id = "Bearer",
+                                Type = ReferenceType.SecurityScheme
                             },
-                            Array.Empty<string>()
-                        }
-                    });
+                        },
+                        Array.Empty<string>()
+                    }
+                });
 
-                options.AddSecurityDefinition(
-                    "Bearer",
-                    new OpenApiSecurityScheme
-                    {
-                        Type = SecuritySchemeType.ApiKey,
-                        In = ParameterLocation.Header,
-                        Scheme = "Bearer",
-                        Name = "Authorization",
-                        Description = "JWT token",
-                        BearerFormat = "JWT"
-                    });
-            });
+            options.AddSecurityDefinition(
+                "Bearer",
+                new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.ApiKey,
+                    In = ParameterLocation.Header,
+                    Scheme = "Bearer",
+                    Name = "Authorization",
+                    Description = "JWT token",
+                    BearerFormat = "JWT"
+                });
+        });
 
-            return services;
-        }
+        return services;
     }
 }

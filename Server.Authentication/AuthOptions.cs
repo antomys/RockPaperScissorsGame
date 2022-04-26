@@ -5,45 +5,44 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Server.Authentication.Models;
 
-namespace Server.Authentication
+namespace Server.Authentication;
+
+/// <summary>
+///     Options for JWT token
+/// </summary>
+public sealed class AuthOptions
 {
     /// <summary>
-    /// Options for JWT token
+    /// Token issuer (producer).
     /// </summary>
-    public class AuthOptions
+    public string Issuer { get; set; } = "RPC";
+        
+    /// <summary>
+    /// Token audience (consumer).
+    /// </summary>
+    public string Audience { get; set; } = "Server.Host";
+
+    /// <summary>
+    /// Token secret part.
+    /// </summary>
+    public string PrivateKey { get; set; } = "RockPaperScissors";
+        
+    /// <summary>
+    /// Token life time.
+    /// </summary>
+    public TimeSpan LifeTime { get; set; }  = TimeSpan.FromHours(3d);
+
+    /// <summary>
+    /// Require HTTPS.
+    /// </summary>
+    public bool RequireHttps { get; set; } = false;
+
+    /// <summary>
+    /// Getting a symmetric security key
+    /// </summary>
+    /// <returns></returns>
+    public SymmetricSecurityKey GetSymmetricSecurityKey()
     {
-        /// <summary>
-        /// Token issuer (producer).
-        /// </summary>
-        public string Issuer { get; set; } = "RPC";
-        
-        /// <summary>
-        /// Token audience (consumer).
-        /// </summary>
-        public string Audience { get; set; } = "Server.Host";
-
-        /// <summary>
-        /// Token secret part.
-        /// </summary>
-        public string PrivateKey { get; set; } = "RockPaperScissors";
-        
-        /// <summary>
-        /// Token life time.
-        /// </summary>
-        public TimeSpan LifeTime { get; set; }  = TimeSpan.FromHours(3d);
-
-        /// <summary>
-        /// Require HTTPS.
-        /// </summary>
-        public bool RequireHttps { get; set; } = false;
-
-        /// <summary>
-        /// Getting a symmetric security key
-        /// </summary>
-        /// <returns></returns>
-        public SymmetricSecurityKey GetSymmetricSecurityKey()
-        {
-            return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(PrivateKey));
-        }
+        return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(PrivateKey));
     }
 }
