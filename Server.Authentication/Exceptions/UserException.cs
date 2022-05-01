@@ -8,10 +8,10 @@ public readonly struct UserException
     public int Code { get; }
     public string Message { get; }
         
-    public UserException(string messageType, string message, DateTimeOffset dateTimeOffset)
+    public UserException(string message)
     {
         Code = StatusCodes.Status400BadRequest;
-        Message = string.Format(messageType, message, dateTimeOffset.ToString("f"));
+        Message = message;
     }
 
     public UserException(string invalidCredentialsForUser, string loginName)

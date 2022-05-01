@@ -76,7 +76,7 @@ internal sealed class RoundService : IRoundService
             .FirstOrDefaultAsync(x => x.Id == roundModel.Id);
             
         if(thisRound is null)
-            return new CustomException(ExceptionTemplates.RoundNotFound, roundModel.Id);
+            return new CustomException(ExceptionTemplates.RoundNotFound(roundModel.Id));
         if(thisRound.RoomPlayers.FirstPlayerId != userId || thisRound.RoomPlayers.SecondPlayerId != userId)
             return new CustomException(ExceptionTemplates.NotAllowed);
 

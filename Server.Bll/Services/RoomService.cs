@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Server.Bll.Exceptions;
@@ -12,7 +13,7 @@ using Server.Dal.Entities;
 
 namespace Server.Bll.Services;
 
-internal sealed class RoomService : IRoomService, IHostedRoomService
+internal sealed class RoomService : IRoomService
 {
     private readonly DbSet<Room> _rooms;
     private readonly ServerContext _repository;
@@ -30,9 +31,9 @@ internal sealed class RoomService : IRoomService, IHostedRoomService
         CreateRoom(int userId, bool isPrivate = false, bool isTraining = false)
     {
         var doesRoomExist = await _repository.RoomPlayersEnumerable
-            .FirstOrDefaultAsync(x => x.FirstPlayerId == userId 
-                                      || x.SecondPlayerId == userId);
-        if (doesRoomExist != null)
+            .FirstOrDefaultAsync(roomPlayers => roomPlayers.FirstPlayerId == userId 
+                                      || roomPlayers.SecondPlayerId == userId);
+        if (doesRoomExist is not null)
         {
             return new CustomException(ExceptionTemplates.TwinkRoom);
         }
@@ -57,7 +58,7 @@ internal sealed class RoomService : IRoomService, IHostedRoomService
             
         if (isTraining)
         {
-            var bot = await _repository.Accounts.FirstAsync(x => x.Login == "BOT");
+            var bot = await _repository.Accounts.FirstAsync(account => account.Login.Equals("BOT", StringComparison.OrdinalIgnoreCase));
             newRoomPlayers.SecondPlayerId = bot.Id;
         }
 
@@ -72,22 +73,16 @@ internal sealed class RoomService : IRoomService, IHostedRoomService
         
     public async Task<OneOf<RoomModel, CustomException>> JoinRoom(int userId, bool isPrivate, string roomCode)
     {
-        Room thisRoom;
-            
-        if (isPrivate)
-        {
-            thisRoom = await _rooms
-                .Include(x => x.RoomPlayers)
-                .Where(x => !x.IsFull).FirstOrDefaultAsync();
-        }
-        else
-        {
-            thisRoom = await _rooms
-                .Include(x=>x.RoomPlayers).
-                FirstOrDefaultAsync(x => x.RoomCode == roomCode);
-        }
-            
-        if (thisRoom == null)
+        var thisRoom = isPrivate 
+            ? await _rooms
+                .Include(room => room.RoomPlayers)
+                .Where(room => !room.IsFull)
+                .FirstOrDefaultAsync()
+            : await _rooms
+                .Include(room=>room.RoomPlayers).
+                FirstOrDefaultAsync(room => room.RoomCode == roomCode);
+
+        if (thisRoom is null)
         {
             return new CustomException(ExceptionTemplates.RoomNotExists);
         }
@@ -97,12 +92,12 @@ internal sealed class RoomService : IRoomService, IHostedRoomService
             return new CustomException(ExceptionTemplates.AlreadyInRoom);
         }
             
-        if (thisRoom.RoomPlayers.FirstPlayerId != 0 && thisRoom.RoomPlayers.SecondPlayerId != 0)
+        if (thisRoom.RoomPlayers.FirstPlayerId is not 0 && thisRoom.RoomPlayers.SecondPlayerId is not 0)
         {
             return new CustomException(ExceptionTemplates.RoomFull);
         }
             
-        if (thisRoom.RoomPlayers.FirstPlayerId != 0)
+        if (thisRoom.RoomPlayers.FirstPlayerId is not 0)
         {
             thisRoom.RoomPlayers.FirstPlayerId = userId;
             _rooms.Update(thisRoom);
@@ -112,28 +107,29 @@ internal sealed class RoomService : IRoomService, IHostedRoomService
             return thisRoom.Adapt<RoomModel>();
         }
 
-        if (thisRoom.RoomPlayers.SecondPlayerId == 0)
+        if (thisRoom.RoomPlayers.SecondPlayerId is 0)
         {
             return new CustomException(ExceptionTemplates.Unknown);
         }
             
         thisRoom.RoomPlayers.SecondPlayerId = userId;
 
-        if (thisRoom.RoomPlayers.FirstPlayerId != 0 && thisRoom.RoomPlayers.SecondPlayerId != 0)
+        if (thisRoom.RoomPlayers.FirstPlayerId is not 0 && thisRoom.RoomPlayers.SecondPlayerId is not 0)
         {
             await _roundService.CreateRoundAsync(userId, thisRoom.Id);
         }
             
         _rooms.Update(thisRoom);
         await _repository.SaveChangesAsync();
+        
         return thisRoom.Adapt<RoomModel>();
     }
 
     public async Task<OneOf<RoomModel, CustomException>> GetRoom(int roomId)
     {
-        var room = await _rooms.FindAsync(roomId.ToString());
+        var room = await _rooms.FindAsync(roomId);
 
-        return room != null 
+        return room is not null 
             ? room.Adapt<RoomModel>() 
             : new CustomException(ExceptionTemplates.RoomNotExists);
     }
@@ -142,9 +138,9 @@ internal sealed class RoomService : IRoomService, IHostedRoomService
     {
         var thisRoom = await _rooms.FindAsync(room.Id);
             
-        if ( thisRoom == null)
+        if (thisRoom is null)
         {
-            return 400;
+            return StatusCodes.Status400BadRequest;
         }
            
         var updatedRoom = room.Adapt<Room>();
@@ -155,40 +151,40 @@ internal sealed class RoomService : IRoomService, IHostedRoomService
 
         if (!_repository.Entry(thisRoom).Properties.Any(x => x.IsModified))
         {
-            return 400;
+            return StatusCodes.Status400BadRequest;
         }
             
         _repository.Update(thisRoom);
             
-        return 200;
+        return StatusCodes.Status200OK;
     }
 
     public async Task<int?> DeleteRoom(int userId, int roomId)
     {
         var thisRoom = await _rooms
-            .Include(x=>x.RoomPlayers)
-            .FirstOrDefaultAsync(x=>x.Id == roomId);
+            .Include(room=>room.RoomPlayers)
+            .FirstOrDefaultAsync(room => room.Id == roomId);
             
-        if (thisRoom == null)
+        if (thisRoom is null)
         {
-            return 400;
+            return StatusCodes.Status400BadRequest;
         }
             
         if (thisRoom.RoomPlayers.FirstPlayerId != userId)
         {
-            return 400;
+            return StatusCodes.Status400BadRequest;
         }
            
         if (thisRoom.RoomPlayers.SecondPlayerId != userId)
         {
-            return 400;
+            return StatusCodes.Status400BadRequest;
         }
             
         _rooms.Remove(thisRoom);
 
         await _repository.SaveChangesAsync();
             
-        return 200;
+        return StatusCodes.Status200OK;
     }
 
     /// <summary>
@@ -203,7 +199,7 @@ internal sealed class RoomService : IRoomService, IHostedRoomService
         var currentDate = DateTimeOffset.Now.Ticks;
            
         var rooms = await _rooms
-            .Where(x => x.CreationTimeTicks + roomOutDate.Ticks < currentDate && x.RoundId == null)
+            .Where(room => room.CreationTimeTicks + roomOutDate.Ticks < currentDate && room.RoundId == null)
             .ToArrayAsync();
             
         var allRound = await _repository.Rounds

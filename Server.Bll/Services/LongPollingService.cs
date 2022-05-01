@@ -17,7 +17,7 @@ internal sealed class LongPollingService : ILongPollingService
     {
         var thisRoom = await _serverContext.Rooms.FindAsync(roomId.ToString());
             
-        return thisRoom != null;
+        return thisRoom is not null;
     }
 
     public async Task<bool> CheckRoundState(int roundId)

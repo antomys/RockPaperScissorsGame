@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -47,21 +48,21 @@ internal sealed class AuthService : IAuthService
     {
         if (string.IsNullOrWhiteSpace(login))
         {
-            return new UserException(UserExceptionsTemplates.UserInvalidCredentials, nameof(login));
+            return new UserException(nameof(login).UserInvalidCredentials());
         }
             
         if (string.IsNullOrEmpty(password))
         {
-            return new UserException(UserExceptionsTemplates.UserInvalidCredentials, nameof(password));
+            return new UserException(nameof(password).UserInvalidCredentials());
         }
             
         var release = await _semaphore.WaitAsync(1000);
 
         try
         {
-            if (await _accounts.CountAsync(x=>x.Login == login) > 0)
+            if (await _accounts.AnyAsync(account => account.Login.Equals(login, StringComparison.OrdinalIgnoreCase)))
             {
-                return new UserException(UserExceptionsTemplates.UserAlreadyExists, login);
+                return new UserException(login.UserAlreadyExists());
             }
 
             var account = new Account
@@ -81,7 +82,7 @@ internal sealed class AuthService : IAuthService
                 
             await _repository.SaveChangesAsync();
             
-            return 200;
+            return StatusCodes.Status200OK;
         }
         catch
         {
@@ -91,24 +92,26 @@ internal sealed class AuthService : IAuthService
         }
         finally
         {
-            if (release) 
+            if (release)
+            {
                 _semaphore.Release();
+            }
         }
     }
         
     /// <inheritdoc/>
     public async Task<OneOf<AccountOutputModel, UserException>> LoginAsync(string login, string password)
     {
-        var userAccount = await _accounts.FirstOrDefaultAsync(x => x.Login == login);
+        var userAccount = await _accounts.FirstOrDefaultAsync(account => account.Login == login);
 
         if (userAccount is null)
         {
-            return new UserException(UserExceptionsTemplates.UserNotFound,login);
+            return new UserException(login.UserNotFound());
         }
            
         if (_attemptValidationService.IsCoolDown(login, out var coolRequestDate))
         {
-            return new UserException(UserExceptionsTemplates.UserCoolDown, login, coolRequestDate);
+            return new UserException(login.UserCoolDown(coolRequestDate));
         }
 
         if (userAccount.Password.IsHashEqual(login))
@@ -122,7 +125,7 @@ internal sealed class AuthService : IAuthService
             
         _attemptValidationService.InsertFailAttempt(login);
             
-        return new UserException(UserExceptionsTemplates.UserInvalidCredentials, login);
+        return new UserException(login.UserInvalidCredentials());
     }
 
     public Task<bool> RemoveAsync(int accountId)

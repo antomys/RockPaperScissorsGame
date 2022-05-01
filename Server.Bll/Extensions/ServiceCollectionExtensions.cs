@@ -14,14 +14,9 @@ public static class ServiceCollectionExtensions
             .AddTransient<ILongPollingService,LongPollingService>()
             .AddHostedService<CleanerHostedService>();
         service.AddHttpContextAccessor();
-
-        // In this way I am registering multiple interfaces to one Transient instance of RoomService;
+        
         service
-            .AddTransient<RoomService>()
-            .AddTransient<IRoomService>(provider => provider.GetRequiredService<RoomService>())
-            .AddTransient<IHostedRoomService>(provider => provider.GetRequiredService<RoomService>());
-
-        service
+            .AddTransient<IRoomService, RoomService>()
             .AddTransient<IRoundService, RoundService>();
 
         return service;

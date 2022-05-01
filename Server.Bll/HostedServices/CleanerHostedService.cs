@@ -31,16 +31,18 @@ public sealed class CleanerHostedService : IHostedService
             _serviceProvider,
             TimeSpan.FromSeconds(10), 
             TimeSpan.FromSeconds(10));
+        
         return Task.CompletedTask;
     }
 
     private async void CleanJunk(object state)
     {
         _logger.LogInformation("Starting Cleaning");
+        
         var factory = (IServiceScopeFactory) state;
         using var scope = factory.CreateScope();
-        var roomService = scope.ServiceProvider.GetRequiredService<IHostedRoomService>();
-
+        var roomService = scope.ServiceProvider.GetRequiredService<IRoomService>();
+        //todo: timespan to option.
         var rooms = await roomService
             .RemoveEntityRangeByDate(TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(20));
             

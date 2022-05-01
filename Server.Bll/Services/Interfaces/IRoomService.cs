@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using OneOf;
 using Server.Bll.Exceptions;
@@ -8,6 +9,8 @@ namespace Server.Bll.Services.Interfaces;
 public interface IRoomService
 {
     Task<OneOf<RoomModel, CustomException>> CreateRoom(int userId, bool isPrivate = false, bool isTraining = false);
+    
+    Task<int> RemoveEntityRangeByDate(TimeSpan roomOutDate, TimeSpan roundOutDate);
     
     Task<OneOf<RoomModel, CustomException>> JoinRoom(int userId, bool isPrivate, string roomCode);
     

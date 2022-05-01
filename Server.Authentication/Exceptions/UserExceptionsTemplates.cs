@@ -1,10 +1,18 @@
+using System;
+
 namespace Server.Authentication.Exceptions;
 
 internal static class UserExceptionsTemplates
 {
-    internal const string UserCoolDown = "User [{0}] has been cooled down till [{1}].";
-    internal const string UserInvalidCredentials = "Invalid Crenedtials for user [{0}].";
-    internal const string UserNotFound = "User with login [{0}] is not found.";
-    internal const string UserAlreadyExists = "User with login [{0}] already exists.";
+    internal static string UserCoolDown(this string userName, DateTimeOffset date) => 
+        $"User [{userName}] has been cooled down till [{date}].";
+    
+    internal static  string UserInvalidCredentials(this string userCredentials) =>
+        $"Invalid Credentials for user [{userCredentials}].";
+    
+    internal static string UserNotFound(this string userName) => $"User with login [{userName}] is not found.";
+    
+    internal static string UserAlreadyExists(this string userName) => $"User with login [{userName}] already exists.";
+    
     internal const string UnknownError = "Unknown error occured. Please try again.";    
 }

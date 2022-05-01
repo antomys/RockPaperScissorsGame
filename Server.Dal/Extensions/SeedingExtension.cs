@@ -13,7 +13,8 @@ public static class SeedingExtension
     public static async Task EnsureBotCreated(this ServerContext context)
     {
         var bot = await context.Accounts.FirstOrDefaultAsync(account => account.Login.Equals(DefaultName, StringComparison.OrdinalIgnoreCase));
-        if (bot == null)
+        
+        if (bot is null)
             await context.AddAsync(new Account
             {
                 Id = 0,

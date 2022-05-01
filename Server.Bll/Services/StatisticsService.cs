@@ -19,7 +19,9 @@ internal sealed class StatisticsService : IStatisticsService
 
     public async Task<IEnumerable<StatisticsModel>> GetAllStatistics()
     {
-        return await _repository.StatisticsEnumerable.ProjectToType<StatisticsModel>()
+        return await _repository
+            .StatisticsEnumerable
+            .ProjectToType<StatisticsModel>()
             .ToArrayAsync();
     }
 

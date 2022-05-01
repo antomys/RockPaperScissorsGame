@@ -16,5 +16,5 @@ public static class ExceptionTemplates
         
     // ROUND EXCEPTIONS
     public const string RoundAlreadyCreated = "Round is already creaded.";
-    public const string RoundNotFound = "Round with id \"{0}\" is not found";
+    public static string RoundNotFound(int roundId) => $"Round with id \"{roundId}\" is not found";
 }

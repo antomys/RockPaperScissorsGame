@@ -21,7 +21,7 @@ public static class AuthenticationExtension
     /// <returns></returns>
     public static IServiceCollection AddAuthentications(this IServiceCollection services)
     {
-        if (services == null) throw new ArgumentNullException(nameof(services));
+        _ = services ?? throw new ArgumentNullException(nameof(services));
 
         services.AddOptions<AuthOptions>();
         
@@ -53,6 +53,7 @@ public static class AuthenticationExtension
             .AddTransient<IAuthService, AuthService>()
             .AddTransient<IApplicationUser, ApplicationUser>()
             .AddSingleton(typeof(AttemptValidationService));
+        
         return services;
     }
 }

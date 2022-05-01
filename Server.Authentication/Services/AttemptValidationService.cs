@@ -18,6 +18,7 @@ public sealed class AttemptValidationService
                 // todo: in options
                 _coolDownCollection.TryAdd(userId, DateTimeOffset.Now.AddMinutes(1));
                 _failedAttempts.TryRemove(userId, out _);
+                
                 return true;
             }
         }
