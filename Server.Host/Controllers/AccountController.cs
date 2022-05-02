@@ -20,19 +20,24 @@ public sealed class AccountController : ControllerBase
     public AccountController(IAuthService authService)
     {
         _authService = authService;
-    }       
+    }
+    
     [HttpPost("register")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
     [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> Register(RegisterRequest registerRequest)
     {
-        if (!ModelState.IsValid) return BadRequest();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+        
         var newAccount = await _authService
             .RegisterAsync(registerRequest.Login,registerRequest.Password);
         
         return newAccount.Match<IActionResult>(
-            integer => Ok(integer),
+            _ => Ok(),
             exception => BadRequest(exception));
     }
 

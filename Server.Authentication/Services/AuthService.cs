@@ -60,7 +60,7 @@ internal sealed class AuthService : IAuthService
 
         try
         {
-            if (await _accounts.AnyAsync(account => account.Login.Equals(login, StringComparison.OrdinalIgnoreCase)))
+            if (await _accounts.AnyAsync(account => account.Login.Equals(login)))
             {
                 return new UserException(login.UserAlreadyExists());
             }
@@ -68,18 +68,22 @@ internal sealed class AuthService : IAuthService
             var account = new Account
             {
                 Login = login,
-                Password = password.EncodeBase64()
+                Password = password.EncodeBase64(),
             };
                 
             await _accounts.AddAsync(account);
             await _repository.SaveChangesAsync();
-                
+
             var accountStatistics = new Statistics
             {
                 AccountId = account.Id
             };
+            
             await _repository.StatisticsEnumerable.AddAsync(accountStatistics);
-                
+            await _repository.SaveChangesAsync();
+
+            account.StatisticsId = accountStatistics.Id;
+            
             await _repository.SaveChangesAsync();
             
             return StatusCodes.Status200OK;
