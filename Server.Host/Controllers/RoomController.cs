@@ -34,7 +34,7 @@ public sealed class RoomController : ControllerBase
         [FromHeader(Name="X-Training")] bool isTraining = false)
     {
         var newRoom = await _roomService
-            .CreateRoom(UserId, isPrivate, isTraining);
+            .CreateAsync(UserId, isPrivate, isTraining);
 
         return newRoom.Match<IActionResult>(
             Ok,
@@ -44,7 +44,7 @@ public sealed class RoomController : ControllerBase
     [HttpPost("join/public")]
     public async Task<IActionResult> JoinPublicRoom()
     {
-        var result = await _roomService.JoinRoom(UserId, true,null);
+        var result = await _roomService.JoinAsync(UserId, true,null);
         return result.Match<IActionResult>(
             Ok,
             exception => BadRequest(exception));
@@ -54,7 +54,7 @@ public sealed class RoomController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> JoinPrivateRoom([FromQuery] string roomCode)
     {
-        var result = await _roomService.JoinRoom(UserId, false, roomCode);
+        var result = await _roomService.JoinAsync(UserId, false, roomCode);
         return result.Match<IActionResult>(
             Ok,
             exception => BadRequest(exception));
@@ -78,7 +78,7 @@ public sealed class RoomController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> DeleteRoom([FromQuery] int roomId)
     {
-        var deleteResponse = await _roomService.DeleteRoom(UserId,roomId);
+        var deleteResponse = await _roomService.DeleteAsync(UserId,roomId);
             
         return deleteResponse switch
         {

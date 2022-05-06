@@ -16,9 +16,6 @@ using Server.Dal.Entities;
 
 namespace Server.Authentication.Services;
 
-/// <summary>
-///     Implements <see cref="IAuthService"/>.
-/// </summary>
 internal sealed class AuthService : IAuthService
 {
     private readonly ServerContext _repository;
@@ -92,7 +89,7 @@ internal sealed class AuthService : IAuthService
         {
             _logger.LogWarning("Unable to process account for {Login}", login);
             
-            return new UserException(UserExceptionsTemplates.UnknownError,string.Empty);
+            return new UserException(UserExceptionsTemplates.UnknownError);
         }
         finally
         {
@@ -127,7 +124,7 @@ internal sealed class AuthService : IAuthService
             };
         }
             
-        _attemptValidationService.InsertFailAttempt(login);
+        _attemptValidationService.TryInsertFailAttempt(login);
             
         return new UserException(login.UserInvalidCredentials());
     }

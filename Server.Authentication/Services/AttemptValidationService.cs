@@ -9,7 +9,7 @@ public sealed class AttemptValidationService
     private readonly ConcurrentDictionary<string,int> _failedAttempts = new();
     private readonly ConcurrentDictionary<string, DateTimeOffset> _coolDownCollection = new();
 
-    public bool InsertFailAttempt(string userId)
+    public bool TryInsertFailAttempt(string userId)
     {
         if (_failedAttempts.TryGetValue(userId, out var failedAttempts))
         {

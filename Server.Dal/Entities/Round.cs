@@ -9,19 +9,29 @@ public class Round
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; init; }
+    
     public int RoomPlayersId { get; set; }
+    
     [ForeignKey("RoomPlayersId")]
     public virtual RoomPlayers RoomPlayers { get; set; }
+    
     public int FirstPlayerMove { get; set; }
+   
     public int SecondPlayerMove { get; set; }
+    
     public int? WinnerId { get; set; }
+    
     [ForeignKey("WinnerId")]
     public virtual Account Winner { get; set; }
+    
     public int? LoserId { get; set; }
+    
     [ForeignKey("LoserId")]
     public virtual Account Loser { get; set; }
+    
     public long LastMoveTicks { get; set; }
+    
     public long TimeFinishedTicks { get; set; }
+    
     public bool IsFinished { get; set; }
-        
 }

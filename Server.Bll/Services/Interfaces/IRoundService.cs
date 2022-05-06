@@ -7,7 +7,7 @@ namespace Server.Bll.Services.Interfaces;
 
 public interface IRoundService
 {
-    Task<OneOf<RoundModel, CustomException>> CreateRoundAsync(int userId, int roomId);
+    Task<OneOf<RoundModel, CustomException>> CreateAsync(int userId, int roomId);
     Task<RoundModel> MakeMoveAsync();
-    Task<OneOf<RoundModel, CustomException>> UpdateRoundAsync(int userId, RoundModel roundModel);
+    Task<OneOf<RoundModel, CustomException>> UpdateAsync(int userId, RoundModel roundModel);
 }

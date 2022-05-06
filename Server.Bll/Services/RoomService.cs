@@ -28,11 +28,12 @@ internal sealed class RoomService : IRoomService
     }
 
     public async Task<OneOf<RoomModel, CustomException>> 
-        CreateRoom(int userId, bool isPrivate = false, bool isTraining = false)
+        CreateAsync(int userId, bool isPrivate = false, bool isTraining = false)
     {
         var doesRoomExist = await _repository.RoomPlayersEnumerable
             .FirstOrDefaultAsync(roomPlayers => roomPlayers.FirstPlayerId == userId 
                                       || roomPlayers.SecondPlayerId == userId);
+        
         if (doesRoomExist is not null)
         {
             return new CustomException(ExceptionTemplates.TwinkRoom);
@@ -71,7 +72,7 @@ internal sealed class RoomService : IRoomService
         return room.Adapt<RoomModel>();
     }
         
-    public async Task<OneOf<RoomModel, CustomException>> JoinRoom(int userId, bool isPrivate, string roomCode)
+    public async Task<OneOf<RoomModel, CustomException>> JoinAsync(int userId, bool isPrivate, string roomCode)
     {
         var thisRoom = isPrivate 
             ? await _rooms
@@ -116,7 +117,7 @@ internal sealed class RoomService : IRoomService
 
         if (thisRoom.RoomPlayers.FirstPlayerId is not 0 && thisRoom.RoomPlayers.SecondPlayerId is not 0)
         {
-            await _roundService.CreateRoundAsync(userId, thisRoom.Id);
+            await _roundService.CreateAsync(userId, thisRoom.Id);
         }
             
         _rooms.Update(thisRoom);
@@ -125,7 +126,7 @@ internal sealed class RoomService : IRoomService
         return thisRoom.Adapt<RoomModel>();
     }
 
-    public async Task<OneOf<RoomModel, CustomException>> GetRoom(int roomId)
+    public async Task<OneOf<RoomModel, CustomException>> GetAsync(int roomId)
     {
         var room = await _rooms.FindAsync(roomId);
 
@@ -159,7 +160,7 @@ internal sealed class RoomService : IRoomService
         return StatusCodes.Status200OK;
     }
 
-    public async Task<int?> DeleteRoom(int userId, int roomId)
+    public async Task<int?> DeleteAsync(int userId, int roomId)
     {
         var thisRoom = await _rooms
             .Include(room=>room.RoomPlayers)

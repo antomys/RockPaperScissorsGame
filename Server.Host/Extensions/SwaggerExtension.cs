@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
@@ -16,14 +17,11 @@ public static class SwaggerExtension
     /// <returns>Service collection.</returns>
     public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
-        if (services == null) throw new ArgumentNullException(nameof(services));
-            
-        //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            
+        if (services is null) throw new ArgumentNullException(nameof(services));
+
         services.AddSwaggerGen(options =>
         {
-            //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            //options.IncludeXmlComments(xmlPath);
+            options.IncludeXmlComments($"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "RPC Host", Version = "v1" });
 
             options.AddSecurityRequirement(

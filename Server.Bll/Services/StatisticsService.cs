@@ -28,8 +28,8 @@ internal sealed class StatisticsService : IStatisticsService
     public async Task<StatisticsModel> GetPersonalStatistics(int userId)
     {
         var statistics = await _repository.StatisticsEnumerable
-            .Include(x=>x.Account)
-            .FirstOrDefaultAsync(x=>x.Id == userId);
+            .Include(x=> x.Account)
+            .FirstOrDefaultAsync(statistics => statistics.Id == userId);
             
         return statistics.Adapt<StatisticsModel>();
     }

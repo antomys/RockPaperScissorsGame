@@ -10,15 +10,14 @@ using Server.Authentication.Services;
 namespace Server.Authentication.Extensions;
 
 /// <summary>
-/// Authentication services extension
+///     Authentication services extension.
 /// </summary>
 public static class AuthenticationExtension
 {
     /// <summary>
-    /// Register authentication
+    ///     Registers authentication.
     /// </summary>
     /// <param name="services">Service collection</param>
-    /// <returns></returns>
     public static IServiceCollection AddAuthentications(this IServiceCollection services)
     {
         _ = services ?? throw new ArgumentNullException(nameof(services));

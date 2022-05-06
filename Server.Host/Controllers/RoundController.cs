@@ -39,7 +39,7 @@ public sealed class RoundController:ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CreateRound(int roomId)
     {
-        var result = await _roundService.CreateRoundAsync(UserId, roomId);
+        var result = await _roundService.CreateAsync(UserId, roomId);
         return result.Match<IActionResult>(
             Ok,
             exception => BadRequest(exception));
@@ -54,7 +54,7 @@ public sealed class RoundController:ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> UpdateCurrentRound(RoundModel roundModel)
     {
-        var updateResult = await _roundService.UpdateRoundAsync(UserId, roundModel);
+        var updateResult = await _roundService.UpdateAsync(UserId, roundModel);
         return updateResult.Match<IActionResult>(
             Ok,
             exception => BadRequest(exception));

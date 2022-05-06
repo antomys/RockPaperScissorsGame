@@ -20,28 +20,38 @@ internal sealed class RoundService : IRoundService
     {
         _serverContext = serverContext;
     }
-    public async Task<OneOf<RoundModel,CustomException>> CreateRoundAsync(int userId, int roomId)
+    public async Task<OneOf<RoundModel,CustomException>> CreateAsync(int userId, int roomId)
     {
         var foundRoom = await _serverContext
             .Rooms
             .Include(x => x.RoomPlayers)
             .FirstOrDefaultAsync(x => x.Id == roomId);
+        
         if (foundRoom is null)
+        {
             return new CustomException(ExceptionTemplates.RoomNotExists);
+        }
+        
         if (foundRoom.RoomPlayers.FirstPlayerId != userId)
         {
             if(foundRoom.RoomPlayers.SecondPlayerId != userId)
+            {
                 return new CustomException(ExceptionTemplates.NotAllowed);
+            }
                 
         }
         if (foundRoom.RoomPlayers.SecondPlayerId != userId)
         {
             if(foundRoom.RoomPlayers.FirstPlayerId != userId)
+            {
                 return new CustomException(ExceptionTemplates.NotAllowed);
+            }
         }
                 
         if (!foundRoom.IsFull)
+        {
             return new CustomException(ExceptionTemplates.RoomNotFull);
+        }
 
         var newRound = new Round
         {
@@ -67,7 +77,7 @@ internal sealed class RoundService : IRoundService
         throw new NotImplementedException();
     }
 
-    public async Task<OneOf<RoundModel,CustomException>> UpdateRoundAsync(int userId, RoundModel roundModel)
+    public async Task<OneOf<RoundModel,CustomException>> UpdateAsync(int userId, RoundModel roundModel)
     {
         var thisRound = await _serverContext
             .Rounds
@@ -76,9 +86,14 @@ internal sealed class RoundService : IRoundService
             .FirstOrDefaultAsync(x => x.Id == roundModel.Id);
             
         if(thisRound is null)
+        {
             return new CustomException(ExceptionTemplates.RoundNotFound(roundModel.Id));
+        }
+        
         if(thisRound.RoomPlayers.FirstPlayerId != userId || thisRound.RoomPlayers.SecondPlayerId != userId)
+        {
             return new CustomException(ExceptionTemplates.NotAllowed);
+        }
 
         var incomeRound = roundModel.Adapt<Round>();
         thisRound.FirstPlayerMove = incomeRound.FirstPlayerMove;
@@ -92,10 +107,13 @@ internal sealed class RoundService : IRoundService
         }
 
         if (!_serverContext.Entry(thisRound).Properties.Any(x => x.IsModified))
+        {
             return new CustomException(ExceptionTemplates.NotAllowed);
+        }
             
         _serverContext.Update(thisRound);
         await _serverContext.SaveChangesAsync();
+        
         return thisRound.Adapt<RoundModel>();
     }
 }
