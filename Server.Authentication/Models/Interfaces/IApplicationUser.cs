@@ -8,5 +8,5 @@ public interface IApplicationUser
     /// <summary>
     ///     Gets user request id from token
     /// </summary>
-    int Id { get; }
+    string Id { get; }
 }

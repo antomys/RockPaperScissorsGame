@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Authentication.Models.Interfaces;
+using Server.Bll.Exceptions;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 using Server.Host.Contracts;
@@ -22,28 +23,34 @@ public sealed class StatisticsController : ControllerBase
 {
     private readonly IStatisticsService _statisticsService;
     private readonly IApplicationUser _applicationUser;
-    private int UserId => _applicationUser.Id;
+    
+    private string UserId => _applicationUser.Id;
+   
     public StatisticsController(IStatisticsService statisticsService, IApplicationUser applicationUser)
     {
         _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
         _applicationUser = applicationUser ?? throw new ArgumentNullException(nameof(applicationUser));
     }
 
-    [HttpGet("all")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<StatisticsDto>), (int) HttpStatusCode.OK)]
+    [HttpGet("all")]
+    [ProducesResponseType(typeof(ShortStatisticsModel[]), (int) HttpStatusCode.OK)]
     [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-    public Task<IEnumerable<ShortStatisticsModel>> GetOverallStatistics()
+    public Task<ShortStatisticsModel[]> GetOverallStatistics()
     {
         return _statisticsService.GetAllStatistics();
     }
         
-    [HttpGet("personal")]
     [Authorize]
-    //[ProducesResponseType(typeof(Statistics), (int) HttpStatusCode.OK)]
-    [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+    [HttpGet("personal")]
+    [ProducesResponseType(typeof(StatisticsModel), (int) HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(CustomException), (int) HttpStatusCode.BadRequest)]
     public async Task<IActionResult> GetPersonalStatistics()
     {
-        return Ok(await _statisticsService.GetPersonalStatistics(UserId));
+        var result = await _statisticsService.GetPersonalStatistics(UserId);
+
+        return result.Match<IActionResult>(
+            statsModel => Ok(statsModel),
+            statsException => BadRequest(statsException));
     }
 }

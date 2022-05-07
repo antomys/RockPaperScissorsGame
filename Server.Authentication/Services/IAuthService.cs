@@ -8,5 +8,6 @@ namespace Server.Authentication.Services;
 public interface IAuthService
 {
     Task<OneOf<int, UserException>> RegisterAsync(string login, string password);
+    
     Task<OneOf<AccountOutputModel, UserException>> LoginAsync(string login, string password);
 }

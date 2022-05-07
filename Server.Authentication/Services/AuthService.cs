@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,25 +19,25 @@ namespace Server.Authentication.Services;
 
 internal sealed class AuthService : IAuthService
 {
+    private static readonly JwtSecurityTokenHandler TokenHandler = new();
+    private static SigningCredentials _signingCredentials;
+    
     private readonly ServerContext _repository;
-    private readonly AttemptValidationService _attemptValidationService;
     private readonly AuthOptions _authOptions;
     private readonly ILogger<AuthService> _logger;
-        
+
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private readonly DbSet<Account> _accounts;
-        
+
     public AuthService(
         ILogger<AuthService> logger,
-        IOptions<AuthOptions> authOptions, 
-        AttemptValidationService attemptValidationService, 
+        IOptions<AuthOptions> authOptions,
         ServerContext repository)
     {
         _logger = logger;
-        _attemptValidationService = attemptValidationService;
         _repository = repository;
         _authOptions = authOptions.Value;
-        _accounts = repository.Accounts;
+
+        _signingCredentials = new SigningCredentials(_authOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256);
     }
 
     /// <inheritdoc/>
@@ -53,37 +54,35 @@ internal sealed class AuthService : IAuthService
             return new UserException(nameof(password).UserInvalidCredentials());
         }
             
-        var release = await _semaphore.WaitAsync(1000);
+        var release = await _semaphore.WaitAsync(100);
 
         try
         {
-            if (await _accounts.AnyAsync(account => account.Login.Equals(login)))
+            if (await _repository.Accounts.AnyAsync(account => account.Login.Equals(login.ToLower())))
             {
                 return new UserException(login.UserAlreadyExists());
             }
 
+            var accountId = Guid.NewGuid().ToString();
+            
             var account = new Account
             {
+                Id = accountId,
                 Login = login,
                 Password = password.EncodeBase64(),
-                Statistics = new Statistics()
             };
                 
-            _accounts.Add(account);
+            _repository.Accounts.Add(account);
+
+            var accountStatistics = new Statistics
+            {
+                Id = accountId,
+                AccountId = accountId
+            };
+            
+            _repository.StatisticsEnumerable.Add(accountStatistics);
             await _repository.SaveChangesAsync();
 
-            // var accountStatistics = new Statistics
-            // {
-            //     AccountId = account.Id
-            // };
-            //
-            // await _repository.StatisticsEnumerable.AddAsync(accountStatistics);
-            // await _repository.SaveChangesAsync();
-            //
-            // account.StatisticsId = accountStatistics.Id;
-            //
-            // await _repository.SaveChangesAsync();
-            
             return StatusCodes.Status200OK;
         }
         catch
@@ -104,19 +103,19 @@ internal sealed class AuthService : IAuthService
     /// <inheritdoc/>
     public async Task<OneOf<AccountOutputModel, UserException>> LoginAsync(string login, string password)
     {
-        var userAccount = await _accounts.FirstOrDefaultAsync(account => account.Login == login);
+        var userAccount = await _repository.Accounts.FirstOrDefaultAsync(account => account.Login.ToLower().Equals(login.ToLower()));
 
         if (userAccount is null)
         {
             return new UserException(login.UserNotFound());
         }
            
-        if (_attemptValidationService.IsCoolDown(login, out var coolRequestDate))
+        if (login.IsCoolDown(out var coolRequestDate))
         {
             return new UserException(login.UserCoolDown(coolRequestDate));
         }
 
-        if (userAccount.Password.IsHashEqual(login))
+        if (userAccount.Password.IsHashEqual(password))
         {
             return new AccountOutputModel
             {
@@ -124,48 +123,46 @@ internal sealed class AuthService : IAuthService
                 Login = userAccount.Login
             };
         }
-            
-        _attemptValidationService.TryInsertFailAttempt(login);
+
+        login.TryInsertFailAttempt();
             
         return new UserException(login.UserInvalidCredentials());
     }
 
-    public Task<bool> RemoveAsync(int accountId)
+    public Task<int> RemoveAsync(string accountId)
     {
-        throw new NotImplementedException();
+        _repository.Accounts.Remove(new Account { Id = accountId });
+
+        return _repository.SaveChangesAsync();
     }
         
     private string BuildToken(Account accountModel)
-    {
-        var identity = GetClaimsIdentity(accountModel.Id);
-
+    { 
         var now = DateTime.UtcNow;
-        var jwtToken = new JwtSecurityToken(
-            issuer: _authOptions.Issuer,
-            audience: _authOptions.Audience,
-            notBefore: now,
-            claims: identity.Claims,
-            expires: now.Add(_authOptions.LifeTime),
-            signingCredentials: new SigningCredentials(
-                _authOptions.GetSymmetricSecurityKey(), 
-                SecurityAlgorithms.HmacSha256));
 
-        var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+        var encodedJwt = TokenHandler.CreateEncodedJwt(
+            _authOptions.Issuer,
+            _authOptions.Audience,
+            GetClaimsIdentity(accountModel.Id),
+            now,
+            now.Add(_authOptions.LifeTime),
+            now,
+            _signingCredentials);
 
         return encodedJwt;
     }
 
-    private static ClaimsIdentity GetClaimsIdentity(int userId)
+    private static ClaimsIdentity GetClaimsIdentity(string userId)
     {
         var claims = new[]
         {
-            new Claim("id", userId.ToString()),
-            new Claim(ClaimsIdentity.DefaultRoleClaimType, "User")
+            new Claim(ClaimsIdentity.DefaultNameClaimType, userId),
+            new Claim(ClaimsIdentity.DefaultRoleClaimType, Roles.User)
         };
         var claimsIdentity =
             new ClaimsIdentity(
                 claims,
-                "Token",
+                JwtBearerDefaults.AuthenticationScheme,
                 ClaimsIdentity.DefaultNameClaimType,
                 ClaimsIdentity.DefaultRoleClaimType);
             

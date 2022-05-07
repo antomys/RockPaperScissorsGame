@@ -26,6 +26,8 @@ public sealed class CleanerHostedService : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Starting Cleaning");
+        
         _timer = new Timer(
             CleanJunk, 
             _serviceProvider,
@@ -37,16 +39,15 @@ public sealed class CleanerHostedService : IHostedService
 
     private async void CleanJunk(object state)
     {
-        _logger.LogInformation("Starting Cleaning");
-        
         var factory = (IServiceScopeFactory) state;
         using var scope = factory.CreateScope();
         var roomService = scope.ServiceProvider.GetRequiredService<IRoomService>();
         //todo: timespan to option.
         var rooms = await roomService
             .RemoveEntityRangeByDate(TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(20));
-            
-        _logger.LogInformation("Cleaned {Room} entities", rooms.ToString());
+        
+        if(rooms > 0)
+            _logger.LogInformation("Cleaned {Room} entities", rooms.ToString());
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

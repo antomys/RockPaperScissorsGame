@@ -10,8 +10,8 @@ public class Room
     /// Id of the room. Consists of 5 randomized chars
     /// </summary>
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; init; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public string Id { get; init; }
         
     /// <summary>
     /// Special code to join a room

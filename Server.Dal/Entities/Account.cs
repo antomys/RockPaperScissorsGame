@@ -10,8 +10,8 @@ public class Account
     ///     Id of account. Unique to everyone and similar with Statistics Id
     /// </summary>
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; init; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public string Id { get; init; }
         
     /// <summary>
     ///     Nick name of Account.

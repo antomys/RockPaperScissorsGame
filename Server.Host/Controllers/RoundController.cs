@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,7 +22,7 @@ public sealed class RoundController:ControllerBase
 {
     private readonly IApplicationUser _applicationUser;
     private readonly IRoundService _roundService;
-    private int UserId => _applicationUser.Id;
+    private string UserId => _applicationUser.Id;
     public RoundController(
         IRoundService roundService, 
         IApplicationUser applicationUser)
@@ -39,10 +40,11 @@ public sealed class RoundController:ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CreateRound(int roomId)
     {
-        var result = await _roundService.CreateAsync(UserId, roomId);
-        return result.Match<IActionResult>(
-            Ok,
-            exception => BadRequest(exception));
+        throw new NotImplementedException();
+        // var result = await _roundService.CreateAsync(UserId, roomId);
+        // return result.Match<IActionResult>(
+        //     Ok,
+        //     exception => BadRequest(exception));
     }       
     /// <summary>
     /// Updates current room (Patches).
@@ -54,9 +56,10 @@ public sealed class RoundController:ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> UpdateCurrentRound(RoundModel roundModel)
     {
-        var updateResult = await _roundService.UpdateAsync(UserId, roundModel);
-        return updateResult.Match<IActionResult>(
-            Ok,
-            exception => BadRequest(exception));
+        throw new NotImplementedException();
+        // var updateResult = await _roundService.UpdateAsync(UserId, roundModel);
+        // return updateResult.Match<IActionResult>(
+        //     Ok,
+        //     exception => BadRequest(exception));
     }
 }

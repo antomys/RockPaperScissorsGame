@@ -3,40 +3,40 @@ using System.Collections.Concurrent;
 
 namespace Server.Authentication.Services;
 
-public sealed class AttemptValidationService
+internal static class AttemptValidationService
 {
     // key - userId. Value - failed attempts
-    private readonly ConcurrentDictionary<string,int> _failedAttempts = new();
-    private readonly ConcurrentDictionary<string, DateTimeOffset> _coolDownCollection = new();
+    private static readonly ConcurrentDictionary<string, int> FailedAttempts = new();
+    private static readonly ConcurrentDictionary<string, DateTimeOffset> CoolDownCollection = new();
 
-    public bool TryInsertFailAttempt(string userId)
+    public static bool TryInsertFailAttempt(this string userId)
     {
-        if (_failedAttempts.TryGetValue(userId, out var failedAttempts))
+        if (FailedAttempts.TryGetValue(userId, out var failedAttempts))
         {
             if (failedAttempts >= 2)
             {
                 // todo: in options
-                _coolDownCollection.TryAdd(userId, DateTimeOffset.Now.AddMinutes(1));
-                _failedAttempts.TryRemove(userId, out _);
+                CoolDownCollection.TryAdd(userId, DateTimeOffset.Now.AddMinutes(2));
+                FailedAttempts.TryRemove(userId, out _);
                 
                 return true;
             }
         }
-        _failedAttempts.AddOrUpdate(userId, 1, (_, i) => i + 1);
+        FailedAttempts.AddOrUpdate(userId, 1, (_, i) => i + 1);
             
         return true;
     }
 
-    public int? CountFailedAttempts(string userId)
+    public static int? CountFailedAttempts(this string userId)
     {
-        return _failedAttempts.TryGetValue(userId, out var failedAttempts)
+        return FailedAttempts.TryGetValue(userId, out var failedAttempts)
             ? failedAttempts
             : default;
     }
 
-    public bool IsCoolDown(string userId, out DateTimeOffset coolDownDate)
+    public static bool IsCoolDown(this string userId, out DateTimeOffset coolDownDate)
     {
-        var result = _coolDownCollection.TryGetValue(userId, out coolDownDate);
+        var result = CoolDownCollection.TryGetValue(userId, out coolDownDate);
 
         if (!result)
         {
@@ -46,7 +46,7 @@ public sealed class AttemptValidationService
         {
             return true;
         }
-        _coolDownCollection.TryRemove(userId, out coolDownDate);
+        CoolDownCollection.TryRemove(userId, out coolDownDate);
 
         return false;
     }

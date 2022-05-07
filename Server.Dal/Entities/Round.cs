@@ -8,11 +8,11 @@ namespace Server.Dal.Entities;
 public class Round
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; init; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public string Id { get; init; }
 
     [ForeignKey("Room")]
-    public int RoomId { get; set; }
+    public string RoomId { get; set; }
     
     public virtual Room Room { get; set; }
     

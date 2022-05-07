@@ -9,6 +9,7 @@ public static class Roles
     /// Admin role
     /// </summary>
     public const string Admin = "admin";
+    
     /// <summary>
     /// User role
     /// </summary>

@@ -12,15 +12,23 @@ public static class SeedingExtension
     
     public static async Task EnsureBotCreated(this ServerContext context)
     {
-        var bot = await context.Accounts.FirstOrDefaultAsync(account => account.Login.Equals(DefaultName, StringComparison.OrdinalIgnoreCase));
+        if (await context.Accounts.ContainsAsync(new Account {Id = DefaultName}))
+        {
+           return;
+        }
         
-        if (bot is null)
-            await context.AddAsync(new Account
-            {
-                Id = 0,
-                Login = DefaultName,
-                Password = "SKJSDKBNDFB21321412UIWHFDKSJGNKSDJGN"
-            });
+        context.Add(new Account
+        {
+            Id = DefaultName,
+            Login = DefaultName,
+            Password = Guid.NewGuid().ToString()
+        });
+        
+        context.Add(new Statistics
+        {
+            Id = DefaultName,
+            AccountId = DefaultName
+        });
            
         await context.SaveChangesAsync();
     }

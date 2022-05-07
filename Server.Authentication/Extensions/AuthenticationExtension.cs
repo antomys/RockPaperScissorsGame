@@ -23,15 +23,15 @@ public static class AuthenticationExtension
         _ = services ?? throw new ArgumentNullException(nameof(services));
 
         services.AddOptions<AuthOptions>();
-        
-        var jwtOptions = services
-            .BuildServiceProvider()
-            .GetRequiredService<IOptions<AuthOptions>>()
-            .Value;
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
-            {
+            { 
+                var jwtOptions = services
+                    .BuildServiceProvider()
+                    .GetRequiredService<IOptions<AuthOptions>>()
+                    .Value;
+                            
                 options.RequireHttpsMetadata = jwtOptions.RequireHttps;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -50,9 +50,8 @@ public static class AuthenticationExtension
 
         services
             .AddTransient<IAuthService, AuthService>()
-            .AddTransient<IApplicationUser, ApplicationUser>()
-            .AddSingleton(typeof(AttemptValidationService));
-        
+            .AddTransient<IApplicationUser, ApplicationUser>();
+
         return services;
     }
 }

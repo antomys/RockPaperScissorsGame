@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Server.Authentication.Models;
 
 namespace Server.Authentication;
 
@@ -15,12 +12,12 @@ public sealed class AuthOptions
     /// <summary>
     /// Token issuer (producer).
     /// </summary>
-    public string Issuer { get; set; } = "RPC";
+    public string Issuer { get; set; } = "Rock Paper Scissors";
         
     /// <summary>
     /// Token audience (consumer).
     /// </summary>
-    public string Audience { get; set; } = "Server.Host";
+    public string Audience { get; set; } = "Player";
 
     /// <summary>
     /// Token secret part.
@@ -30,7 +27,7 @@ public sealed class AuthOptions
     /// <summary>
     /// Token life time.
     /// </summary>
-    public TimeSpan LifeTime { get; set; }  = TimeSpan.FromHours(3d);
+    public TimeSpan LifeTime { get; set; }  = TimeSpan.FromHours(3);
 
     /// <summary>
     /// Require HTTPS.

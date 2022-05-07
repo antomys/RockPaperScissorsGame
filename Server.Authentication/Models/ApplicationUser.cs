@@ -24,13 +24,13 @@ internal sealed class ApplicationUser: IApplicationUser
     /// <summary>
     ///     This user id
     /// </summary>
-    public int Id => GetUserId();
+    public string Id => GetUserId();
         
-    private int GetUserId()
+    private string GetUserId()
     {
         var request = _httpContextAccessor.HttpContext
-            ?.User.Claims.FirstOrDefault(x => x.Type == "id");
+            ?.User.Identity.Name;
 
-        return int.TryParse(request?.Value, out var id) ? id : 0;
+        return request;
     }
 }

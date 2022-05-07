@@ -8,11 +8,11 @@ namespace Server.Dal.Entities;
 public class Statistics
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public string Id { get; set; }
     
     [ForeignKey("Account")]
-    public int AccountId { get; set; }
+    public string AccountId { get; set; }
     
     public virtual Account Account { get; set; }
     

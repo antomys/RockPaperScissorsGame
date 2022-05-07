@@ -5,7 +5,7 @@ namespace Server.Authentication.Exceptions;
 /// <summary>
 ///     User-related custom structure exception.
 /// </summary>
-public readonly struct UserException
+public sealed class UserException
 {
     /// <summary>
     ///     Gets response code.

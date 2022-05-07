@@ -1,6 +1,6 @@
 namespace Server.Bll.Exceptions;
 
-public static class ExceptionTemplates
+internal static class ExceptionTemplates
 {
     // GENERAL EXCEPTION MESSAGES
     public const string Unknown = "Unknown error occured. Please try again";

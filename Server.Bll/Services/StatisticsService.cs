@@ -1,10 +1,12 @@
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Server.Bll.Exceptions;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 using Server.Dal.Context;
+using OneOf;
 
 namespace Server.Bll.Services;
 
@@ -14,23 +16,25 @@ internal sealed class StatisticsService : IStatisticsService
 
     public StatisticsService(ServerContext repository)
     {
-        _repository = repository;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
-    public async Task<IEnumerable<ShortStatisticsModel>> GetAllStatistics()
+    public Task<ShortStatisticsModel[]> GetAllStatistics()
     {
-        return await _repository
+        return _repository
             .StatisticsEnumerable
             .ProjectToType<ShortStatisticsModel>()
             .ToArrayAsync();
     }
 
-    public async Task<StatisticsModel> GetPersonalStatistics(int userId)
+    public async Task<OneOf<StatisticsModel, CustomException>> GetPersonalStatistics(string userId)
     {
         var statistics = await _repository.StatisticsEnumerable
-            .Include(x=> x.Account)
-            .FirstOrDefaultAsync(statistics => statistics.Id == userId);
-            
-        return statistics.Adapt<StatisticsModel>();
+            .Include(stats => stats.Account)
+            .FirstOrDefaultAsync(statistics => statistics.Id.Equals(userId));
+
+        return statistics is not null
+            ? statistics.Adapt<StatisticsModel>()
+            : new CustomException($"Unable to get statistics for user \"{userId}\"");
     }
 }

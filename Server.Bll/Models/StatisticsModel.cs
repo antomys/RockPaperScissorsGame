@@ -2,6 +2,9 @@
 
 public sealed class StatisticsModel
 {
+    /// <summary>
+    ///     <see cref="AccountModel"/>.
+    /// </summary>
     public AccountModel Account { get; set; }
 
     /// <summary>
