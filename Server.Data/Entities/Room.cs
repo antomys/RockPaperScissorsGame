@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Server.Dal.Entities;
+namespace Server.Data.Entities;
 
 [Table("Rooms")]
 public class Room
@@ -22,7 +23,11 @@ public class Room
     /// Round, linked to this room
     /// </summary>
     public virtual Round Round { get; set; }
-    public virtual Player Player { get; set; }
+    
+    /// <summary>
+    ///     <see cref="Player"/>.
+    /// </summary>
+    public virtual ICollection<Player> Players { get; set; }
 
     /// <summary>
     /// Flag is this room is private

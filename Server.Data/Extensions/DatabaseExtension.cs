@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Server.Dal.Context;
+using Server.Data.Context;
 
-namespace Server.Dal.Extensions;
+namespace Server.Data.Extensions;
 
 public static class DatabaseExtension
 {
     private const string DatabaseConnection = "DatabaseConnection";
-    private const string MigrationAssemblyName = "Server.Dal";
+    private const string MigrationAssemblyName = "Server.Data";
     public static IServiceCollection AddDatabase(this IServiceCollection service, IConfiguration configuration)
     {
         return service.AddDbContext<ServerContext>(

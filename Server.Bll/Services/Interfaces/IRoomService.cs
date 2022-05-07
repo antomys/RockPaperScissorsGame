@@ -8,15 +8,15 @@ namespace Server.Bll.Services.Interfaces;
 
 public interface IRoomService
 {
-    Task<OneOf<RoomModel, CustomException>> CreateAsync(int userId, bool isPrivate = false, bool isTraining = false);
+    Task<OneOf<RoomModel, CustomException>> CreateAsync(string userId, bool isPrivate = false, bool isTraining = false);
     
-    Task<int> RemoveEntityRangeByDate(TimeSpan roomOutDate, TimeSpan roundOutDate);
+    Task<int> RemoveRangeAsync(TimeSpan roomOutDate, TimeSpan roundOutDate);
     
-    Task<OneOf<RoomModel, CustomException>> JoinAsync(int userId, bool isPrivate, string roomCode);
+    Task<OneOf<RoomModel, CustomException>> JoinAsync(string userId, bool isPrivate, string roomCode);
     
-    Task<OneOf<RoomModel, CustomException>> GetAsync(int roomId);
+    Task<OneOf<RoomModel, CustomException>> GetAsync(string roomId);
     
-    Task<int?> UpdateRoom(RoomModel room);
+    Task<int?> UpdateAsync(RoomModel room);
     
-    Task<int?> DeleteAsync(int userId, int roomId);
+    Task<int?> DeleteAsync(string userId, string roomId);
 }

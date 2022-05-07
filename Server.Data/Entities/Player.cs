@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Server.Dal.Entities;
+namespace Server.Data.Entities;
 
 [Table("Players")]
 public class Player
@@ -14,6 +14,8 @@ public class Player
     public string AccountId { get; set; }
     
     public virtual Account Account { get; set; }
+    
+    public bool IsReady { get; set; }
     
     public int Move { get; set; }
 }

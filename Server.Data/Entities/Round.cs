@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Server.Dal.Entities;
+namespace Server.Data.Entities;
 
 [Table("Rounds")]
 public class Round
@@ -21,6 +22,10 @@ public class Round
     public virtual Account Winner { get; set; }
     
     public virtual Account Loser { get; set; }
+    
+    public DateTimeOffset StartTime { get; set; }
+    
+    public DateTimeOffset FinishTime { get; set; }
 
     public bool IsFinished { get; set; }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mapster;
@@ -6,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Server.Bll.Exceptions;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
-using Server.Dal.Context;
 using OneOf;
-using Server.Dal.Entities;
+using Server.Data.Context;
+using Server.Data.Entities;
 
 namespace Server.Bll.Services;
 
@@ -18,62 +19,66 @@ internal sealed class RoundService : IRoundService
 
     public RoundService(ServerContext serverContext)
     {
-        _serverContext = serverContext;
+        _serverContext = serverContext ?? throw new ArgumentNullException(nameof(serverContext));
     }
-    public async Task<OneOf<RoundModel,CustomException>> CreateAsync(int userId, int roomId)
+    public async Task<OneOf<RoundModel, CustomException>> CreateAsync(string userId, string roomId)
     {
-        throw new NotImplementedException();
-        // var foundRoom = await _serverContext
-        //     .Rooms
-        //     .Include(x => x.RoomPlayer)
-        //     .FirstOrDefaultAsync(x => x.Id == roomId);
-        //
-        // if (foundRoom is null)
-        // {
-        //     return new CustomException(ExceptionTemplates.RoomNotExists);
-        // }
-        //
-        // if (foundRoom.RoomPlayer.FirstPlayerId != userId)
-        // {
-        //     if(foundRoom.RoomPlayer.SecondPlayerId != userId)
-        //     {
-        //         return new CustomException(ExceptionTemplates.NotAllowed);
-        //     }
-        //         
-        // }
-        // if (foundRoom.RoomPlayer.SecondPlayerId != userId)
-        // {
-        //     if(foundRoom.RoomPlayer.FirstPlayerId != userId)
-        //     {
-        //         return new CustomException(ExceptionTemplates.NotAllowed);
-        //     }
-        // }
-        //         
-        // if (!foundRoom.IsFull)
-        // {
-        //     return new CustomException(ExceptionTemplates.RoomNotFull);
-        // }
-        //
-        // var newRound = new Round
-        // {
-        //     RoomPlayersId = foundRoom.RoomPlayer.Id,
-        //     FirstPlayerMove = 0,
-        //     SecondPlayerMove = 0,
-        //     LastMoveTicks = DateTimeOffset.Now.Ticks,
-        //     TimeFinishedTicks = 0,
-        //     IsFinished = false
-        // };
-        //
-        // await _serverContext.AddAsync(newRound);
-        //
-        // foundRoom.RoundId = newRound.Id;
-        // await _serverContext.SaveChangesAsync();
-        //
-        // return newRound.Adapt<RoundModel>();
+        var playingRoom = await _serverContext
+            .Rooms
+            .Include(rooms => rooms.Players)
+            .FirstOrDefaultAsync(room => room.Id.Equals(roomId));
+        
+        if (playingRoom is null)
+        {
+            return new CustomException(ExceptionTemplates.RoomNotExists);
+        }
+
+        if (!playingRoom.IsFull)
+        {
+            return new CustomException(ExceptionTemplates.RoomNotFull);
+        }
+        
+        if (!playingRoom.Players.Any(player => player.AccountId.Equals(userId)))
+        {
+            return new CustomException(ExceptionTemplates.NotAllowed);
+        }
+
+        var newRound = new Round
+        {
+            Id = Guid.NewGuid().ToString(),
+            RoomId = roomId,
+            Room = playingRoom,
+            StartTime = DateTimeOffset.UtcNow,
+            IsFinished = false
+        };
+
+        _serverContext.Rounds.Add(newRound);
+
+        var players = new List<Player>(2)
+        {
+            new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                AccountId = userId,
+            }
+        };
+
+        newRound.Players = players;
+
+        _serverContext.Rounds.Update(newRound);
+
+        await _serverContext.SaveChangesAsync();
+       
+        return newRound.Adapt<RoundModel>();
     }
 
     [Obsolete(message: "Not used in new version. Please use UpdateRoundAsync")]
     public Task<RoundModel> MakeMoveAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<OneOf<RoundModel, CustomException>> UpdateAsync(string userId, RoundModel roundModel)
     {
         throw new NotImplementedException();
     }

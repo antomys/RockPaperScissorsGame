@@ -1,24 +1,39 @@
-﻿using System;
-
-namespace Server.Bll.Models;
+﻿namespace Server.Bll.Models;
 
 public sealed class RoomModel
 {
-    public int Id { get; set; }
-        
-    public int? RoundId { get; set; }
-        
-    public string RoomCode { get; set; }
+    /// <summary>
+    /// Id of the room. Consists of 5 randomized chars
+    /// </summary>
+    public string Id { get; init; }
+    
+    /// <summary>
+    /// Special code to join a room
+    /// </summary>
+    public string Code { get; set; }
 
-    public RoomPlayersModel RoomPlayers { get; set; }
+    /// <summary>
+    /// Round, linked to this room
+    /// </summary>
+    public RoundModel? Round { get; set; }
+    
+    /// <summary>
+    ///     <see cref="Player"/>.
+    /// </summary>
+    public PlayerModel? Player { get; set; }
 
+    /// <summary>
+    /// Flag is this room is private
+    /// </summary>
     public bool IsPrivate { get; set; }
 
-    public bool IsReady { get; set; }
-
+    /// <summary>
+    /// Flag if room is full
+    /// </summary>
     public bool IsFull { get; set; }
-
-    public DateTimeOffset CreationTime { get; set; }
-
-    public bool IsRoundEnded { get; set; }
+        
+    /// <summary>
+    /// Creation date. After 5 minutes of inactivity will be deleted
+    /// </summary>
+    public long CreationTimeTicks { get; set; }
 }

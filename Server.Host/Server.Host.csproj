@@ -25,7 +25,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Server.Authentication\Server.Authentication.csproj" />
       <ProjectReference Include="..\Server.Bll\Server.Bll.csproj" />
-      <ProjectReference Include="..\Server.Dal\Server.Dal.csproj" />
+      <ProjectReference Include="..\Server.Data\Server.Data.csproj" />
     </ItemGroup>
 
 

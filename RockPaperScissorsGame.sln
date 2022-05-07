@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.Host", "Server.Host\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{B6D69162-F9E0-4165-A288-00FF1D073291}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Dal", "Server.Dal\Server.Dal.csproj", "{1207E8F7-D6FF-4F7D-B5A1-55D96F286430}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Data", "Server.Data\Server.Data.csproj", "{1207E8F7-D6FF-4F7D-B5A1-55D96F286430}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Bll", "Server.Bll\Server.Bll.csproj", "{FCFA76FA-5C19-4FC2-BCD7-E5B1112A5C42}"
 EndProject

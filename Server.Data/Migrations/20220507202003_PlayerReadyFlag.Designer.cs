@@ -2,22 +2,24 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Server.Dal.Context;
+using Server.Data.Context;
 
 #nullable disable
 
 namespace Server.Dal.Migrations
 {
     [DbContext(typeof(ServerContext))]
-    partial class ServerContextModelSnapshot : ModelSnapshot
+    [Migration("20220507202003_PlayerReadyFlag")]
+    partial class PlayerReadyFlag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.4");
 
-            modelBuilder.Entity("Server.Dal.Entities.Account", b =>
+            modelBuilder.Entity("Server.Data.Entities.Account", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -33,7 +35,7 @@ namespace Server.Dal.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Player", b =>
+            modelBuilder.Entity("Server.Data.Entities.Player", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -41,8 +43,14 @@ namespace Server.Dal.Migrations
                     b.Property<string>("AccountId")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsReady")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Move")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("RoomId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RoundId")
                         .HasColumnType("TEXT");
@@ -51,12 +59,14 @@ namespace Server.Dal.Migrations
 
                     b.HasIndex("AccountId");
 
+                    b.HasIndex("RoomId");
+
                     b.HasIndex("RoundId");
 
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Room", b =>
+            modelBuilder.Entity("Server.Data.Entities.Room", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -73,17 +83,12 @@ namespace Server.Dal.Migrations
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("PlayerId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("PlayerId");
 
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Round", b =>
+            modelBuilder.Entity("Server.Data.Entities.Round", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -112,7 +117,7 @@ namespace Server.Dal.Migrations
                     b.ToTable("Rounds");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Statistics", b =>
+            modelBuilder.Entity("Server.Data.Entities.Statistics", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -155,39 +160,34 @@ namespace Server.Dal.Migrations
                     b.ToTable("Statistics");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Player", b =>
+            modelBuilder.Entity("Server.Data.Entities.Player", b =>
                 {
-                    b.HasOne("Server.Dal.Entities.Account", "Account")
+                    b.HasOne("Server.Data.Entities.Account", "Account")
                         .WithMany()
                         .HasForeignKey("AccountId");
 
-                    b.HasOne("Server.Dal.Entities.Round", null)
+                    b.HasOne("Server.Data.Entities.Room", null)
+                        .WithMany("Players")
+                        .HasForeignKey("RoomId");
+
+                    b.HasOne("Server.Data.Entities.Round", null)
                         .WithMany("Players")
                         .HasForeignKey("RoundId");
 
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Room", b =>
+            modelBuilder.Entity("Server.Data.Entities.Round", b =>
                 {
-                    b.HasOne("Server.Dal.Entities.Player", "Player")
-                        .WithMany()
-                        .HasForeignKey("PlayerId");
-
-                    b.Navigation("Player");
-                });
-
-            modelBuilder.Entity("Server.Dal.Entities.Round", b =>
-                {
-                    b.HasOne("Server.Dal.Entities.Account", "Loser")
+                    b.HasOne("Server.Data.Entities.Account", "Loser")
                         .WithMany()
                         .HasForeignKey("LoserId");
 
-                    b.HasOne("Server.Dal.Entities.Room", "Room")
+                    b.HasOne("Server.Data.Entities.Room", "Room")
                         .WithOne("Round")
-                        .HasForeignKey("Server.Dal.Entities.Round", "RoomId");
+                        .HasForeignKey("Server.Data.Entities.Round", "RoomId");
 
-                    b.HasOne("Server.Dal.Entities.Account", "Winner")
+                    b.HasOne("Server.Data.Entities.Account", "Winner")
                         .WithMany()
                         .HasForeignKey("WinnerId");
 
@@ -198,26 +198,28 @@ namespace Server.Dal.Migrations
                     b.Navigation("Winner");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Statistics", b =>
+            modelBuilder.Entity("Server.Data.Entities.Statistics", b =>
                 {
-                    b.HasOne("Server.Dal.Entities.Account", "Account")
+                    b.HasOne("Server.Data.Entities.Account", "Account")
                         .WithOne("Statistics")
-                        .HasForeignKey("Server.Dal.Entities.Statistics", "AccountId");
+                        .HasForeignKey("Server.Data.Entities.Statistics", "AccountId");
 
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Account", b =>
+            modelBuilder.Entity("Server.Data.Entities.Account", b =>
                 {
                     b.Navigation("Statistics");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Room", b =>
+            modelBuilder.Entity("Server.Data.Entities.Room", b =>
                 {
+                    b.Navigation("Players");
+
                     b.Navigation("Round");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Round", b =>
+            modelBuilder.Entity("Server.Data.Entities.Round", b =>
                 {
                     b.Navigation("Players");
                 });

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6</TargetFramework>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Server.Dal\Server.Dal.csproj" />
+      <ProjectReference Include="..\Server.Data\Server.Data.csproj" />
     </ItemGroup>
     
 </Project>

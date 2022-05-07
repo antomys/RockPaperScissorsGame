@@ -44,7 +44,7 @@ public sealed class CleanerHostedService : IHostedService
         var roomService = scope.ServiceProvider.GetRequiredService<IRoomService>();
         //todo: timespan to option.
         var rooms = await roomService
-            .RemoveEntityRangeByDate(TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(20));
+            .RemoveRangeAsync(TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(20));
         
         if(rooms > 0)
             _logger.LogInformation("Cleaned {Room} entities", rooms.ToString());

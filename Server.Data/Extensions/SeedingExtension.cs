@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Server.Dal.Context;
-using Server.Dal.Entities;
+using Server.Data.Context;
+using Server.Data.Entities;
 
-namespace Server.Dal.Extensions;
+namespace Server.Data.Extensions;
 
 public static class SeedingExtension
 {

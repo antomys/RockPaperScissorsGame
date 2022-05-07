@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Server.Dal.Entities;
+using Server.Data.Entities;
 
-namespace Server.Dal.Context;
+namespace Server.Data.Context;
 
 public sealed class ServerContext : DbContext
 {

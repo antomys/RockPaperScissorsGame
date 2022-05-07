@@ -12,8 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using OneOf;
 using Server.Authentication.Exceptions;
 using Server.Authentication.Models;
-using Server.Dal.Context;
-using Server.Dal.Entities;
+using Server.Data.Context;
+using Server.Data.Entities;
 
 namespace Server.Authentication.Services;
 

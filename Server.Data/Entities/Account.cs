@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Server.Dal.Entities;
+namespace Server.Data.Entities;
 
 [Table("Accounts")]
 public class Account

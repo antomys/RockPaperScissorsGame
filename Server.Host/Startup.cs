@@ -5,8 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Server.Authentication.Extensions;
-using Server.Dal.Context;
-using Server.Dal.Extensions;
+using Server.Data.Context;
+using Server.Data.Extensions;
 using Server.Host.Extensions;
 
 namespace Server.Host;
