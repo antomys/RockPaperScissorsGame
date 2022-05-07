@@ -17,7 +17,7 @@ public static class AuthenticationExtension
     /// <summary>
     ///     Registers authentication.
     /// </summary>
-    /// <param name="services">Service collection</param>
+    /// <param name="services">Service collection.</param>
     public static IServiceCollection AddAuthentications(this IServiceCollection services)
     {
         _ = services ?? throw new ArgumentNullException(nameof(services));

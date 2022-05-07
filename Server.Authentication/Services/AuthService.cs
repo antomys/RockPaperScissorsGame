@@ -17,10 +17,11 @@ using Server.Data.Entities;
 
 namespace Server.Authentication.Services;
 
+/// <inheritdoc />
 internal sealed class AuthService : IAuthService
 {
     private static readonly JwtSecurityTokenHandler TokenHandler = new();
-    private static SigningCredentials _signingCredentials;
+    private static SigningCredentials _signingCredentials = null!;
     
     private readonly ServerContext _repository;
     private readonly AuthOptions _authOptions;
@@ -28,6 +29,12 @@ internal sealed class AuthService : IAuthService
 
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
+    /// <summary>
+    ///     Constructor.
+    /// </summary>
+    /// <param name="logger"><see cref="ILogger"/>.</param>
+    /// <param name="authOptions"><see cref="AuthOptions"/>.</param>
+    /// <param name="repository"><see cref="ServerContext"/>.</param>
     public AuthService(
         ILogger<AuthService> logger,
         IOptions<AuthOptions> authOptions,
@@ -129,13 +136,6 @@ internal sealed class AuthService : IAuthService
         return new UserException(login.UserInvalidCredentials());
     }
 
-    public Task<int> RemoveAsync(string accountId)
-    {
-        _repository.Accounts.Remove(new Account { Id = accountId });
-
-        return _repository.SaveChangesAsync();
-    }
-        
     private string BuildToken(Account accountModel)
     { 
         var now = DateTime.UtcNow;

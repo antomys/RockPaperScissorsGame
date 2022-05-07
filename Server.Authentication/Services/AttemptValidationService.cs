@@ -3,9 +3,12 @@ using System.Collections.Concurrent;
 
 namespace Server.Authentication.Services;
 
+/// <summary>
+///     Static service with validation features.
+/// </summary>
 internal static class AttemptValidationService
 {
-    // key - userId. Value - failed attempts
+    // key - userId. Value - count of failed attempts
     private static readonly ConcurrentDictionary<string, int> FailedAttempts = new();
     private static readonly ConcurrentDictionary<string, DateTimeOffset> CoolDownCollection = new();
 

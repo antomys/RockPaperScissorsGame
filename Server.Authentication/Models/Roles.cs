@@ -1,17 +1,17 @@
 namespace Server.Authentication.Models;
 
 /// <summary>
-/// User roles
+///     User roles.
 /// </summary>
 public static class Roles
 {
     /// <summary>
-    /// Admin role
+    ///     Admin role.
     /// </summary>
     public const string Admin = "admin";
     
     /// <summary>
-    /// User role
+    ///     User role.
     /// </summary>
     public const string User = "user";
 }
