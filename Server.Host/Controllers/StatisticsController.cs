@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +14,9 @@ using Server.Host.Contracts;
 namespace Server.Host.Controllers;
 
 [ApiController]
-[Route("api/v1/stats")]
+[Route ("api/[controller]")]
+[Consumes(MediaTypeNames.Application.Json)]
+[Produces(MediaTypeNames.Application.Json)]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class StatisticsController : ControllerBase
 {
@@ -21,17 +25,17 @@ public sealed class StatisticsController : ControllerBase
     private int UserId => _applicationUser.Id;
     public StatisticsController(IStatisticsService statisticsService, IApplicationUser applicationUser)
     {
-        _statisticsService = statisticsService;
-        _applicationUser = applicationUser;
+        _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
+        _applicationUser = applicationUser ?? throw new ArgumentNullException(nameof(applicationUser));
     }
 
     [HttpGet("all")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(IEnumerable<StatisticsDto>), (int) HttpStatusCode.OK)]
     [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-    public async Task<IEnumerable<StatisticsModel>> GetOverallStatistics()
+    public Task<IEnumerable<ShortStatisticsModel>> GetOverallStatistics()
     {
-        return await _statisticsService.GetAllStatistics();
+        return _statisticsService.GetAllStatistics();
     }
         
     [HttpGet("personal")]

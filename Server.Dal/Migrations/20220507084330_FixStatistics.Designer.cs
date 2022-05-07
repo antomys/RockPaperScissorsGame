@@ -9,8 +9,8 @@ using Server.Dal.Context;
 namespace Server.Dal.Migrations
 {
     [DbContext(typeof(ServerContext))]
-    [Migration("20210720112106_NewFluentAssertion2")]
-    partial class NewFluentAssertion2
+    [Migration("20220507084330_FixStatistics")]
+    partial class FixStatistics
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,14 +30,33 @@ namespace Server.Dal.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("StatisticsId")
+                    b.HasKey("Id");
+
+                    b.ToTable("Accounts");
+                });
+
+            modelBuilder.Entity("Server.Dal.Entities.Player", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Move")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("RoundId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StatisticsId");
+                    b.HasIndex("AccountId");
 
-                    b.ToTable("Accounts");
+                    b.HasIndex("RoundId");
+
+                    b.ToTable("Players");
                 });
 
             modelBuilder.Entity("Server.Dal.Entities.Room", b =>
@@ -45,6 +64,9 @@ namespace Server.Dal.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("CreationTimeTicks")
                         .HasColumnType("INTEGER");
@@ -55,53 +77,14 @@ namespace Server.Dal.Migrations
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("RoomCode")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("RoomPlayerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("RoundId")
+                    b.Property<int?>("PlayerId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomPlayerId")
-                        .IsUnique();
-
-                    b.HasIndex("RoundId");
+                    b.HasIndex("PlayerId");
 
                     b.ToTable("Rooms");
-                });
-
-            modelBuilder.Entity("Server.Dal.Entities.RoomPlayers", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("FirstPlayerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PlayersCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("SecondPlayerId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FirstPlayerId");
-
-                    b.HasIndex("RoomId")
-                        .IsUnique();
-
-                    b.HasIndex("SecondPlayerId");
-
-                    b.ToTable("RoomPlayers");
                 });
 
             modelBuilder.Entity("Server.Dal.Entities.Round", b =>
@@ -110,25 +93,13 @@ namespace Server.Dal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("FirstPlayerMove")
-                        .HasColumnType("INTEGER");
-
                     b.Property<bool>("IsFinished")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("LastMoveTicks")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("LoserId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("RoomPlayersId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SecondPlayerMove")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("TimeFinishedTicks")
+                    b.Property<int>("RoomId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("WinnerId")
@@ -138,7 +109,7 @@ namespace Server.Dal.Migrations
 
                     b.HasIndex("LoserId");
 
-                    b.HasIndex("RoomPlayersId")
+                    b.HasIndex("RoomId")
                         .IsUnique();
 
                     b.HasIndex("WinnerId");
@@ -164,7 +135,7 @@ namespace Server.Dal.Migrations
                     b.Property<int>("Score")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("TimeSpent")
+                    b.Property<TimeSpan>("TimeSpent")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UsedPaper")
@@ -184,59 +155,34 @@ namespace Server.Dal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId")
+                        .IsUnique();
 
                     b.ToTable("Statistics");
                 });
 
-            modelBuilder.Entity("Server.Dal.Entities.Account", b =>
+            modelBuilder.Entity("Server.Dal.Entities.Player", b =>
                 {
-                    b.HasOne("Server.Dal.Entities.Statistics", "Statistics")
+                    b.HasOne("Server.Dal.Entities.Account", "Account")
                         .WithMany()
-                        .HasForeignKey("StatisticsId");
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Statistics");
+                    b.HasOne("Server.Dal.Entities.Round", null)
+                        .WithMany("Players")
+                        .HasForeignKey("RoundId");
+
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("Server.Dal.Entities.Room", b =>
                 {
-                    b.HasOne("Server.Dal.Entities.RoomPlayers", "RoomPlayers")
-                        .WithOne()
-                        .HasForeignKey("Server.Dal.Entities.Room", "RoomPlayerId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Server.Dal.Entities.Round", "Round")
+                    b.HasOne("Server.Dal.Entities.Player", "Player")
                         .WithMany()
-                        .HasForeignKey("RoundId");
+                        .HasForeignKey("PlayerId");
 
-                    b.Navigation("RoomPlayers");
-
-                    b.Navigation("Round");
-                });
-
-            modelBuilder.Entity("Server.Dal.Entities.RoomPlayers", b =>
-                {
-                    b.HasOne("Server.Dal.Entities.Account", "FirstPlayer")
-                        .WithMany("FirstPlayer")
-                        .HasForeignKey("FirstPlayerId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Server.Dal.Entities.Room", "Room")
-                        .WithOne()
-                        .HasForeignKey("Server.Dal.Entities.RoomPlayers", "RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Server.Dal.Entities.Account", "SecondPlayer")
-                        .WithMany("SecondPlayer")
-                        .HasForeignKey("SecondPlayerId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("FirstPlayer");
-
-                    b.Navigation("Room");
-
-                    b.Navigation("SecondPlayer");
+                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("Server.Dal.Entities.Round", b =>
@@ -245,10 +191,10 @@ namespace Server.Dal.Migrations
                         .WithMany()
                         .HasForeignKey("LoserId");
 
-                    b.HasOne("Server.Dal.Entities.RoomPlayers", "RoomPlayers")
-                        .WithOne()
-                        .HasForeignKey("Server.Dal.Entities.Round", "RoomPlayersId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("Server.Dal.Entities.Room", "Room")
+                        .WithOne("Round")
+                        .HasForeignKey("Server.Dal.Entities.Round", "RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Server.Dal.Entities.Account", "Winner")
@@ -257,7 +203,7 @@ namespace Server.Dal.Migrations
 
                     b.Navigation("Loser");
 
-                    b.Navigation("RoomPlayers");
+                    b.Navigation("Room");
 
                     b.Navigation("Winner");
                 });
@@ -265,8 +211,8 @@ namespace Server.Dal.Migrations
             modelBuilder.Entity("Server.Dal.Entities.Statistics", b =>
                 {
                     b.HasOne("Server.Dal.Entities.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
+                        .WithOne("Statistics")
+                        .HasForeignKey("Server.Dal.Entities.Statistics", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -275,9 +221,17 @@ namespace Server.Dal.Migrations
 
             modelBuilder.Entity("Server.Dal.Entities.Account", b =>
                 {
-                    b.Navigation("FirstPlayer");
+                    b.Navigation("Statistics");
+                });
 
-                    b.Navigation("SecondPlayer");
+            modelBuilder.Entity("Server.Dal.Entities.Room", b =>
+                {
+                    b.Navigation("Round");
+                });
+
+            modelBuilder.Entity("Server.Dal.Entities.Round", b =>
+                {
+                    b.Navigation("Players");
                 });
 #pragma warning restore 612, 618
         }

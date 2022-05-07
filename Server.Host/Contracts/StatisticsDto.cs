@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Server.Host.Contracts;
 
 public sealed class StatisticsDto
 {
-    [JsonProperty("Login")]
+    [JsonPropertyName("Login")]
     public string Login { get; set; }
         
-    [JsonProperty("Score")]
+    [JsonPropertyName("Score")]
     public int Score { get; set; }
 }

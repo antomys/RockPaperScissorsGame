@@ -23,7 +23,7 @@ internal sealed class LongPollingService : ILongPollingService
     public async Task<bool> CheckRoundState(int roundId)
     {
         var thisRound = await _serverContext.Rounds.FindAsync(roundId.ToString());
-            
-        return thisRound is {WinnerId: null};
+
+        return thisRound.IsFinished;
     }
 }

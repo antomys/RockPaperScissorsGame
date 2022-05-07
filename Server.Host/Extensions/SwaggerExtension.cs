@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
@@ -21,7 +20,7 @@ public static class SwaggerExtension
 
         services.AddSwaggerGen(options =>
         {
-            options.IncludeXmlComments($"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+            // options.IncludeXmlComments($"{Assembly.GetExecutingAssembly().GetName().Name}.XML");
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "RPC Host", Version = "v1" });
 
             options.AddSecurityRequirement(

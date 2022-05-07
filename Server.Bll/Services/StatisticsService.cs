@@ -17,11 +17,11 @@ internal sealed class StatisticsService : IStatisticsService
         _repository = repository;
     }
 
-    public async Task<IEnumerable<StatisticsModel>> GetAllStatistics()
+    public async Task<IEnumerable<ShortStatisticsModel>> GetAllStatistics()
     {
         return await _repository
             .StatisticsEnumerable
-            .ProjectToType<StatisticsModel>()
+            .ProjectToType<ShortStatisticsModel>()
             .ToArrayAsync();
     }
 

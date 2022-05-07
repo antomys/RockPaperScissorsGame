@@ -1,14 +1,14 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Server.Bll.Services;
 using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
 
 [ApiController]
-[Route("api/v1")]
+[Route ("api")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class LongPollingController : ControllerBase
 {
@@ -16,18 +16,18 @@ public sealed class LongPollingController : ControllerBase
 
     public LongPollingController(ILongPollingService longPollingService)
     {
-        _longPollingService = longPollingService;
+        _longPollingService = longPollingService ?? throw new ArgumentNullException(nameof(longPollingService));
     }
 
     [HttpGet("room")]
-    public async Task<bool> CheckRoomState([FromQuery] int roomId)
+    public Task<bool> CheckRoomState([FromQuery] int roomId)
     {
-        return await _longPollingService.CheckRoomState(roomId);
+        return _longPollingService.CheckRoomState(roomId);
     }
         
     [HttpGet("round")]
-    public async Task<bool> CheckRoundState(int roundId)
+    public Task<bool> CheckRoundState(int roundId)
     {
-        return await _longPollingService.CheckRoundState(roundId);
+        return _longPollingService.CheckRoundState(roundId);
     }
 }

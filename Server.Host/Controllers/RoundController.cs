@@ -14,7 +14,7 @@ namespace Server.Host.Controllers;
 /// API Round Controller
 /// </summary>
 [ApiController]
-[Route("api/v1/round")]
+[Route ("api/[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class RoundController:ControllerBase

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Server.Dal.Entities;
@@ -9,29 +10,17 @@ public class Round
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; init; }
+
+    [ForeignKey("Room")]
+    public int RoomId { get; set; }
     
-    public int RoomPlayersId { get; set; }
+    public virtual Room Room { get; set; }
     
-    [ForeignKey("RoomPlayersId")]
-    public virtual RoomPlayers RoomPlayers { get; set; }
+    public virtual ICollection<Player> Players { get; set; }
     
-    public int FirstPlayerMove { get; set; }
-   
-    public int SecondPlayerMove { get; set; }
-    
-    public int? WinnerId { get; set; }
-    
-    [ForeignKey("WinnerId")]
     public virtual Account Winner { get; set; }
     
-    public int? LoserId { get; set; }
-    
-    [ForeignKey("LoserId")]
     public virtual Account Loser { get; set; }
-    
-    public long LastMoveTicks { get; set; }
-    
-    public long TimeFinishedTicks { get; set; }
-    
+
     public bool IsFinished { get; set; }
 }

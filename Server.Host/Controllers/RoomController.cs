@@ -11,7 +11,8 @@ using Server.Bll.Services.Interfaces;
 namespace Server.Host.Controllers;
 
 [ApiController]
-[Route("api/v1/room/")]
+[Route ("api/[controller]")]
+[Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class RoomController : ControllerBase

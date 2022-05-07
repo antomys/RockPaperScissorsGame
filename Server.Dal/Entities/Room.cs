@@ -11,29 +11,19 @@ public class Room
     /// </summary>
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public int Id { get; init; }
         
     /// <summary>
     /// Special code to join a room
     /// </summary>
-    public string RoomCode { get; set; }
-        
-    /// <summary>
-    /// Id of current round
-    /// </summary>
-    public int? RoundId { get; set; }
-        
+    public string Code { get; set; }
+
     /// <summary>
     /// Round, linked to this room
     /// </summary>
-    [ForeignKey("RoundId")]
     public virtual Round Round { get; set; }
-        
-    public int? RoomPlayerId { get; set; }
-        
-    [ForeignKey("RoomPlayerId")]
-    public virtual RoomPlayers RoomPlayers { get; set; }
-        
+    public virtual Player Player { get; set; }
+
     /// <summary>
     /// Flag is this room is private
     /// </summary>

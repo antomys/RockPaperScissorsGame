@@ -1,8 +1,10 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Server.Authentication.Exceptions;
 using Server.Authentication.Services;
 using Server.Host.Contracts;
 using Server.Host.Contracts.Requests;
@@ -10,7 +12,7 @@ using Server.Host.Contracts.Requests;
 namespace Server.Host.Controllers;
 
 [ApiController]
-[Route ("api/v1/account/")]
+[Route ("api/[controller]")]
 [Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 public sealed class AccountController : ControllerBase
@@ -19,47 +21,40 @@ public sealed class AccountController : ControllerBase
 
     public AccountController(IAuthService authService)
     {
-        _authService = authService;
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
     }
     
     [HttpPost("register")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
-    [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> Register(RegisterRequest registerRequest)
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserException),StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RegisterAsync(RegisterRequest registerRequest)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest();
-        }
-        
         var newAccount = await _authService
             .RegisterAsync(registerRequest.Login,registerRequest.Password);
         
         return newAccount.Match<IActionResult>(
-            _ => Ok(),
-            exception => BadRequest(exception));
+            statusCode => Ok(statusCode),
+            userException => BadRequest(userException));
     }
 
     [HttpPost("login")]
-    [ProducesResponseType(typeof(string),(int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> Login(AccountDto accountDto)
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserException),StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> LoginAsync(AccountDto accountDto)
     {
-        if (!ModelState.IsValid) return BadRequest();
         var newAccount =
             await _authService.LoginAsync(accountDto.Login, accountDto.Password);
             
         return newAccount.Match<IActionResult>(
-            Ok,
+            statusCode => Ok(statusCode),
             userException => BadRequest(userException));
     }
         
     [HttpGet("logout")]
     [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]
     [ProducesResponseType(typeof(int), (int) HttpStatusCode.BadRequest)]
-    public ActionResult<int> Logout(string sessionId)
+    public ActionResult<string> Logout(string sessionId)
     {
-        return Ok(sessionId);
+        return sessionId;
     }
 }

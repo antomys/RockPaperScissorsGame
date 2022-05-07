@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Dal.Context;
 
 namespace Server.Dal.Migrations
 {
     [DbContext(typeof(ServerContext))]
-    partial class ServerContextModelSnapshot : ModelSnapshot
+    [Migration("20220507084026_InitialCommit")]
+    partial class InitialCommit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,7 +135,7 @@ namespace Server.Dal.Migrations
                     b.Property<int>("Score")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeSpan>("TimeSpent")
+                    b.Property<string>("TimeSpent")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UsedPaper")

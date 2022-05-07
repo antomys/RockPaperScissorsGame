@@ -66,22 +66,23 @@ internal sealed class AuthService : IAuthService
             {
                 Login = login,
                 Password = password.EncodeBase64(),
+                Statistics = new Statistics()
             };
                 
-            await _accounts.AddAsync(account);
+            _accounts.Add(account);
             await _repository.SaveChangesAsync();
 
-            var accountStatistics = new Statistics
-            {
-                AccountId = account.Id
-            };
-            
-            await _repository.StatisticsEnumerable.AddAsync(accountStatistics);
-            await _repository.SaveChangesAsync();
-
-            account.StatisticsId = accountStatistics.Id;
-            
-            await _repository.SaveChangesAsync();
+            // var accountStatistics = new Statistics
+            // {
+            //     AccountId = account.Id
+            // };
+            //
+            // await _repository.StatisticsEnumerable.AddAsync(accountStatistics);
+            // await _repository.SaveChangesAsync();
+            //
+            // account.StatisticsId = accountStatistics.Id;
+            //
+            // await _repository.SaveChangesAsync();
             
             return StatusCodes.Status200OK;
         }

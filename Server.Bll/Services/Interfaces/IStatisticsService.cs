@@ -6,6 +6,6 @@ namespace Server.Bll.Services.Interfaces;
 
 public interface IStatisticsService
 {
-    Task<IEnumerable<StatisticsModel>> GetAllStatistics();
+    Task<IEnumerable<ShortStatisticsModel>> GetAllStatistics();
     Task<StatisticsModel> GetPersonalStatistics(int userId);
 }
