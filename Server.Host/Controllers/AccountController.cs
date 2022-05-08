@@ -33,7 +33,7 @@ public sealed class AccountController : ControllerBase
             .RegisterAsync(registerRequest.Login,registerRequest.Password);
         
         return newAccount.Match<IActionResult>(
-            statusCode => Ok(statusCode),
+            statusCode => Ok(statusCode.ToString()),
             userException => BadRequest(userException));
     }
 

@@ -5,6 +5,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.Authentication.Models.Interfaces;
 using Server.Bll.Exceptions;
@@ -34,8 +35,8 @@ public sealed class StatisticsController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet("all")]
-    [ProducesResponseType(typeof(ShortStatisticsModel[]), (int) HttpStatusCode.OK)]
-    [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ShortStatisticsModel[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public Task<ShortStatisticsModel[]> GetOverallStatistics()
     {
         return _statisticsService.GetAllStatistics();
@@ -43,8 +44,8 @@ public sealed class StatisticsController : ControllerBase
         
     [Authorize]
     [HttpGet("personal")]
-    [ProducesResponseType(typeof(StatisticsModel), (int) HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(CustomException), (int) HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(StatisticsModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CustomException), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetPersonalStatistics()
     {
         var result = await _statisticsService.GetPersonalStatistics(UserId);

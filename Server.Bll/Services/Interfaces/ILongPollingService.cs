@@ -4,6 +4,7 @@ namespace Server.Bll.Services.Interfaces;
 
 public interface ILongPollingService
 {
-    Task<bool> CheckRoomState(int roomId);
-    Task<bool> CheckRoundState(int roundId);
+    Task<bool> CheckRoomState(string roomId);
+    
+    Task<bool> CheckRoundState(string roundId);
 }

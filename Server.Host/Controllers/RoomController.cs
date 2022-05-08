@@ -33,7 +33,9 @@ public sealed class RoomController : ControllerBase
     [HttpPost("create")]
     //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> CreateRoom([FromQuery] bool isPrivate, 
+    
+    public async Task<IActionResult> CreateRoom(
+        [FromQuery] bool isPrivate, 
         [FromHeader(Name="X-Training")] bool isTraining = false)
     {
         throw new NotImplementedException();

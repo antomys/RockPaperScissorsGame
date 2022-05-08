@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Server.Bll.Services.Interfaces;
 using Server.Data.Context;
 
@@ -13,17 +14,15 @@ internal sealed class LongPollingService : ILongPollingService
         _serverContext = serverContext;
     }
 
-    public async Task<bool> CheckRoomState(int roomId)
+    public Task<bool> CheckRoomState(string roomId)
     {
-        var thisRoom = await _serverContext.Rooms.FindAsync(roomId.ToString());
-            
-        return thisRoom is not null;
+        return _serverContext.Rooms.AnyAsync(room => room.Id.Equals(roomId));
     }
 
-    public async Task<bool> CheckRoundState(int roundId)
+    public async Task<bool> CheckRoundState(string roundId)
     {
-        var thisRound = await _serverContext.Rounds.FindAsync(roundId.ToString());
+        var thisRound = await _serverContext.Rounds.FirstOrDefaultAsync(rounds => rounds.Id.Equals(roundId));
 
-        return thisRound.IsFinished;
+        return thisRound?.IsFinished ?? false;
     }
 }

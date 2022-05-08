@@ -1,8 +1,11 @@
 using System;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Server.Authentication.Exceptions;
 using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
@@ -20,13 +23,15 @@ public sealed class LongPollingController : ControllerBase
     }
 
     [HttpGet("room")]
-    public Task<bool> CheckRoomState([FromQuery] int roomId)
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    public Task<bool> CheckRoomState([FromQuery] string roomId)
     {
         return _longPollingService.CheckRoomState(roomId);
     }
         
     [HttpGet("round")]
-    public Task<bool> CheckRoundState(int roundId)
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    public Task<bool> CheckRoundState(string roundId)
     {
         return _longPollingService.CheckRoundState(roundId);
     }
