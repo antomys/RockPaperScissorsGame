@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Server.Bll.Services.Interfaces;
@@ -11,7 +12,7 @@ internal sealed class LongPollingService : ILongPollingService
 
     public LongPollingService(ServerContext serverContext)
     {
-        _serverContext = serverContext;
+        _serverContext = serverContext ?? throw new ArgumentNullException(nameof(serverContext));
     }
 
     public Task<bool> CheckRoomState(string roomId)

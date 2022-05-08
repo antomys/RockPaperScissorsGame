@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Server.Authentication.Models;
-using Server.Authentication.Models.Interfaces;
 using Server.Authentication.Services;
 
 namespace Server.Authentication.Extensions;
@@ -49,8 +47,7 @@ public static class AuthenticationExtension
             });
 
         services
-            .AddTransient<IAuthService, AuthService>()
-            .AddTransient<IApplicationUser, ApplicationUser>();
+            .AddTransient<IAuthService, AuthService>();
 
         return services;
     }

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Server.Authentication.Models.Interfaces;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 
@@ -20,16 +19,15 @@ namespace Server.Host.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class RoundController:ControllerBase
 {
-    private readonly IApplicationUser _applicationUser;
     private readonly IRoundService _roundService;
-    private string UserId => _applicationUser.Id;
-    public RoundController(
-        IRoundService roundService, 
-        IApplicationUser applicationUser)
+
+    public RoundController(IRoundService roundService)
     {
-        _roundService = roundService;
-        _applicationUser = applicationUser;
+        _roundService = roundService ?? throw new ArgumentNullException(nameof(roundService));
     }
+
+    private string UserId => User.Identity?.Name ?? string.Empty;
+    
     /// <summary>
     /// Creates round in room
     /// </summary>

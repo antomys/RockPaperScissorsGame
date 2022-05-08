@@ -8,7 +8,9 @@ namespace Server.Data.Extensions;
 public static class DatabaseExtension
 {
     private const string DatabaseConnection = "DatabaseConnection";
+    
     private const string MigrationAssemblyName = "Server.Data";
+    
     public static IServiceCollection AddDatabase(this IServiceCollection service, IConfiguration configuration)
     {
         return service.AddDbContext<ServerContext>(

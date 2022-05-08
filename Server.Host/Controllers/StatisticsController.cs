@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Server.Authentication.Models.Interfaces;
 using Server.Bll.Exceptions;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
-using Server.Host.Contracts;
 
 namespace Server.Host.Controllers;
 
@@ -23,16 +19,14 @@ namespace Server.Host.Controllers;
 public sealed class StatisticsController : ControllerBase
 {
     private readonly IStatisticsService _statisticsService;
-    private readonly IApplicationUser _applicationUser;
-    
-    private string UserId => _applicationUser.Id;
-   
-    public StatisticsController(IStatisticsService statisticsService, IApplicationUser applicationUser)
+
+    public StatisticsController(IStatisticsService statisticsService)
     {
         _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
-        _applicationUser = applicationUser ?? throw new ArgumentNullException(nameof(applicationUser));
     }
 
+    private string UserId => User.Identity?.Name ?? string.Empty;
+    
     [AllowAnonymous]
     [HttpGet("all")]
     [ProducesResponseType(typeof(ShortStatisticsModel[]), StatusCodes.Status200OK)]

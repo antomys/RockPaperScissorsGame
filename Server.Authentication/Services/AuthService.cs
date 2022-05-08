@@ -26,7 +26,6 @@ internal sealed class AuthService : IAuthService
     private readonly ServerContext _repository;
     private readonly AuthOptions _authOptions;
     private readonly ILogger<AuthService> _logger;
-
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     /// <summary>

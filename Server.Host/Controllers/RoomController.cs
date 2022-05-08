@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Server.Authentication.Models.Interfaces;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 
@@ -19,17 +18,13 @@ namespace Server.Host.Controllers;
 public sealed class RoomController : ControllerBase
 {
     private readonly IRoomService _roomService;
-    private readonly IApplicationUser _applicationUser;
 
-    public RoomController(
-        IRoomService roomService, 
-        IApplicationUser applicationUser)
+    public RoomController(IRoomService roomService)
     {
         _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
-        _applicationUser = applicationUser ?? throw new ArgumentNullException(nameof(applicationUser));
     }
 
-    private string UserId => _applicationUser.Id;
+    private string UserId => User.Identity?.Name ?? string.Empty;
     
     [HttpPost("create")]
     [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
