@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.Authentication.Models.Interfaces;
 using Server.Bll.Models;
@@ -20,7 +20,6 @@ public sealed class RoomController : ControllerBase
 {
     private readonly IRoomService _roomService;
     private readonly IApplicationUser _applicationUser;
-    private string UserId => _applicationUser.Id;
 
     public RoomController(
         IRoomService roomService, 
@@ -30,70 +29,71 @@ public sealed class RoomController : ControllerBase
         _applicationUser = applicationUser ?? throw new ArgumentNullException(nameof(applicationUser));
     }
 
-    [HttpPost("create")]
-    //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+    private string UserId => _applicationUser.Id;
     
-    public async Task<IActionResult> CreateRoom(
+    [HttpPost("create")]
+    [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateAsync(
         [FromQuery] bool isPrivate, 
         [FromHeader(Name="X-Training")] bool isTraining = false)
     {
-        throw new NotImplementedException();
-        // var newRoom = await _roomService
-        //     .CreateAsync(UserId, isPrivate, isTraining);
-        //
-        // return newRoom.Match<IActionResult>(
-        //     Ok,
-        //     exception => BadRequest(exception));
+        var newRoom = await _roomService
+            .CreateAsync(UserId, isPrivate, isTraining);
+        
+        return newRoom.Match<IActionResult>(
+            roomModel => Ok(roomModel),
+            exception => BadRequest(exception));
     }
 
     [HttpPost("join/public")]
-    public async Task<IActionResult> JoinPublicRoom()
+    [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> JoinPublicAsync()
     {
-        throw new NotImplementedException();
-        // var result = await _roomService.JoinAsync(UserId, true,null);
-        // return result.Match<IActionResult>(
-        //     Ok,
-        //     exception => BadRequest(exception));
+        var result = await _roomService.JoinAsync(UserId, true);
+        
+        return result.Match<IActionResult>(
+            roomModel => Ok(roomModel),
+            exception => BadRequest(exception));
     }
     [HttpPost("join/private")]
-    //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> JoinPrivateRoom([FromQuery] string roomCode)
+    [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> JoinPrivateAsync([FromQuery] string roomCode)
     {
-        throw new NotImplementedException();
-        // var result = await _roomService.JoinAsync(UserId, false, roomCode);
-        // return result.Match<IActionResult>(
-        //     Ok,
-        //     exception => BadRequest(exception));
+        var result = await _roomService.JoinAsync(UserId, false, roomCode);
+        
+        return result.Match<IActionResult>(
+            roomModel => Ok(roomModel),
+            exception => BadRequest(exception));
     }
         
     [HttpGet("update")]
-    //[ProducesResponseType(typeof(Room), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> UpdateRoom([FromBody] RoomModel roomModel)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateAsync([FromBody] RoomModel roomModel)
     {
-        throw new NotImplementedException();
-        // var updateResponse = await _roomService.UpdateRoom(roomModel);
-        //
-        // return updateResponse switch
-        // {
-        //     200 => Ok(),
-        //     _ => BadRequest()
-        // };
+        var updateResponse = await _roomService.UpdateAsync(roomModel);
+        
+        return updateResponse switch
+        {
+            StatusCodes.Status200OK => Ok(),
+            _ => BadRequest()
+        };
     }
         
     [HttpDelete("delete")]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> DeleteRoom([FromQuery] int roomId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteAsync([FromQuery] string roomId)
     {
-        throw new NotImplementedException();
-        // var deleteResponse = await _roomService.DeleteAsync(UserId,roomId);
-        //     
-        // return deleteResponse switch
-        // {
-        //     200 => Ok(),
-        //     _ => BadRequest()
-        // };
+        var deleteResponse = await _roomService.DeleteAsync(UserId, roomId);
+            
+        return deleteResponse switch
+        {
+            StatusCodes.Status200OK => Ok(),
+            _ => BadRequest()
+        };
     }
 }

@@ -12,7 +12,7 @@ public interface IRoomService
     
     Task<int> RemoveRangeAsync(TimeSpan roomOutDate, TimeSpan roundOutDate);
     
-    Task<OneOf<RoomModel, CustomException>> JoinAsync(string userId, bool isPrivate, string roomCode);
+    Task<OneOf<RoomModel, CustomException>> JoinAsync(string userId, bool isPrivate, string? roomCode = default);
     
     Task<OneOf<RoomModel, CustomException>> GetAsync(string roomId);
     

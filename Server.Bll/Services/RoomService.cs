@@ -229,7 +229,7 @@ internal sealed class RoomService : IRoomService
         return rooms.Length + allRounds.Length;
     }
 
-    public Task<OneOf<RoomModel, CustomException>> JoinAsync(string userId, bool isPrivate, string roomCode)
+    public Task<OneOf<RoomModel, CustomException>> JoinAsync(string userId, bool isPrivate, string? roomCode = default)
     {
         throw new NotImplementedException();
     }
