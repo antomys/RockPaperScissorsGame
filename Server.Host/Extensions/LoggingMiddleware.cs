@@ -23,15 +23,8 @@ internal sealed class LoggingMiddleware
         
     public async Task Invoke(HttpContext context)
     {
-        var requestInformation = 
-            "Request information:\n" + 
-            $"Schema:{context.Request.Scheme}\n" +
-            $"Content-Type:{context.Request.ContentType}" +
-            $"Host:{context.Request.Host}\n" +
-            $"Path:{context.Request.Path}\n" +
-            $"QueryString:{context.Request.QueryString}\n" +
-            $"Request Body:{await ObtainRequestBody(context.Request)}\n";
-        
+        var requestInformation = await BuildLog(context);
+
         _logger.LogWarning(requestInformation);
 
         var originalResponseBody = context.Response.Body;
@@ -43,8 +36,8 @@ internal sealed class LoggingMiddleware
         var status = GetStatusCode(context);
         var level = GetLogLevel(status);
 
-        _logger.Log(level, "Response body: LogLevel: {0}; Code: {1}\n Body: {2}",
-            GetLogLevel(status),status,await ObtainResponseBody(context));
+        _logger.Log(level, "Response body: LogLevel: {Enum}; Code: {Status}\n Body: {Body}",
+            Enum.GetName(GetLogLevel(status)), status.ToString(), await ObtainResponseBody(context));
 
         await responseBody.CopyToAsync(originalResponseBody);
 
@@ -63,6 +56,7 @@ internal sealed class LoggingMiddleware
         request.Body.Seek(0, SeekOrigin.Begin);
         return bodyStr;
     }
+    
     private static async Task<string> ObtainResponseBody(HttpContext context)
     {
         var response = context.Response;
@@ -74,13 +68,15 @@ internal sealed class LoggingMiddleware
         response.Body.Seek(0, SeekOrigin.Begin);
         return text;
     }
-    private static Encoding GetEncodingFromContentType(string contentTypeStr)
+    
+    private static Encoding GetEncodingFromContentType(string? contentTypeStr)
     {
         if (string.IsNullOrEmpty(contentTypeStr))
         {
             return Encoding.UTF8;
         }
         ContentType contentType;
+        
         try
         {
             contentType = new ContentType(contentTypeStr);
@@ -89,6 +85,7 @@ internal sealed class LoggingMiddleware
         {
             return Encoding.UTF8;
         }
+        
         return string.IsNullOrEmpty(contentType.CharSet) 
             ? Encoding.UTF8 
             : Encoding.GetEncoding(contentType.CharSet, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback);
@@ -101,5 +98,85 @@ internal sealed class LoggingMiddleware
     {
         return context.Response.StatusCode;
     }
+
+    private static async Task<string> BuildLog(HttpContext context)
+    {
+        var requestBody = await ObtainRequestBody(context.Request);
         
+        var length = 89 +
+                     context.Request.Scheme.Length +
+                     context.Request.ContentType?.Length +
+                     context.Request.Host.Host.Length +
+                     (context.Request.Path.HasValue ? context.Request.Path.Value.Length : 0) +
+                     (context.Request.QueryString.HasValue ? context.Request.QueryString.Value!.Length : 0) +
+                     requestBody.Length ?? 0;
+
+        if (length <= 88)
+        {
+            return string.Empty;
+        }
+
+        return string.Create(length, (context, requestBody), (span, tuple) =>
+        {
+            var index = 0;
+            var tempString = "Request information:\n";
+            tempString.CopyTo(span[..index]);
+            index += tempString.Length;
+
+            tempString = "Schema:";
+            tempString.CopyTo(span[..index]);
+            index += tempString.Length;
+
+            context.Request.Scheme.CopyTo(span[..index]);
+            index += context.Request.Scheme.Length;
+
+            "\n".CopyTo(span[..index++]);
+
+            tempString = "Content-Type:";
+            tempString.CopyTo(span[..index]);
+            index += tempString.Length;
+
+            context.Request.ContentType?.CopyTo(span[..index]);
+            index += context.Request.ContentType?.Length ?? 0;
+
+            "\n".CopyTo(span[..index++]);
+
+            tempString = "Host:";
+            tempString.CopyTo(span[..index]);
+            index += tempString.Length;
+
+            context.Request.Host.Host.CopyTo(span[..index]);
+            index += context.Request.Host.Host.Length;
+
+            "\n".CopyTo(span[..index++]);
+
+            tempString = "Path:";
+            tempString.CopyTo(span[..index]);
+            index += tempString.Length;
+
+            context.Request.Path.Value?.CopyTo(span[..index]);
+            index += context.Request.Path.Value?.Length ?? 0;
+
+            "\n".CopyTo(span[..index++]);
+
+            tempString = "Query String:";
+            tempString.CopyTo(span[..index]);
+            index += tempString.Length;
+
+            context.Request.QueryString.Value?.CopyTo(span[..index]);
+            index += context.Request.QueryString.Value?.Length ?? 0;
+
+            "\n".CopyTo(span[..index++]);
+
+            tempString = "Request Body:";
+            tempString.CopyTo(span[..index]);
+            index += tempString.Length;
+
+            tuple.requestBody.CopyTo(span[..index]);
+            index += tuple.requestBody.Length;
+
+            "\n".CopyTo(span[..index]);
+
+        });
+    }
 }

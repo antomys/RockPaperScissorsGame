@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Server.Authentication.Extensions;
+using Server.Bll.Extensions;
 using Server.Data.Context;
 using Server.Data.Extensions;
 using Server.Host.Extensions;
@@ -27,17 +28,19 @@ public class Startup
             .AddSwagger()
             .AddAuthentications();
         
-        services.AddServices();
+        services.AddBusinessLogic();
             
         services.AddControllers();
            
         services.AddCors();
     }
         
-    public static void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+    public static void Configure(
+        IApplicationBuilder app,
+        IWebHostEnvironment env,
         ServerContext serverContext)
     {
-        serverContext?.Database.Migrate();
+        serverContext.Database.Migrate();
         serverContext?.EnsureBotCreated();
         if (env.IsDevelopment())
         {

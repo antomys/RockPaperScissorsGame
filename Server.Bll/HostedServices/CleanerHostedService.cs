@@ -12,7 +12,7 @@ public sealed class CleanerHostedService : IHostedService
 {
     private readonly IServiceScopeFactory _serviceProvider;
     private readonly ILogger<CleanerHostedService> _logger;
-    private Timer _timer;
+    private Timer? _timer;
         
     // todo: options of max time
 
@@ -37,9 +37,9 @@ public sealed class CleanerHostedService : IHostedService
         return Task.CompletedTask;
     }
 
-    private async void CleanJunk(object state)
+    private async void CleanJunk(object? state)
     {
-        var factory = (IServiceScopeFactory) state;
+        var factory = (IServiceScopeFactory) state!;
         using var scope = factory.CreateScope();
         var roomService = scope.ServiceProvider.GetRequiredService<IRoomService>();
         //todo: timespan to option.

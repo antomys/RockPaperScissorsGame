@@ -48,7 +48,7 @@ internal sealed class RoundService : IRoundService
             Id = Guid.NewGuid().ToString(),
             RoomId = roomId,
             Room = playingRoom,
-            StartTime = DateTimeOffset.UtcNow,
+            StartTimeTicks = DateTimeOffset.UtcNow.Ticks,
             IsFinished = false
         };
 

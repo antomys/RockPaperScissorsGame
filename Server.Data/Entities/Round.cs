@@ -23,9 +23,9 @@ public class Round
     
     public virtual Account Loser { get; set; }
     
-    public DateTimeOffset StartTime { get; set; }
+    public long StartTimeTicks { get; set; }
     
-    public DateTimeOffset FinishTime { get; set; }
+    public long FinishTimeTicks { get; set; }
 
     public bool IsFinished { get; set; }
 }

@@ -210,23 +210,37 @@ internal sealed class RoomService : IRoomService
 
     public async Task<int> RemoveRangeAsync(TimeSpan roomOutDate, TimeSpan roundOutDate)
     {
-        var currentDate = DateTimeOffset.Now.Ticks;
+        var currentDate = DateTimeOffset.UtcNow.Ticks;
            
         var rooms = await _repository.Rooms
                 .Include(room => room.Round)
                 .Where(room => room.CreationTimeTicks + roomOutDate.Ticks < currentDate && room.Round == null)
                 .ToArrayAsync();
-            
-        var allRounds = await _repository.Rounds
-            .Where(round => round.FinishTime.Ticks + roundOutDate.Ticks < currentDate)
-            .ToArrayAsync();
-            
-        _repository.Rooms.RemoveRange(rooms);
-        _repository.Rounds.RemoveRange(allRounds);
-            
-        await _repository.SaveChangesAsync();
+
+        var roomLength = rooms.Length;
         
-        return rooms.Length + allRounds.Length;
+        var allRounds = await _repository.Rounds
+            .Where(round => round.FinishTimeTicks + roundOutDate.Ticks < currentDate)
+            .ToArrayAsync();
+
+        var roundsLength = allRounds.Length;
+        
+        if (roomLength is not 0)
+        {
+            _repository.Rooms.RemoveRange(rooms);   
+        }
+
+        if (roundsLength is not 0)
+        {
+            _repository.Rounds.RemoveRange(allRounds);   
+        }
+
+        if (roundsLength is not 0 && roomLength is not 0)
+        {
+            await _repository.SaveChangesAsync();   
+        }
+
+        return roomLength + roundsLength;
     }
 
     public Task<OneOf<RoomModel, CustomException>> JoinAsync(string userId, bool isPrivate, string? roomCode = default)
