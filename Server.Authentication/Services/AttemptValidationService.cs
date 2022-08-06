@@ -19,7 +19,7 @@ internal static class AttemptValidationService
             if (failedAttempts >= 2)
             {
                 // todo: in options
-                CoolDownCollection.TryAdd(userId, DateTimeOffset.Now.AddMinutes(2));
+                CoolDownCollection.TryAdd(userId, DateTimeOffset.UtcNow.AddMinutes(2));
                 FailedAttempts.TryRemove(userId, out _);
                 
                 return true;
@@ -39,16 +39,16 @@ internal static class AttemptValidationService
 
     public static bool IsCoolDown(this string userId, out DateTimeOffset coolDownDate)
     {
-        var result = CoolDownCollection.TryGetValue(userId, out coolDownDate);
-
-        if (!result)
+        if (!CoolDownCollection.TryGetValue(userId, out coolDownDate))
         {
             return false;
         }
-        if (coolDownDate >= DateTimeOffset.Now)
+        
+        if (coolDownDate >= DateTimeOffset.UtcNow)
         {
             return true;
         }
+        
         CoolDownCollection.TryRemove(userId, out coolDownDate);
 
         return false;

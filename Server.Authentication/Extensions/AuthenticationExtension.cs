@@ -46,8 +46,7 @@ public static class AuthenticationExtension
                 };
             });
 
-        services
-            .AddTransient<IAuthService, AuthService>();
+        services.AddTransient<IAuthService, AuthService>();
 
         return services;
     }

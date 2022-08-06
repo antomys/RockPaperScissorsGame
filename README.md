@@ -1,5 +1,5 @@
 # RockPaperScissorsGame
-This is second project of Parimatch Tech Academy .NET course.
+This is second project of PariMatch Tech Academy .NET course.
 
 [Technical requirement](https://docs.google.com/document/d/13lsfyUkMJBZAiXt8OlBWYdKq9zExdHdDhBBH00s5tv4/edit?usp=sharing)
 

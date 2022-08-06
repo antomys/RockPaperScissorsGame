@@ -20,13 +20,13 @@ namespace Server.Authentication.Services;
 /// <inheritdoc />
 internal sealed class AuthService : IAuthService
 {
+    private static readonly SemaphoreSlim Semaphore = new(initialCount: 1, maxCount: 1);
     private static readonly JwtSecurityTokenHandler TokenHandler = new();
     private static SigningCredentials _signingCredentials = null!;
-    
+
     private readonly ServerContext _repository;
     private readonly AuthOptions _authOptions;
     private readonly ILogger<AuthService> _logger;
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     /// <summary>
     ///     Constructor.
@@ -60,7 +60,7 @@ internal sealed class AuthService : IAuthService
             return new UserException(nameof(password).UserInvalidCredentials());
         }
             
-        var release = await _semaphore.WaitAsync(100);
+        var release = await Semaphore.WaitAsync(100);
 
         try
         {
@@ -101,7 +101,7 @@ internal sealed class AuthService : IAuthService
         {
             if (release)
             {
-                _semaphore.Release();
+                Semaphore.Release();
             }
         }
     }

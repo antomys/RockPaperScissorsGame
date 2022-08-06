@@ -37,7 +37,7 @@ internal sealed class LoggingMiddleware
         var level = GetLogLevel(status);
 
         _logger.Log(level, "Response body: LogLevel: {Enum}; Code: {Status}\n Body: {Body}",
-            Enum.GetName(GetLogLevel(status)), status.ToString(), await ObtainResponseBody(context));
+            Enum.GetName(GetLogLevel(status)), status, await ObtainResponseBody(context));
 
         await responseBody.CopyToAsync(originalResponseBody);
 
@@ -53,6 +53,7 @@ internal sealed class LoggingMiddleware
         {
             bodyStr = await reader.ReadToEndAsync().ConfigureAwait(false);
         }
+        
         request.Body.Seek(0, SeekOrigin.Begin);
         return bodyStr;
     }
@@ -62,10 +63,10 @@ internal sealed class LoggingMiddleware
         var response = context.Response;
         response.Body.Seek(0, SeekOrigin.Begin);
         var encoding = GetEncodingFromContentType(response.ContentType);
-        using var reader = new StreamReader(response.Body, encoding, detectEncodingFromByteOrderMarks:
-            false, bufferSize: 4096, leaveOpen: true);
+        using var reader = new StreamReader(response.Body, encoding, detectEncodingFromByteOrderMarks: false, bufferSize: 4096, leaveOpen: true);
         var text = await reader.ReadToEndAsync().ConfigureAwait(false);
         response.Body.Seek(0, SeekOrigin.Begin);
+        
         return text;
     }
     
@@ -176,7 +177,6 @@ internal sealed class LoggingMiddleware
             index += tuple.requestBody.Length;
 
             "\n".CopyTo(span[..index]);
-
         });
     }
 }
