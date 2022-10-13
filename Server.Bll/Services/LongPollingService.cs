@@ -12,7 +12,7 @@ internal sealed class LongPollingService : ILongPollingService
 
     public LongPollingService(ServerContext serverContext)
     {
-        _serverContext = serverContext ?? throw new ArgumentNullException(nameof(serverContext));
+        _serverContext = serverContext;
     }
 
     public Task<bool> CheckRoomState(string roomId)

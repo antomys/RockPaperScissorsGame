@@ -16,12 +16,12 @@ public class Account
     /// <summary>
     ///     Nick name of Account.
     /// </summary>
-    public string Login { get; set; }
+    public string Login { get; init; }
         
     /// <summary>
     /// Password of the Account
     /// </summary>
-    public string Password { get; set; }
+    public string Password { get; init; }
     
     /// <summary>
     ///     Linked to this player statistics

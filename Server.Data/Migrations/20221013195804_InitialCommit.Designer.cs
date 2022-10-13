@@ -8,16 +8,16 @@ using Server.Data.Context;
 
 #nullable disable
 
-namespace Server.Dal.Migrations
+namespace Server.Data.Migrations
 {
     [DbContext(typeof(ServerContext))]
-    [Migration("20220508144103_DateTimeToLongTicks")]
-    partial class DateTimeToLongTicks
+    [Migration("20221013195804_InitialCommit")]
+    partial class InitialCommit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.4");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.10");
 
             modelBuilder.Entity("Server.Data.Entities.Account", b =>
                 {

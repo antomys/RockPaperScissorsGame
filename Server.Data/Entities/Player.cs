@@ -11,7 +11,7 @@ public class Player
     public string Id { get; init; }
     
     [ForeignKey("Account")]
-    public string AccountId { get; set; }
+    public string AccountId { get; init; }
     
     public virtual Account Account { get; set; }
     

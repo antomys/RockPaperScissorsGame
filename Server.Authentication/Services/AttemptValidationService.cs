@@ -14,6 +14,11 @@ internal static class AttemptValidationService
 
     public static bool TryInsertFailAttempt(this string userId)
     {
+        if (string.IsNullOrEmpty(userId))
+        {
+            return false;
+        }
+        
         if (FailedAttempts.TryGetValue(userId, out var failedAttempts))
         {
             if (failedAttempts >= 2)
@@ -32,6 +37,11 @@ internal static class AttemptValidationService
 
     public static int? CountFailedAttempts(this string userId)
     {
+        if (string.IsNullOrEmpty(userId))
+        {
+            return default;
+        }
+        
         return FailedAttempts.TryGetValue(userId, out var failedAttempts)
             ? failedAttempts
             : default;
@@ -39,6 +49,12 @@ internal static class AttemptValidationService
 
     public static bool IsCoolDown(this string userId, out DateTimeOffset coolDownDate)
     {
+        if (string.IsNullOrEmpty(userId))
+        {
+            coolDownDate = default;
+            return false;
+        }
+        
         if (!CoolDownCollection.TryGetValue(userId, out coolDownDate))
         {
             return false;

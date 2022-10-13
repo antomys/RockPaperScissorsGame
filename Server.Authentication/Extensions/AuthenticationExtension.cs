@@ -18,13 +18,13 @@ public static class AuthenticationExtension
     /// <param name="services">Service collection.</param>
     public static IServiceCollection AddAuthentications(this IServiceCollection services)
     {
-        _ = services ?? throw new ArgumentNullException(nameof(services));
+        ArgumentNullException.ThrowIfNull(services);
 
         services.AddOptions<AuthOptions>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
-            { 
+            {
                 var jwtOptions = services
                     .BuildServiceProvider()
                     .GetRequiredService<IOptions<AuthOptions>>()
@@ -41,7 +41,7 @@ public static class AuthenticationExtension
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
 
-                    IssuerSigningKey = jwtOptions.GetSymmetricSecurityKey(),
+                    IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
                     ValidateIssuerSigningKey = true
                 };
             });

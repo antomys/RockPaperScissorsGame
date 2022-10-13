@@ -9,37 +9,39 @@ namespace Server.Authentication;
 /// </summary>
 public sealed class AuthOptions
 {
+    private static readonly SymmetricSecurityKey DefaultKey = new(Encoding.ASCII.GetBytes(PrivateKey));
+    
     /// <summary>
     ///     Token issuer (producer).
     /// </summary>
-    public string Issuer { get; set; } = "Rock Paper Scissors";
+    public string Issuer { get; init; } = "Rock Paper Scissors";
         
     /// <summary>
     ///     Token audience (consumer).
     /// </summary>
-    public string Audience { get; set; } = "Player";
+    public string Audience { get; init; } = "Player";
 
     /// <summary>
     ///     Token secret part.
     /// </summary>
-    public string PrivateKey { get; set; } = "RockPaperScissors";
-        
+    public static string PrivateKey => "RockPaperScissors";
+
     /// <summary>
     ///     Token life time.
     /// </summary>
-    public TimeSpan LifeTime { get; set; }  = TimeSpan.FromHours(3);
+    public TimeSpan LifeTime { get; init; }  = TimeSpan.FromHours(3);
 
     /// <summary>
     ///     Require HTTPS.
     /// </summary>
-    public bool RequireHttps { get; set; } = false;
+    public bool RequireHttps { get; init; } = false;
 
     /// <summary>
     ///     Getting a symmetric security key.
     /// </summary>
     /// <returns><see cref="SymmetricSecurityKey"/>.</returns>
-    public SymmetricSecurityKey GetSymmetricSecurityKey()
+    public static SymmetricSecurityKey GetSymmetricSecurityKey()
     {
-        return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(PrivateKey));
+        return DefaultKey;
     }
 }

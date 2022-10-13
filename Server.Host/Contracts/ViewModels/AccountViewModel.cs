@@ -2,7 +2,7 @@
 
 public sealed class AccountViewModel
 {
-    public string Token { get; set; }
+    public string Token { get; init; }
         
-    public string Login { get; set; }
+    public string Login { get; init; }
 }

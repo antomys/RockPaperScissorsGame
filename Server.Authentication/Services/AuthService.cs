@@ -20,9 +20,9 @@ namespace Server.Authentication.Services;
 /// <inheritdoc />
 internal sealed class AuthService : IAuthService
 {
+    private static readonly SigningCredentials SigningCredentials = new(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256);
     private static readonly SemaphoreSlim Semaphore = new(initialCount: 1, maxCount: 1);
     private static readonly JwtSecurityTokenHandler TokenHandler = new();
-    private static SigningCredentials _signingCredentials = null!;
 
     private readonly ServerContext _repository;
     private readonly AuthOptions _authOptions;
@@ -42,21 +42,24 @@ internal sealed class AuthService : IAuthService
         _logger = logger;
         _repository = repository;
         _authOptions = authOptions.Value;
-
-        _signingCredentials = new SigningCredentials(_authOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256);
     }
 
     /// <inheritdoc/>
-    public async Task<OneOf<int,UserException>>  
-        RegisterAsync(string login, string password)
+    public async Task<OneOf<int, UserException>> RegisterAsync(
+        string login,
+        string password)
     {
         if (string.IsNullOrWhiteSpace(login))
         {
+            _logger.LogError("Login should not be 'empty'");
+            
             return new UserException(nameof(login).UserInvalidCredentials());
         }
             
         if (string.IsNullOrEmpty(password))
         {
+            _logger.LogError("Password should not be 'empty'");
+            
             return new UserException(nameof(password).UserInvalidCredentials());
         }
             
@@ -66,7 +69,11 @@ internal sealed class AuthService : IAuthService
         {
             if (await _repository.Accounts.AnyAsync(account => account.Login.Equals(login.ToLower())))
             {
-                return new UserException(login.UserAlreadyExists());
+                var exceptionMessage = login.UserAlreadyExists();
+                
+                _logger.LogError("Error occured : {ExceptionMessage}", exceptionMessage);
+                
+                return new UserException(exceptionMessage);
             }
 
             var accountId = Guid.NewGuid().ToString();
@@ -111,14 +118,22 @@ internal sealed class AuthService : IAuthService
     {
         var userAccount = await _repository.Accounts.FirstOrDefaultAsync(account => account.Login.ToLower().Equals(login.ToLower()));
 
+        string exceptionMessage;
+        
         if (userAccount is null)
         {
-            return new UserException(login.UserNotFound());
+            exceptionMessage = login.UserNotFound();
+            _logger.LogWarning("Error occured: {ExceptionMessage}", exceptionMessage);
+            
+            return new UserException(exceptionMessage);
         }
            
         if (login.IsCoolDown(out var coolRequestDate))
         {
-            return new UserException(login.UserCoolDown(coolRequestDate));
+            exceptionMessage = login.UserCoolDown(coolRequestDate);
+            _logger.LogWarning("Error occured: {ExceptionMessage}", exceptionMessage);
+            
+            return new UserException(exceptionMessage);
         }
 
         if (userAccount.Password.IsHashEqual(password))
@@ -131,8 +146,11 @@ internal sealed class AuthService : IAuthService
         }
 
         login.TryInsertFailAttempt();
-            
-        return new UserException(login.UserInvalidCredentials());
+
+        exceptionMessage = login.UserInvalidCredentials();
+        _logger.LogWarning("Error occured: {ExceptionMessage}", exceptionMessage);
+       
+        return new UserException(exceptionMessage);
     }
 
     private string BuildToken(Account accountModel)
@@ -146,7 +164,7 @@ internal sealed class AuthService : IAuthService
             now,
             now.Add(_authOptions.LifeTime),
             now,
-            _signingCredentials);
+            SigningCredentials);
 
         return encodedJwt;
     }

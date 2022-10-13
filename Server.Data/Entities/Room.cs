@@ -17,7 +17,7 @@ public class Room
     /// <summary>
     /// Special code to join a room
     /// </summary>
-    public string Code { get; set; }
+    public string Code { get; init; }
 
     /// <summary>
     /// Round, linked to this room

@@ -5,16 +5,16 @@ namespace Server.Data.Context;
 
 public sealed class ServerContext : DbContext
 {
-    public DbSet<Account> Accounts { get; set; }
+    public DbSet<Account> Accounts { get; init; }
     
-    public DbSet<Room> Rooms { get; set; }
+    public DbSet<Room> Rooms { get; init; }
     
     
-    public DbSet<Player> Players { get; set; }
+    public DbSet<Player> Players { get; init; }
     
-    public DbSet<Round> Rounds { get; set; }
+    public DbSet<Round> Rounds { get; init; }
     
-    public DbSet<Statistics> StatisticsEnumerable { get; set; }
+    public DbSet<Statistics> StatisticsEnumerable { get; init; }
 
     public ServerContext(DbContextOptions<ServerContext> contextOptions)
         :base(contextOptions) { }
@@ -22,6 +22,6 @@ public sealed class ServerContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Round>()
-            .HasQueryFilter(x => !x.IsFinished);
+            .HasQueryFilter(round => !round.IsFinished);
     }
 }

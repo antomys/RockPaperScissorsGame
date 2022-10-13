@@ -7,7 +7,7 @@ using Server.Data.Context;
 
 #nullable disable
 
-namespace Server.Dal.Migrations
+namespace Server.Data.Migrations
 {
     [DbContext(typeof(ServerContext))]
     partial class ServerContextModelSnapshot : ModelSnapshot
@@ -15,7 +15,7 @@ namespace Server.Dal.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.4");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.10");
 
             modelBuilder.Entity("Server.Data.Entities.Account", b =>
                 {

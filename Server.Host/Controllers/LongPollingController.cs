@@ -1,12 +1,10 @@
 using System;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Server.Authentication.Exceptions;
 using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
@@ -17,12 +15,10 @@ namespace Server.Host.Controllers;
 public sealed class LongPollingController : ControllerBase
 {
     private readonly ILongPollingService _longPollingService;
-    private readonly ILogger<LongPollingController> _logger; 
 
     public LongPollingController(ILongPollingService longPollingService, ILogger<LongPollingController> logger)
     {
         _longPollingService = longPollingService ?? throw new ArgumentNullException(nameof(longPollingService));
-        _logger = logger;
     }
 
     [HttpGet("room")]

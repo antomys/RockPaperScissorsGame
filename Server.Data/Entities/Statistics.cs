@@ -9,7 +9,7 @@ public class Statistics
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public string Id { get; set; }
+    public string Id { get; init; }
     
     [ForeignKey("Account")]
     public string AccountId { get; set; }
