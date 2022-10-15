@@ -13,6 +13,10 @@ public interface IClient
         (string HeaderKey, string HeaderValue) headerValues,
         CancellationToken cancellationToken = default);
 
+    Task<bool> GetAsync(
+        string url,
+        CancellationToken cancellationToken);
+
     Task<OneOf<T, CustomException>> PostAsync<T, T1>(
         string url,
         T1 content,

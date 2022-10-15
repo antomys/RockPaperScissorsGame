@@ -23,6 +23,8 @@ public sealed class Startup
         
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddHealthChecks();
+        
         services
             .AddDatabase(Configuration)
             .AddSwagger()
@@ -42,6 +44,7 @@ public sealed class Startup
     {
         serverContext.Database.Migrate();
         serverContext?.EnsureBotCreated();
+        
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -59,8 +62,10 @@ public sealed class Startup
 
         app.UseAuthorization();
 
+        
         app.UseEndpoints(endpoints =>
         {
+            endpoints.MapHealthChecks("/health");
             endpoints.MapControllers();
         });
     }

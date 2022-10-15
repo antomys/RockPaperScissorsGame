@@ -1,6 +1,7 @@
 ﻿using Client.Account.Menus;
 using Client.StartMenu.Enums;
 using Client.StartMenu.Extensions;
+using Client.StartMenu.Services;
 using Client.Statistics.Menus;
 using RockPaperScissors.Common.Extensions;
 
@@ -10,26 +11,35 @@ internal sealed class StartMenu: IStartMenu
 {
     private readonly IAccountMenu _accountMenu;
     private readonly IStatisticsMenu _statisticsMenu;
+    private readonly IHealthCheckService _healthCheckService;
 
-    public StartMenu(IAccountMenu accountMenu, IStatisticsMenu statisticsMenu)
+    public StartMenu(
+        IAccountMenu accountMenu,
+        IStatisticsMenu statisticsMenu,
+        IHealthCheckService healthCheckService)
     {
         _accountMenu = accountMenu ?? throw new ArgumentNullException(nameof(accountMenu));
         _statisticsMenu = statisticsMenu ?? throw new ArgumentNullException(nameof(statisticsMenu));
+        _healthCheckService = healthCheckService ?? throw new ArgumentNullException(nameof(healthCheckService));
     }
 
-    public Task PrintAsync(CancellationToken cancellationToken)
+    public async Task PrintAsync(CancellationToken cancellationToken)
     {
         PrintGreeting();
 
+        await _healthCheckService.ConnectAsync();
+        cancellationToken.ThrowIfCancellationRequested();
+        await Task.Factory.StartNew(() => _healthCheckService.PingAsync(), TaskCreationOptions.LongRunning);
+        cancellationToken.ThrowIfCancellationRequested();
+        
         "\nPress any key to show start up menu list.".Print(ConsoleColor.Green);
 
         Console.ReadKey();
         Console.Clear();
-        //todo: trying to connect to the server
-        
-        return ShowStartAsync(cancellationToken);
+
+        await ShowStartAsync(cancellationToken);
     }
-    
+
     private async Task ShowStartAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)

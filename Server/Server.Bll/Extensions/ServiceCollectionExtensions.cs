@@ -1,7 +1,6 @@
 ﻿using System;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
-using Server.Bll.HostedServices;
 using Server.Bll.Models;
 using Server.Bll.Services;
 using Server.Bll.Services.Interfaces;

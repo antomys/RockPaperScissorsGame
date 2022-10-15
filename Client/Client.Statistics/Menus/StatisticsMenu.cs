@@ -23,23 +23,23 @@ internal sealed class StatisticsMenu: IStatisticsMenu
         while (!cancellationToken.IsCancellationRequested)
         {
             "Statistics Menu:".Print(ConsoleColor.DarkYellow);
-            $"{MenuTypes.All.GetValue()}.\t{MenuTypes.All.GetDisplayName()}".Print(ConsoleColor.DarkYellow);
             $"{MenuTypes.Personal.GetValue()}.\t{MenuTypes.Personal.GetDisplayName()}".Print(ConsoleColor.DarkYellow);
+            $"{MenuTypes.All.GetValue()}.\t{MenuTypes.All.GetDisplayName()}".Print(ConsoleColor.DarkYellow);
             $"{MenuTypes.Back.GetValue()}.\t{MenuTypes.Back.GetDisplayName()}".Print(ConsoleColor.DarkYellow);
 
             "\nPlease select an item from the list".Print(ConsoleColor.Green);
 
             Console.Write("Select -> ");
-            
+
             var menuType = Console.ReadLine().TryGetMenuType();
-            
+
             if (menuType is MenuTypes.Unknown)
             {
                 "Invalid input. Try again.".Print(ConsoleColor.Red);
                 
                 continue;
             }
-             
+
             switch (menuType)
             {
                 case MenuTypes.All:

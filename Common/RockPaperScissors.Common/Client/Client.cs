@@ -81,6 +81,31 @@ public sealed class Client : IClient
         
         return (await JsonSerializer.DeserializeAsync<T>(responseStream, cancellationToken: cancellationToken))!;
     }
+
+    public async Task<bool> GetAsync(
+        string url,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(HttpClient.BaseAddress!, url),
+                Version = HttpClient.DefaultRequestVersion,
+                VersionPolicy = HttpVersionPolicy.RequestVersionOrLower
+            };
+
+            using var response =
+                await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
     
     public async Task<OneOf<T, CustomException>> PostAsync<T, T1>(
         string url,

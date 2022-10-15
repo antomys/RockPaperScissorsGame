@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Server.Bll.Services.Interfaces;
 
-namespace Server.Bll.HostedServices;
+namespace Server.Bll.Services;
 
 public sealed class CleanerHostedService : IHostedService
 {
