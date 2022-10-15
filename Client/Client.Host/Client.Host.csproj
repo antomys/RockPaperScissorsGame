@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6</TargetFramework>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="OneOf" Version="3.0.223" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\RockPaperScissors.Common\RockPaperScissors.Common.csproj" />
+      <ProjectReference Include="..\Client.Account\Client.Account.csproj" />
+      <ProjectReference Include="..\Client.StartMenu\Client.StartMenu.csproj" />
+    </ItemGroup>
+
+</Project>
