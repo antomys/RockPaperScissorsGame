@@ -1,12 +1,13 @@
 ﻿using System.Threading.Tasks;
 using Client.Models;
 
-namespace Client.Menus
+namespace Client.Menus;
+
+public interface IAccountMenu
 {
-    public interface IAccountMenu
-    {
-        Task<bool> RegisterAsync();
-        Task<(string token, TokenModel inputAccount)> LoginAsync();
-        Task<bool> LogoutAsync(string token);
-    }
+    Task<bool> RegisterAsync();
+   
+    Task<(string token, TokenModel inputAccount)> LoginAsync();
+    
+    Task<bool> LogoutAsync(string token);
 }

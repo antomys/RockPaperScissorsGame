@@ -1,12 +1,11 @@
 using Newtonsoft.Json;
 
-namespace Client.Models
+namespace Client.Models;
+
+public class ErrorModel
 {
-    public class ErrorModel
-    {
-        [JsonProperty("Code")]
-        public int Code { get; set; }
-        [JsonProperty("Message")]
-        public string Message { get; set; }
-    }
+    [JsonProperty("Code")]
+    public int Code { get; set; }
+    [JsonProperty("Message")]
+    public string Message { get; set; }
 }

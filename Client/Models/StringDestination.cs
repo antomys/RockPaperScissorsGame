@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Client.Models;
 
-namespace Client.Models
+public enum StringDestination
 {
-    public enum StringDestination
-    {
-        Login,
-        Password,
-        Email,
-        PassportType //If firstname, lastname...(data without digits!)
-    }
+    Login,
+    Password,
+    Email,
+    PassportType //If firstname, lastname...(data without digits!)
 }

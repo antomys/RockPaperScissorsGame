@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Server.Data.Entities;
 
-[Table("Accounts")]
+[Table(nameof(Account))]
 public class Account
 {
     /// <summary>

@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Server.Data.Entities;
 
-[Table("Rounds")]
+[Table(nameof(Round))]
 public class Round
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public string Id { get; init; }
 
-    [ForeignKey("Room")]
+    [ForeignKey(nameof(Room))]
     public string RoomId { get; set; }
     
     public virtual Room Room { get; set; }
@@ -21,10 +21,12 @@ public class Round
     public virtual Account Winner { get; set; }
     
     public virtual Account Loser { get; set; }
+
+    public bool IsFinished { get; init; }
     
     public long StartTimeTicks { get; set; }
     
     public long FinishTimeTicks { get; set; }
-
-    public bool IsFinished { get; init; }
+    
+    public long UpdateTicks { get; set; }
 }

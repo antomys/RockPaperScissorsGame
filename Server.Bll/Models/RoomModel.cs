@@ -1,4 +1,6 @@
-﻿namespace Server.Bll.Models;
+﻿using System.Collections.Generic;
+
+namespace Server.Bll.Models;
 
 public sealed class RoomModel
 {
@@ -16,11 +18,11 @@ public sealed class RoomModel
     /// Round, linked to this room
     /// </summary>
     public RoundModel? Round { get; set; }
-    
+
     /// <summary>
     ///     <see cref="Player"/>.
     /// </summary>
-    public PlayerModel? Player { get; set; }
+    public ICollection<PlayerModel>? Players { get; set; }
 
     /// <summary>
     /// Flag is this room is private

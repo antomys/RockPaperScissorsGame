@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mapster;
@@ -13,7 +12,7 @@ using Server.Data.Entities;
 
 namespace Server.Bll.Services;
 
-internal sealed class RoundService : IRoundService
+internal sealed class RoundService: IRoundService
 {
     private readonly ServerContext _serverContext;
 
@@ -21,16 +20,16 @@ internal sealed class RoundService : IRoundService
     {
         _serverContext = serverContext ?? throw new ArgumentNullException(nameof(serverContext));
     }
+    
     public async Task<OneOf<RoundModel, CustomException>> CreateAsync(string userId, string roomId)
     {
-        var playingRoom = await _serverContext
-            .Rooms
+        var playingRoom = await _serverContext.Rooms
             .Include(rooms => rooms.Players)
             .FirstOrDefaultAsync(room => room.Id.Equals(roomId));
         
         if (playingRoom is null)
         {
-            return new CustomException(ExceptionTemplates.RoomNotExists);
+            return new CustomException(ExceptionTemplates.NotExists(nameof(Room)));
         }
 
         if (!playingRoom.IsFull)
@@ -43,29 +42,25 @@ internal sealed class RoundService : IRoundService
             return new CustomException(ExceptionTemplates.NotAllowed);
         }
 
+        var updateTime = DateTimeOffset.UtcNow.Ticks;
         var newRound = new Round
         {
             Id = Guid.NewGuid().ToString(),
             RoomId = roomId,
             Room = playingRoom,
-            StartTimeTicks = DateTimeOffset.UtcNow.Ticks,
+            StartTimeTicks = updateTime,
+            UpdateTicks = updateTime,
             IsFinished = false
         };
 
-        _serverContext.Rounds.Add(newRound);
-
-        var players = new List<Player>(2)
-        {
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                AccountId = userId,
-            }
-        };
+        playingRoom.UpdateTicks = updateTime;
+        
+        var players = playingRoom.Players;
 
         newRound.Players = players;
 
-        _serverContext.Rounds.Update(newRound);
+        _serverContext.Rounds.Add(newRound);
+        _serverContext.Rooms.Update(playingRoom);
 
         await _serverContext.SaveChangesAsync();
        

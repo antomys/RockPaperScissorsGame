@@ -8,5 +8,6 @@ namespace Server.Bll.Services.Interfaces;
 public interface IStatisticsService
 {
     Task<ShortStatisticsModel[]> GetAllStatistics();
+    
     Task<OneOf<StatisticsModel, CustomException>> GetPersonalStatistics(string userId);
 }

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
@@ -16,22 +15,22 @@ public sealed class LongPollingController : ControllerBase
 {
     private readonly ILongPollingService _longPollingService;
 
-    public LongPollingController(ILongPollingService longPollingService, ILogger<LongPollingController> logger)
+    public LongPollingController(ILongPollingService longPollingService)
     {
         _longPollingService = longPollingService ?? throw new ArgumentNullException(nameof(longPollingService));
     }
 
-    [HttpGet("room")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    public Task<bool> CheckRoomState([FromQuery] string roomId)
+    [HttpGet("Room/{roomId}/status")]
+    [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
+    public Task<long> CheckRoomUpdateTicksAsync(string roomId)
     {
-        return _longPollingService.CheckRoomState(roomId);
+        return _longPollingService.GetRoomUpdateTicksAsync(roomId);
     }
         
-    [HttpGet("round")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    public Task<bool> CheckRoundState(string roundId)
+    [HttpGet("Round/{roundId}/status")]
+    [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
+    public Task<long> CheckRoundUpdateTicksAsync(string roundId)
     {
-        return _longPollingService.CheckRoundState(roundId);
+        return _longPollingService.GetRoundUpdateTicksAsync(roundId);
     }
 }

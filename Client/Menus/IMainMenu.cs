@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Client.Menus
+namespace Client.Menus;
+
+public interface IMainMenu
 {
-    public interface IMainMenu
-    {
-        Task PlayerMenu();
-    }
+    Task PlayerMenu();
 }

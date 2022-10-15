@@ -1,9 +1,8 @@
-﻿namespace Client.Models.Interfaces
+﻿namespace Client.Models.Interfaces;
+
+public interface IOverallStatistics
 {
-    public interface IOverallStatistics
-    {
-        Account Account { get; set; }
-        int Score { get; set; }
-        
-    }
+    Account Account { get; set; }
+    
+    int Score { get; set; }
 }

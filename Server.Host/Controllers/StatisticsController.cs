@@ -16,7 +16,7 @@ namespace Server.Host.Controllers;
 [Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public sealed class StatisticsController : ControllerBase
+public sealed class StatisticsController: ControllerBase
 {
     private readonly IStatisticsService _statisticsService;
 

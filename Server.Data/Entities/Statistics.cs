@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Server.Data.Entities;
 
-[Table("Statistics")]
+[Table(nameof(Statistics))]
 public class Statistics
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public string Id { get; init; }
     
-    [ForeignKey("Account")]
+    [ForeignKey(nameof(Account))]
     public string AccountId { get; set; }
     
     public virtual Account Account { get; set; }

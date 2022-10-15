@@ -11,8 +11,8 @@ using Server.Data.Context;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(ServerContext))]
-    [Migration("20221013195804_InitialCommit")]
-    partial class InitialCommit
+    [Migration("20221015144504_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,7 +32,7 @@ namespace Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Account");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.Player", b =>
@@ -63,7 +63,7 @@ namespace Server.Data.Migrations
 
                     b.HasIndex("RoundId");
 
-                    b.ToTable("Players");
+                    b.ToTable("Player");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.Room", b =>
@@ -83,9 +83,12 @@ namespace Server.Data.Migrations
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("INTEGER");
 
+                    b.Property<long>("UpdateTicks")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Room");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.Round", b =>
@@ -108,6 +111,9 @@ namespace Server.Data.Migrations
                     b.Property<long>("StartTimeTicks")
                         .HasColumnType("INTEGER");
 
+                    b.Property<long>("UpdateTicks")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("WinnerId")
                         .HasColumnType("TEXT");
 
@@ -120,7 +126,7 @@ namespace Server.Data.Migrations
 
                     b.HasIndex("WinnerId");
 
-                    b.ToTable("Rounds");
+                    b.ToTable("Round");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.Statistics", b =>

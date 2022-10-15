@@ -123,6 +123,8 @@ internal sealed class LoggingMiddleware
         return string.Create(length, (context, requestBody), (span, tuple) =>
         {
             var index = 0;
+
+            var (thisContext, thisRequestBody) = tuple;
             
             var tempString = "Request information:\n";
             tempString.CopyTo(span[index..]);
@@ -132,8 +134,8 @@ internal sealed class LoggingMiddleware
             tempString.CopyTo(span[index..]);
             index += tempString.Length;
 
-            context.Request.Scheme.CopyTo(span[index..]);
-            index += context.Request.Scheme.Length;
+            thisContext.Request.Scheme.CopyTo(span[index..]);
+            index += thisContext.Request.Scheme.Length;
 
             "\n".CopyTo(span[index++..]);
 
@@ -141,8 +143,8 @@ internal sealed class LoggingMiddleware
             tempString.CopyTo(span[index..]);
             index += tempString.Length;
 
-            context.Request.ContentType?.CopyTo(span[index..]);
-            index += context.Request.ContentType?.Length ?? 0;
+            thisContext.Request.ContentType?.CopyTo(span[index..]);
+            index += thisContext.Request.ContentType?.Length ?? 0;
 
             "\n".CopyTo(span[index++..]);
 
@@ -150,8 +152,8 @@ internal sealed class LoggingMiddleware
             tempString.CopyTo(span[index..]);
             index += tempString.Length;
 
-            context.Request.Host.Host.CopyTo(span[index..]);
-            index += context.Request.Host.Host.Length;
+            thisContext.Request.Host.Host.CopyTo(span[index..]);
+            index += thisContext.Request.Host.Host.Length;
 
             "\n".CopyTo(span[index++..]);
 
@@ -159,8 +161,8 @@ internal sealed class LoggingMiddleware
             tempString.CopyTo(span[index..]);
             index += tempString.Length;
 
-            context.Request.Path.Value?.CopyTo(span[index..]);
-            index += context.Request.Path.Value?.Length ?? 0;
+            thisContext.Request.Path.Value?.CopyTo(span[index..]);
+            index += thisContext.Request.Path.Value?.Length ?? 0;
 
             "\n".CopyTo(span[index++..]);
 
@@ -168,8 +170,8 @@ internal sealed class LoggingMiddleware
             tempString.CopyTo(span[index..]);
             index += tempString.Length;
 
-            context.Request.QueryString.Value?.CopyTo(span[index..]);
-            index += context.Request.QueryString.Value?.Length ?? 0;
+            thisContext.Request.QueryString.Value?.CopyTo(span[index..]);
+            index += thisContext.Request.QueryString.Value?.Length ?? 0;
 
             "\n".CopyTo(span[index++..]);
 
@@ -177,8 +179,8 @@ internal sealed class LoggingMiddleware
             tempString.CopyTo(span[index..]);
             index += tempString.Length;
 
-            tuple.requestBody.CopyTo(span[index..]);
-            index += tuple.requestBody.Length;
+            thisRequestBody.CopyTo(span[index..]);
+            index += thisRequestBody.Length;
 
             "\n".CopyTo(span[index..]);
         });

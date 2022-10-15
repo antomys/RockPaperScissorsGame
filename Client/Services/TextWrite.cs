@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace Client.Services
+namespace Client.Services;
+
+public static class TextWrite
 {
-    public static class TextWrite
+    public static void Print(string msg, ConsoleColor color)
     {
-        public static void Print(string msg, ConsoleColor color)
-        {
-            Console.ForegroundColor = color;
-            Console.WriteLine(msg);
-            Console.ResetColor();
-        }
+        Console.ForegroundColor = color;
+        Console.WriteLine(msg);
+        Console.ResetColor();
     }
 }

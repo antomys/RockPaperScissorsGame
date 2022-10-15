@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
@@ -16,40 +18,43 @@ public static class SwaggerExtension
     /// <returns>Service collection.</returns>
     public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
-        if (services is null) throw new ArgumentNullException(nameof(services));
+        ArgumentNullException.ThrowIfNull(services);
 
         services.AddSwaggerGen(options =>
         {
-            // options.IncludeXmlComments($"{Assembly.GetExecutingAssembly().GetName().Name}.XML");
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "RPC Host", Version = "v1" });
+            // options.IncludeXmlComments($"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "RPC Host",
+                Version = "v1"
+            });
 
-            options.AddSecurityRequirement(
-                new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Id = "Bearer",
-                                Type = ReferenceType.SecurityScheme
-                            },
-                        },
-                        Array.Empty<string>()
-                    }
-                });
+        var jwtSecurityScheme = new OpenApiSecurityScheme 
+        { 
+            BearerFormat = "JWT",
+            Name = "JWT Authentication",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = JwtBearerDefaults.AuthenticationScheme,
+            Description = "Put **_ONLY_** your JWT Bearer token on text box below!",
 
-            options.AddSecurityDefinition(
-                "Bearer",
-                new OpenApiSecurityScheme
-                {
-                    Type = SecuritySchemeType.ApiKey,
-                    In = ParameterLocation.Header,
-                    Scheme = "Bearer",
-                    Name = "Authorization",
-                    Description = "JWT token",
-                    BearerFormat = "JWT"
-                });
+            Reference = new OpenApiReference
+            {
+                 Id = JwtBearerDefaults.AuthenticationScheme,
+                 Type = ReferenceType.SecurityScheme
+            }
+        };
+        
+        options.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+        
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement 
+        {
+            {
+                jwtSecurityScheme,
+                Array.Empty<string>()
+            } 
+        }); 
+        
         });
 
         return services;

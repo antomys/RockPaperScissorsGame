@@ -1,9 +1,8 @@
-﻿namespace Client.Services.RequestProcessor.RequestModels
+﻿namespace Client.Services.RequestProcessor.RequestModels;
+
+public interface IResponse
 {
-    public interface IResponse
-    {
-        public bool Handled { get; }
-        public int Code { get; }
-        public string Content { get; }
-    }
+    public bool Handled { get; }
+    public int Code { get; }
+    public string Content { get; }
 }

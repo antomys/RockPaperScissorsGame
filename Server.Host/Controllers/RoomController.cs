@@ -15,7 +15,7 @@ namespace Server.Host.Controllers;
 [Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public sealed class RoomController : ControllerBase
+public sealed class RoomController: ControllerBase
 {
     private readonly IRoomService _roomService;
 
@@ -46,18 +46,19 @@ public sealed class RoomController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinPublicAsync()
     {
-        var result = await _roomService.JoinAsync(UserId, true);
+        var result = await _roomService.JoinAsync(UserId);
         
         return result.Match<IActionResult>(
             roomModel => Ok(roomModel),
             exception => BadRequest(exception));
     }
+    
     [HttpPost("join/private")]
     [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinPrivateAsync([FromQuery] string roomCode)
     {
-        var result = await _roomService.JoinAsync(UserId, false, roomCode);
+        var result = await _roomService.JoinAsync(UserId, roomCode);
         
         return result.Match<IActionResult>(
             roomModel => Ok(roomModel),
@@ -85,10 +86,8 @@ public sealed class RoomController : ControllerBase
     {
         var deleteResponse = await _roomService.DeleteAsync(UserId, roomId);
             
-        return deleteResponse switch
-        {
-            StatusCodes.Status200OK => Ok(),
-            _ => BadRequest()
-        };
+        return deleteResponse.Match<IActionResult>(
+            _ => Ok(),
+            exception => BadRequest(exception));
     }
 }

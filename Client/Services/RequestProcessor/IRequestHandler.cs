@@ -1,13 +1,9 @@
-﻿using Client.Services.RequestModels;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Client.Services.RequestProcessor.RequestModels;
 
-namespace Client.Services.RequestProcessor
+namespace Client.Services.RequestProcessor;
+
+public interface IRequestHandler
 {
-    public interface IRequestHandler
-    {
-        Task<IResponse> HandleRequestAsync(IRequestOptions requestOptions);
-    }
+    Task<IResponse> HandleRequestAsync(IRequestOptions requestOptions);
 }

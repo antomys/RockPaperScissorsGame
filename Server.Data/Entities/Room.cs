@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Server.Data.Entities;
 
-[Table("Rooms")]
+[Table(nameof(Room))]
 public class Room
 {
     /// <summary>
@@ -43,4 +43,9 @@ public class Room
     /// Creation date. After 5 minutes of inactivity will be deleted
     /// </summary>
     public long CreationTimeTicks { get; set; }
+    
+    /// <summary>
+    ///     Last update time ticks.
+    /// </summary>
+    public long UpdateTicks { get; set; }
 }

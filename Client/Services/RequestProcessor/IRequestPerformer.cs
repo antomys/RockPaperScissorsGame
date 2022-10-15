@@ -1,13 +1,9 @@
-﻿using Client.Services.RequestModels;
-using Client.Services.RequestProcessor.RequestModels.Impl;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Client.Services.RequestProcessor.RequestModels;
 
-namespace Client.Services.RequestProcessor
+namespace Client.Services.RequestProcessor;
+
+public interface IRequestPerformer
 {
-    public interface IRequestPerformer
-    {
-        Task<IResponse> PerformRequestAsync(IRequestOptions requestOptions);
-    }
+    Task<IResponse> PerformRequestAsync(IRequestOptions requestOptions);
 }

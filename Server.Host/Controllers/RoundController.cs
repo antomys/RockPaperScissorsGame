@@ -17,7 +17,7 @@ namespace Server.Host.Controllers;
 [Route ("api/[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public sealed class RoundController:ControllerBase
+public sealed class RoundController: ControllerBase
 {
     private readonly IRoundService _roundService;
 

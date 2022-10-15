@@ -15,7 +15,7 @@ namespace Server.Host.Controllers;
 [Route ("api/[controller]")]
 [Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
-public sealed class AccountController : ControllerBase
+public sealed class AccountController: ControllerBase
 {
     private readonly IAuthService _authService;
 

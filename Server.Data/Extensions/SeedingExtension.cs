@@ -8,26 +8,26 @@ namespace Server.Data.Extensions;
 
 public static class SeedingExtension
 {
-    private const string DefaultName = "bot";
+    public const string BotId = "bot";
     
     public static async Task EnsureBotCreated(this ServerContext context)
     {
-        if (await context.Accounts.ContainsAsync(new Account {Id = DefaultName}))
+        if (await context.Accounts.ContainsAsync(new Account {Id = BotId}))
         {
            return;
         }
         
         context.Add(new Account
         {
-            Id = DefaultName,
-            Login = DefaultName,
+            Id = BotId,
+            Login = BotId,
             Password = Guid.NewGuid().ToString()
         });
         
         context.Add(new Statistics
         {
-            Id = DefaultName,
-            AccountId = DefaultName
+            Id = BotId,
+            AccountId = BotId
         });
            
         await context.SaveChangesAsync();

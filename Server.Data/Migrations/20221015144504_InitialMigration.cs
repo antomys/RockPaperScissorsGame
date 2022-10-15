@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Server.Data.Migrations
 {
-    public partial class InitialCommit : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Accounts",
+                name: "Account",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
@@ -19,22 +19,23 @@ namespace Server.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Accounts", x => x.Id);
+                    table.PrimaryKey("PK_Account", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rooms",
+                name: "Room",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: true),
                     IsPrivate = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsFull = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CreationTimeTicks = table.Column<long>(type: "INTEGER", nullable: false)
+                    CreationTimeTicks = table.Column<long>(type: "INTEGER", nullable: false),
+                    UpdateTicks = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rooms", x => x.Id);
+                    table.PrimaryKey("PK_Room", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -57,46 +58,47 @@ namespace Server.Data.Migrations
                 {
                     table.PrimaryKey("PK_Statistics", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Statistics_Accounts_AccountId",
+                        name: "FK_Statistics_Account_AccountId",
                         column: x => x.AccountId,
-                        principalTable: "Accounts",
+                        principalTable: "Account",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rounds",
+                name: "Round",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     RoomId = table.Column<string>(type: "TEXT", nullable: true),
                     WinnerId = table.Column<string>(type: "TEXT", nullable: true),
                     LoserId = table.Column<string>(type: "TEXT", nullable: true),
+                    IsFinished = table.Column<bool>(type: "INTEGER", nullable: false),
                     StartTimeTicks = table.Column<long>(type: "INTEGER", nullable: false),
                     FinishTimeTicks = table.Column<long>(type: "INTEGER", nullable: false),
-                    IsFinished = table.Column<bool>(type: "INTEGER", nullable: false)
+                    UpdateTicks = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rounds", x => x.Id);
+                    table.PrimaryKey("PK_Round", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Rounds_Accounts_LoserId",
+                        name: "FK_Round_Account_LoserId",
                         column: x => x.LoserId,
-                        principalTable: "Accounts",
+                        principalTable: "Account",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Rounds_Accounts_WinnerId",
+                        name: "FK_Round_Account_WinnerId",
                         column: x => x.WinnerId,
-                        principalTable: "Accounts",
+                        principalTable: "Account",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Rounds_Rooms_RoomId",
+                        name: "FK_Round_Room_RoomId",
                         column: x => x.RoomId,
-                        principalTable: "Rooms",
+                        principalTable: "Room",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Players",
+                name: "Player",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
@@ -108,53 +110,53 @@ namespace Server.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Players", x => x.Id);
+                    table.PrimaryKey("PK_Player", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Players_Accounts_AccountId",
+                        name: "FK_Player_Account_AccountId",
                         column: x => x.AccountId,
-                        principalTable: "Accounts",
+                        principalTable: "Account",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Players_Rooms_RoomId",
+                        name: "FK_Player_Room_RoomId",
                         column: x => x.RoomId,
-                        principalTable: "Rooms",
+                        principalTable: "Room",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Players_Rounds_RoundId",
+                        name: "FK_Player_Round_RoundId",
                         column: x => x.RoundId,
-                        principalTable: "Rounds",
+                        principalTable: "Round",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Players_AccountId",
-                table: "Players",
+                name: "IX_Player_AccountId",
+                table: "Player",
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Players_RoomId",
-                table: "Players",
+                name: "IX_Player_RoomId",
+                table: "Player",
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Players_RoundId",
-                table: "Players",
+                name: "IX_Player_RoundId",
+                table: "Player",
                 column: "RoundId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rounds_LoserId",
-                table: "Rounds",
+                name: "IX_Round_LoserId",
+                table: "Round",
                 column: "LoserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rounds_RoomId",
-                table: "Rounds",
+                name: "IX_Round_RoomId",
+                table: "Round",
                 column: "RoomId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rounds_WinnerId",
-                table: "Rounds",
+                name: "IX_Round_WinnerId",
+                table: "Round",
                 column: "WinnerId");
 
             migrationBuilder.CreateIndex(
@@ -167,19 +169,19 @@ namespace Server.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Players");
+                name: "Player");
 
             migrationBuilder.DropTable(
                 name: "Statistics");
 
             migrationBuilder.DropTable(
-                name: "Rounds");
+                name: "Round");
 
             migrationBuilder.DropTable(
-                name: "Accounts");
+                name: "Account");
 
             migrationBuilder.DropTable(
-                name: "Rooms");
+                name: "Room");
         }
     }
 }

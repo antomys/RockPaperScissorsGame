@@ -1,10 +1,8 @@
-﻿using System;
+﻿namespace Client.Models.Interfaces;
 
-namespace Client.Models.Interfaces
+public interface IAccount
 {
-    public interface IAccount
-    {
-        public string Login { get; set; }
-        public string Password { get; set; }
-    }
+    public string Login { get; set; }
+   
+    public string Password { get; set; }
 }

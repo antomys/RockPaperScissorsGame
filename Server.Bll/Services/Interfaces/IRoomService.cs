@@ -12,11 +12,11 @@ public interface IRoomService
     
     Task<int> RemoveRangeAsync(TimeSpan roomOutDate, TimeSpan roundOutDate);
     
-    Task<OneOf<RoomModel, CustomException>> JoinAsync(string userId, bool isPrivate, string? roomCode = default);
+    Task<OneOf<RoomModel, CustomException>> JoinAsync(string userId, string? roomCode = null);
     
     Task<OneOf<RoomModel, CustomException>> GetAsync(string roomId);
     
     Task<int?> UpdateAsync(RoomModel room);
     
-    Task<int?> DeleteAsync(string userId, string roomId);
+    Task<OneOf<int, CustomException>> DeleteAsync(string userId, string roomId);
 }
