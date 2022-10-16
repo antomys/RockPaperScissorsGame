@@ -1,4 +1,4 @@
-﻿namespace Client.Account.Services;
+﻿namespace Client.Account.Services.Interfaces;
 
 public interface IUser
 {

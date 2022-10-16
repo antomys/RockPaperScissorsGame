@@ -29,6 +29,9 @@ internal sealed class StatisticsService: IStatisticsService
             return Task.FromResult(OneOf<PersonalStatisticsResponse, CustomException>.FromT1(new CustomException("Token must not be 'null' or '\"\"'")));
         }
         
-        throw new NotImplementedException();
+        var response =
+            _client.GetAsync<PersonalStatisticsResponse>("api/Statistics/personal", ("Authorization", token), cancellationToken);
+
+        return response;
     }
 }

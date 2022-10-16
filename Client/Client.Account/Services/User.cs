@@ -1,4 +1,6 @@
-﻿namespace Client.Account.Services;
+﻿using Client.Account.Services.Interfaces;
+
+namespace Client.Account.Services;
 
 internal sealed class User : IUser
 {

@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockPaperScissors.Common", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.Statistics", "Client\Client.Statistics\Client.Statistics.csproj", "{994CC558-A9A9-4E58-A894-EE06993DAC58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.MainMenu", "Client\Client.MainMenu\Client.MainMenu.csproj", "{3928C9ED-4F7C-4D3E-8265-C98EBC85F318}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{994CC558-A9A9-4E58-A894-EE06993DAC58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{994CC558-A9A9-4E58-A894-EE06993DAC58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{994CC558-A9A9-4E58-A894-EE06993DAC58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3928C9ED-4F7C-4D3E-8265-C98EBC85F318}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3928C9ED-4F7C-4D3E-8265-C98EBC85F318}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3928C9ED-4F7C-4D3E-8265-C98EBC85F318}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3928C9ED-4F7C-4D3E-8265-C98EBC85F318}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,5 +89,6 @@ Global
 		{32045C10-4395-4010-A365-6CAF4D993680} = {540EE2A5-907D-4E6A-A051-22D01DBFE913}
 		{BB2630C0-3F25-49F1-9393-4B75A7014187} = {540EE2A5-907D-4E6A-A051-22D01DBFE913}
 		{994CC558-A9A9-4E58-A894-EE06993DAC58} = {540EE2A5-907D-4E6A-A051-22D01DBFE913}
+		{3928C9ED-4F7C-4D3E-8265-C98EBC85F318} = {540EE2A5-907D-4E6A-A051-22D01DBFE913}
 	EndGlobalSection
 EndGlobal

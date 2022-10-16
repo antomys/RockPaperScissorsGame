@@ -1,6 +1,7 @@
 ﻿using Client.Account.Enums;
 using Client.Account.Extensions;
 using Client.Account.Services;
+using Client.Account.Services.Interfaces;
 using RockPaperScissors.Common.Enums;
 using RockPaperScissors.Common.Extensions;
 
@@ -52,24 +53,29 @@ internal sealed class AccountMenu : IAccountMenu
                     }
 
                     "Trying logging in...".Print(ConsoleColor.White);
+                    Console.Clear();
 
                     return;
                 
                 case MenuTypes.Login: 
                     var isSuccess = await LoginAsync(cancellationToken);
-
+                    
                     if (isSuccess)
                     {
+                        "\nPress any key to back to the start up menu list!".Print(ConsoleColor.Cyan);
+                        Console.ReadKey();
+                        Console.Clear();
+
                         return;
                     }
-                    
-                    Console.Clear();
-                    
+
                     continue;
 
                 case MenuTypes.Back:
+                    Console.Clear();
+
                     return;
-                
+
                 default:
                     "Invalid input. Try again.".Print(ConsoleColor.Red);
                     continue;

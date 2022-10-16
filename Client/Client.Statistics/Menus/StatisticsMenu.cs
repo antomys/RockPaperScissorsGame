@@ -1,4 +1,5 @@
 ﻿using Client.Account.Services;
+using Client.Account.Services.Interfaces;
 using Client.Statistics.EnumExtensions;
 using Client.Statistics.Enums;
 using Client.Statistics.Services;
@@ -23,7 +24,12 @@ internal sealed class StatisticsMenu: IStatisticsMenu
         while (!cancellationToken.IsCancellationRequested)
         {
             "Statistics Menu:".Print(ConsoleColor.DarkYellow);
-            $"{MenuTypes.Personal.GetValue()}.\t{MenuTypes.Personal.GetDisplayName()}".Print(ConsoleColor.DarkYellow);
+
+            if (_accountService.IsAuthorized())
+            {
+                $"{MenuTypes.Personal.GetValue()}.\t{MenuTypes.Personal.GetDisplayName()}".Print(ConsoleColor.DarkYellow);   
+            }
+
             $"{MenuTypes.All.GetValue()}.\t{MenuTypes.All.GetDisplayName()}".Print(ConsoleColor.DarkYellow);
             $"{MenuTypes.Back.GetValue()}.\t{MenuTypes.Back.GetDisplayName()}".Print(ConsoleColor.DarkYellow);
 
@@ -43,18 +49,22 @@ internal sealed class StatisticsMenu: IStatisticsMenu
             switch (menuType)
             {
                 case MenuTypes.All:
+                    Console.Clear();
                     await PrintAllStatisticsAsync(cancellationToken);
-                     
+
                     break;
-                 
+
                 case MenuTypes.Personal:
+                    Console.Clear();
                     await PrintPersonalStatisticsAsync(cancellationToken);
-                    
+
                     break;
-                
+
                 case MenuTypes.Back:
+                    Console.Clear();
+
                     return;
-                 
+
                 default:
                     "Invalid input. Try again.".Print(ConsoleColor.Red);
                     continue;
@@ -72,7 +82,7 @@ internal sealed class StatisticsMenu: IStatisticsMenu
 
             return;
         }
-        
+
         allStatistics.AsT1.Message.Print(ConsoleColor.Red);
     }
 
@@ -81,23 +91,23 @@ internal sealed class StatisticsMenu: IStatisticsMenu
         if (!_accountService.IsAuthorized())
         {
             "User in not logged in.".Print(ConsoleColor.Red);
-            
+
             return;
         }
-        
+
         var user = _accountService.GetUser();
-        var personalStatistics = await _statisticsService.GetPersonalAsync(user.SessionId, cancellationToken);
-        
+        var personalStatistics = await _statisticsService.GetPersonalAsync(user.GetBearerToken(), cancellationToken);
+
         if (personalStatistics.IsT0)
         {
             PrintStatistics(personalStatistics.AsT0, user.Login!);
 
             return;
         }
-        
+
         personalStatistics.AsT1.Message.Print(ConsoleColor.Red);
     }
-    
+
     private static void PrintAllStatistics(AllStatisticsResponse[] allStatistics)
     {
         var statisticsSpan = allStatistics.AsSpan();
@@ -108,20 +118,20 @@ internal sealed class StatisticsMenu: IStatisticsMenu
             $"{index + 1}. User: {statisticsSpan[index].Login}; Score: {statisticsSpan[index].Score}".Print(color);
         }
     }
-    
+
     private static void PrintStatistics(PersonalStatisticsResponse allStatistics, string userName)
     {
-        $"Here is your statistics, {userName}:".Print(ConsoleColor.White);
-        
-        "Main statistics: ".Print(ConsoleColor.DarkYellow);
-        
+        $"Here is your statistics, \"{userName}\" :".Print(ConsoleColor.White);
+
+        "\tMain statistics".Print(ConsoleColor.DarkYellow);
+
         $"\t{nameof(allStatistics.Wins)}: {allStatistics.Wins}".Print(ConsoleColor.Green);
         $"\t{nameof(allStatistics.Draws)}: {allStatistics.Draws}".Print(ConsoleColor.Yellow);
         $"\t{nameof(allStatistics.Loss)}: {allStatistics.Loss}".Print(ConsoleColor.Red);
         $"\t{nameof(allStatistics.Score)}: {allStatistics.Score}".Print(ConsoleColor.White);
-        
-        "Other statistics: ".Print(ConsoleColor.DarkYellow);
-        
+
+        "\tOther statistics".Print(ConsoleColor.DarkYellow);
+
         $"\t{allStatistics.TimeSpent} spent time playing".Print(ConsoleColor.White);
         $"\t{allStatistics.UsedPaper} times used 'Paper'".Print(ConsoleColor.White);
         $"\t{allStatistics.UsedRock} times used 'Rock'".Print(ConsoleColor.White);
@@ -138,7 +148,7 @@ internal sealed class StatisticsMenu: IStatisticsMenu
             _ => ConsoleColor.White
         };
     }
-    
+
     private static ConsoleColor GetColor(double index)
     {
         return index switch

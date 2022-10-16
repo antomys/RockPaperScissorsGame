@@ -29,9 +29,8 @@ internal sealed class StartMenu: IStartMenu
 
         await _healthCheckService.ConnectAsync();
         cancellationToken.ThrowIfCancellationRequested();
-        await Task.Factory.StartNew(() => _healthCheckService.PingAsync(), TaskCreationOptions.LongRunning);
-        cancellationToken.ThrowIfCancellationRequested();
-        
+        await _healthCheckService.PingAsync();
+
         "\nPress any key to show start up menu list.".Print(ConsoleColor.Green);
 
         Console.ReadKey();
@@ -67,17 +66,19 @@ internal sealed class StartMenu: IStartMenu
                 case MenuTypes.Account:
                     await _accountMenu.StartAsync(cancellationToken);
                     Console.Clear();
-                    
+
                     break;
                 
                 case MenuTypes.Leaderboard:
                     await _statisticsMenu.StartAsync(cancellationToken);
-                    
+                    Console.Clear();
+
                     break;
                
                 case MenuTypes.Exit:
                     await _accountMenu.LogoutAsync(cancellationToken);
-                    
+                    Console.Clear();
+
                     return;
                 
                 default:

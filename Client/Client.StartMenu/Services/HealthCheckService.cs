@@ -33,19 +33,22 @@ internal sealed class HealthCheckService : IHealthCheckService
     
     public async Task PingAsync()
     {
-        "Starting health checks".Print(ConsoleColor.White);
-        while (!_cancellationTokenSource.IsCancellationRequested)
+        await Task.Factory.StartNew(async () =>
         {
-            var result = await _client.GetAsync("/health", _cancellationTokenSource.Token);
-
-            if (!result)
+            "Starting health checks".Print(ConsoleColor.White);
+            while (!_cancellationTokenSource.IsCancellationRequested)
             {
-                "\nConnection to the server lost. Stopping...\nPress any key...".Print(ConsoleColor.Red);
-                
-                _cancellationTokenSource.Cancel();
-            }
+                var result = await _client.GetAsync("/health", _cancellationTokenSource.Token);
 
-            await Task.Delay(100);
-        }
+                if (!result)
+                {
+                    "\nConnection to the server lost. Stopping...\nPress any key...".Print(ConsoleColor.Red);
+                
+                    _cancellationTokenSource.Cancel();
+                }
+
+                await Task.Delay(1000);
+            }
+        }, TaskCreationOptions.LongRunning);
     }
 }

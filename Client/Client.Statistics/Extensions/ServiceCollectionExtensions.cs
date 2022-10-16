@@ -1,4 +1,5 @@
 ﻿using Client.Account.Services;
+using Client.Account.Services.Interfaces;
 using Client.Statistics.Menus;
 using Client.Statistics.Services;
 using RockPaperScissors.Common.Client;

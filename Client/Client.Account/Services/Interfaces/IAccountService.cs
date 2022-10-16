@@ -2,7 +2,7 @@
 using RockPaperScissors.Common;
 using RockPaperScissors.Common.Responses;
 
-namespace Client.Account.Services;
+namespace Client.Account.Services.Interfaces;
 
 public interface IAccountService
 {

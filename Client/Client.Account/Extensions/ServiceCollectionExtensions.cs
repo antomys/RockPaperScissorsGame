@@ -1,5 +1,6 @@
 ﻿using Client.Account.Menus;
 using Client.Account.Services;
+using Client.Account.Services.Interfaces;
 using RockPaperScissors.Common.Client;
 
 namespace Client.Account.Extensions;
