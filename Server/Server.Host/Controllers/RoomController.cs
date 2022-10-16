@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RockPaperScissors.Common;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
 
 [ApiController]
-[Route ("api/[controller]")]
 [Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -26,12 +26,12 @@ public sealed class RoomController: ControllerBase
 
     private string UserId => User.Identity?.Name ?? string.Empty;
     
-    [HttpPost("create")]
+    [HttpPost(UrlTemplates.CreateRoom)]
     [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAsync(
         [FromQuery] bool isPrivate, 
-        [FromHeader(Name="X-Training")] bool isTraining = false)
+        [FromQuery] bool isTraining = false)
     {
         var newRoom = await _roomService
             .CreateAsync(UserId, isPrivate, isTraining);
@@ -41,7 +41,7 @@ public sealed class RoomController: ControllerBase
             exception => BadRequest(exception));
     }
 
-    [HttpPost("join/public")]
+    [HttpPost(UrlTemplates.JoinPublicRoom)]
     [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinPublicAsync()
@@ -53,10 +53,10 @@ public sealed class RoomController: ControllerBase
             exception => BadRequest(exception));
     }
     
-    [HttpPost("join/private")]
+    [HttpPost(UrlTemplates.JoinPrivateRoom)]
     [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> JoinPrivateAsync([FromQuery] string roomCode)
+    public async Task<IActionResult> JoinPrivateAsync(string roomCode)
     {
         var result = await _roomService.JoinAsync(UserId, roomCode);
         
@@ -65,7 +65,7 @@ public sealed class RoomController: ControllerBase
             exception => BadRequest(exception));
     }
         
-    [HttpGet("update")]
+    [HttpPost(UrlTemplates.UpdateRoom)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAsync([FromBody] RoomModel roomModel)
@@ -79,7 +79,7 @@ public sealed class RoomController: ControllerBase
         };
     }
         
-    [HttpDelete("delete")]
+    [HttpDelete(UrlTemplates.DeleteRoom)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteAsync([FromQuery] string roomId)

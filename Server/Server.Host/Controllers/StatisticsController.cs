@@ -12,7 +12,6 @@ using Server.Bll.Services.Interfaces;
 namespace Server.Host.Controllers;
 
 [ApiController]
-[Route ("api/[controller]")]
 [Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -28,7 +27,7 @@ public sealed class StatisticsController: ControllerBase
     private string UserId => User.Identity?.Name ?? string.Empty;
     
     [AllowAnonymous]
-    [HttpGet("all")]
+    [HttpGet(UrlTemplates.AllStatistics)]
     [ProducesResponseType(typeof(ShortStatisticsModel[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public Task<ShortStatisticsModel[]> GetOverallStatistics()
@@ -37,7 +36,7 @@ public sealed class StatisticsController: ControllerBase
     }
         
     [Authorize]
-    [HttpGet("personal")]
+    [HttpGet(UrlTemplates.PersonalStatistics)]
     [ProducesResponseType(typeof(StatisticsModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomException), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetPersonalStatistics()

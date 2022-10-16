@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RockPaperScissors.Common;
 using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
 
 [ApiController]
-[Route ("api")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class LongPollingController : ControllerBase
 {
@@ -20,14 +20,14 @@ public sealed class LongPollingController : ControllerBase
         _longPollingService = longPollingService ?? throw new ArgumentNullException(nameof(longPollingService));
     }
 
-    [HttpGet("Room/{roomId}/status")]
+    [HttpGet(UrlTemplates.CheckRoomUpdateTicks)]
     [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
     public Task<long> CheckRoomUpdateTicksAsync(string roomId)
     {
         return _longPollingService.GetRoomUpdateTicksAsync(roomId);
     }
         
-    [HttpGet("Round/{roundId}/status")]
+    [HttpGet(UrlTemplates.CheckRoundUpdateTicks)]
     [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
     public Task<long> CheckRoundUpdateTicksAsync(string roundId)
     {

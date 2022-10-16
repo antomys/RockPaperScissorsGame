@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RockPaperScissors.Common;
 using RockPaperScissors.Common.Models;
 using RockPaperScissors.Common.Requests;
 using Server.Authentication.Exceptions;
@@ -14,7 +15,6 @@ using Server.Authentication.Services;
 namespace Server.Host.Controllers;
 
 [ApiController]
-[Route ("api/[controller]")]
 [Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 public sealed class AccountController: ControllerBase
@@ -26,7 +26,7 @@ public sealed class AccountController: ControllerBase
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
     }
     
-    [HttpPost("register")]
+    [HttpPost(UrlTemplates.RegisterUrl)]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserException),StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RegisterAsync(RegisterRequest registerRequest)
@@ -39,7 +39,7 @@ public sealed class AccountController: ControllerBase
             userException => BadRequest(userException));
     }
 
-    [HttpPost("login")]
+    [HttpPost(UrlTemplates.LoginUrl)]
     [ProducesResponseType(typeof(AccountOutputModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserException),StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> LoginAsync(AccountDto accountDto)
@@ -53,7 +53,7 @@ public sealed class AccountController: ControllerBase
     }
         
     [Authorize]
-    [HttpGet("logout")]
+    [HttpGet(UrlTemplates.LogoutUrl)]
     [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]
     [ProducesResponseType(typeof(int), (int) HttpStatusCode.BadRequest)]
     public ActionResult<string> Logout(string sessionId)

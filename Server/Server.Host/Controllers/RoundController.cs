@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RockPaperScissors.Common;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 
@@ -14,7 +15,6 @@ namespace Server.Host.Controllers;
 /// API Round Controller
 /// </summary>
 [ApiController]
-[Route ("api/[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class RoundController: ControllerBase
@@ -33,7 +33,7 @@ public sealed class RoundController: ControllerBase
     /// </summary>
     /// <param name="roomId">id of the room</param>
     /// <returns></returns>
-    [HttpPost("create")]
+    [HttpPost(UrlTemplates.CreateRound)]
     //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CreateRound(int roomId)
@@ -49,7 +49,7 @@ public sealed class RoundController: ControllerBase
     /// </summary>
     /// <param name="roundModel">This round model from FE or client.</param>
     /// <returns></returns>
-    [HttpPatch("update")]
+    [HttpPatch(UrlTemplates.UpdateRound)]
     //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> UpdateCurrentRound(RoundModel roundModel)
