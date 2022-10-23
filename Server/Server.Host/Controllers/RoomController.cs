@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Net.Mime;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RockPaperScissors.Common;
@@ -11,10 +8,6 @@ using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
 
-[ApiController]
-[Consumes(MediaTypeNames.Application.Json)]
-[Produces(MediaTypeNames.Application.Json)]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class RoomController: ControllerBase
 {
     private readonly IRoomService _roomService;
@@ -24,8 +17,6 @@ public sealed class RoomController: ControllerBase
         _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
     }
 
-    private string UserId => User.Identity?.Name ?? string.Empty;
-    
     [HttpPost(UrlTemplates.CreateRoom)]
     [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -37,8 +28,8 @@ public sealed class RoomController: ControllerBase
             .CreateAsync(UserId, isPrivate, isTraining);
         
         return newRoom.Match<IActionResult>(
-            roomModel => Ok(roomModel),
-            exception => BadRequest(exception));
+            Ok,
+            BadRequest);
     }
 
     [HttpPost(UrlTemplates.JoinPublicRoom)]
@@ -49,10 +40,10 @@ public sealed class RoomController: ControllerBase
         var result = await _roomService.JoinAsync(UserId);
         
         return result.Match<IActionResult>(
-            roomModel => Ok(roomModel),
-            exception => BadRequest(exception));
+            Ok,
+            BadRequest);
     }
-    
+
     [HttpPost(UrlTemplates.JoinPrivateRoom)]
     [ProducesResponseType(typeof(RoomModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -61,8 +52,8 @@ public sealed class RoomController: ControllerBase
         var result = await _roomService.JoinAsync(UserId, roomCode);
         
         return result.Match<IActionResult>(
-            roomModel => Ok(roomModel),
-            exception => BadRequest(exception));
+            Ok,
+            BadRequest);
     }
         
     [HttpPost(UrlTemplates.UpdateRoom)]
@@ -88,6 +79,6 @@ public sealed class RoomController: ControllerBase
             
         return deleteResponse.Match<IActionResult>(
             _ => Ok(),
-            exception => BadRequest(exception));
+            BadRequest);
     }
 }

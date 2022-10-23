@@ -22,5 +22,5 @@ public static class UrlTemplates
     // Round-related
     public const string CreateRound = "api/round/create";
     public const string UpdateRound = "api/round/update";
-    public const string CheckRoundUpdateTicks = "api/round/{roomId}/status";
+    public const string CheckRoundUpdateTicks = "api/round/{roundId}/status";
 }

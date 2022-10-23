@@ -11,10 +11,6 @@ using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
 
-[ApiController]
-[Consumes(MediaTypeNames.Application.Json)]
-[Produces(MediaTypeNames.Application.Json)]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class StatisticsController: ControllerBase
 {
     private readonly IStatisticsService _statisticsService;
@@ -24,8 +20,6 @@ public sealed class StatisticsController: ControllerBase
         _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
     }
 
-    private string UserId => User.Identity?.Name ?? string.Empty;
-    
     [AllowAnonymous]
     [HttpGet(UrlTemplates.AllStatistics)]
     [ProducesResponseType(typeof(ShortStatisticsModel[]), StatusCodes.Status200OK)]
@@ -34,7 +28,7 @@ public sealed class StatisticsController: ControllerBase
     {
         return _statisticsService.GetAllAsync();
     }
-        
+
     [Authorize]
     [HttpGet(UrlTemplates.PersonalStatistics)]
     [ProducesResponseType(typeof(StatisticsModel), StatusCodes.Status200OK)]
@@ -44,7 +38,7 @@ public sealed class StatisticsController: ControllerBase
         var result = await _statisticsService.GetAsync(UserId);
 
         return result.Match<IActionResult>(
-            statsModel => Ok(statsModel),
-            statsException => BadRequest(statsException));
+            Ok,
+            BadRequest);
     }
 }

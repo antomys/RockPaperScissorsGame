@@ -7,9 +7,7 @@ using RockPaperScissors.Common;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
 using OneOf;
-using Server.Bll.Extensions;
 using Server.Data.Context;
-using Server.Data.Entities;
 
 namespace Server.Bll.Services;
 

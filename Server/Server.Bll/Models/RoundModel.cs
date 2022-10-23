@@ -1,20 +1,14 @@
-﻿using System;
-
-namespace Server.Bll.Models;
+﻿namespace Server.Bll.Models;
 
 public sealed class RoundModel
 {
-    public int Id { get; set; }
+    public string Id { get; init; }
     
-    public bool IsFinished { get; set; }
+    public bool IsFinished { get; init; }
+
+    public long StartTimeTicks { get; init; }
     
-    public DateTimeOffset TimeFinished { get; set; }
+    public long FinishTimeTicks { get; init; }
     
-    public AccountModel Winner { get; set; }
-    
-    public AccountModel Loser { get; set; }
-    
-    public int FirstPlayerMove { get; set; }
-    
-    public int SecondPlayerMove { get; set; }
+    public long UpdateTicks { get; init; }
 }

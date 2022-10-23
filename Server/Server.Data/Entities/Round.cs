@@ -17,10 +17,6 @@ public class Round
     public virtual Room Room { get; set; }
     
     public virtual ICollection<Player> Players { get; set; }
-    
-    public virtual Account Winner { get; set; }
-    
-    public virtual Account Loser { get; set; }
 
     public bool IsFinished { get; init; }
     

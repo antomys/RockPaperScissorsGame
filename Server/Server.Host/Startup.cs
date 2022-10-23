@@ -49,7 +49,7 @@ public sealed class Startup
         {
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server.Host v1"));
+            app.UseSwaggerUI();
         }
             
         app.UseCors(builder => builder.AllowAnyOrigin()

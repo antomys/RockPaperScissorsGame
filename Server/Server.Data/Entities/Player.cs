@@ -18,4 +18,6 @@ public class Player
     public bool IsReady { get; set; }
     
     public int Move { get; set; }
+    
+    public bool IsWinner { get; set; }
 }

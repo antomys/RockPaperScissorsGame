@@ -119,4 +119,22 @@ internal sealed class RoundService: IRoundService
         //
         // return thisRound.Adapt<RoundModel>();
     }
+
+    public static Round Create(Room room)
+    {
+        var currentTime = DateTimeOffset.UtcNow.Ticks;
+        var newRound = new Round
+        {
+            Id = Guid.NewGuid().ToString(),
+            RoomId = room.Id,
+            Room = room,
+            Players = room.Players,
+            IsFinished = false,
+            StartTimeTicks = currentTime,
+            FinishTimeTicks = 0,
+            UpdateTicks = currentTime
+        };
+
+        return newRound;
+    }
 }

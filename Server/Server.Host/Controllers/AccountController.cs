@@ -14,9 +14,6 @@ using Server.Authentication.Services;
 
 namespace Server.Host.Controllers;
 
-[ApiController]
-[Consumes(MediaTypeNames.Application.Json)]
-[Produces(MediaTypeNames.Application.Json)]
 public sealed class AccountController: ControllerBase
 {
     private readonly IAuthService _authService;
@@ -25,7 +22,8 @@ public sealed class AccountController: ControllerBase
     {
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
     }
-    
+
+    [AllowAnonymous]
     [HttpPost(UrlTemplates.RegisterUrl)]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserException),StatusCodes.Status400BadRequest)]
@@ -36,9 +34,10 @@ public sealed class AccountController: ControllerBase
         
         return newAccount.Match<IActionResult>(
             statusCode => Ok(statusCode.ToString()),
-            userException => BadRequest(userException));
+            BadRequest);
     }
 
+    [AllowAnonymous]
     [HttpPost(UrlTemplates.LoginUrl)]
     [ProducesResponseType(typeof(AccountOutputModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserException),StatusCodes.Status400BadRequest)]
@@ -48,11 +47,10 @@ public sealed class AccountController: ControllerBase
             await _authService.LoginAsync(accountDto.Login, accountDto.Password);
             
         return newAccount.Match<IActionResult>(
-            accountOutputModel => Ok(accountOutputModel),
-            userException => BadRequest(userException));
+            Ok,
+            BadRequest);
     }
-        
-    [Authorize]
+
     [HttpGet(UrlTemplates.LogoutUrl)]
     [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]
     [ProducesResponseType(typeof(int), (int) HttpStatusCode.BadRequest)]

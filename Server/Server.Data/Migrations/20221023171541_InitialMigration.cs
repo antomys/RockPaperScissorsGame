@@ -70,8 +70,6 @@ namespace Server.Data.Migrations
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     RoomId = table.Column<string>(type: "TEXT", nullable: true),
-                    WinnerId = table.Column<string>(type: "TEXT", nullable: true),
-                    LoserId = table.Column<string>(type: "TEXT", nullable: true),
                     IsFinished = table.Column<bool>(type: "INTEGER", nullable: false),
                     StartTimeTicks = table.Column<long>(type: "INTEGER", nullable: false),
                     FinishTimeTicks = table.Column<long>(type: "INTEGER", nullable: false),
@@ -80,16 +78,6 @@ namespace Server.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Round", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Round_Account_LoserId",
-                        column: x => x.LoserId,
-                        principalTable: "Account",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Round_Account_WinnerId",
-                        column: x => x.WinnerId,
-                        principalTable: "Account",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Round_Room_RoomId",
                         column: x => x.RoomId,
@@ -105,6 +93,7 @@ namespace Server.Data.Migrations
                     AccountId = table.Column<string>(type: "TEXT", nullable: true),
                     IsReady = table.Column<bool>(type: "INTEGER", nullable: false),
                     Move = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsWinner = table.Column<bool>(type: "INTEGER", nullable: false),
                     RoomId = table.Column<string>(type: "TEXT", nullable: true),
                     RoundId = table.Column<string>(type: "TEXT", nullable: true)
                 },
@@ -144,20 +133,10 @@ namespace Server.Data.Migrations
                 column: "RoundId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Round_LoserId",
-                table: "Round",
-                column: "LoserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Round_RoomId",
                 table: "Round",
                 column: "RoomId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Round_WinnerId",
-                table: "Round",
-                column: "WinnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Statistics_AccountId",

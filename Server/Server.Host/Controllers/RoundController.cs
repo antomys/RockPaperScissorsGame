@@ -14,9 +14,6 @@ namespace Server.Host.Controllers;
 /// <summary>
 /// API Round Controller
 /// </summary>
-[ApiController]
-[Produces(MediaTypeNames.Application.Json)]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class RoundController: ControllerBase
 {
     private readonly IRoundService _roundService;
@@ -26,8 +23,6 @@ public sealed class RoundController: ControllerBase
         _roundService = roundService ?? throw new ArgumentNullException(nameof(roundService));
     }
 
-    private string UserId => User.Identity?.Name ?? string.Empty;
-    
     /// <summary>
     /// Creates round in room
     /// </summary>

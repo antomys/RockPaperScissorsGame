@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
@@ -22,16 +25,21 @@ public static class SwaggerExtension
 
         services.AddSwaggerGen(options =>
         {
-            // options.IncludeXmlComments($"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
-            options.SwaggerDoc("v1", new OpenApiInfo
+            var title = AppDomain.CurrentDomain.FriendlyName;
+            var assemblyName = Assembly.GetExecutingAssembly().GetName();
+            var version = assemblyName.Version?.ToString() ?? string.Empty;
+            var documentationPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{assemblyName.Name}.xml");
+
+            options.IncludeXmlComments(documentationPath);
+            options.SwaggerDoc(version, new OpenApiInfo
             {
-                Title = "RPC Host",
-                Version = "v1"
+                Title = title,
+                Version = version
             });
 
-        var jwtSecurityScheme = new OpenApiSecurityScheme 
+        var jwtSecurityScheme = new OpenApiSecurityScheme
         { 
-            BearerFormat = "JWT",
+            BearerFormat = JwtConstants.TokenType,
             Name = "JWT Authentication",
             In = ParameterLocation.Header,
             Type = SecuritySchemeType.Http,
@@ -44,19 +52,33 @@ public static class SwaggerExtension
                  Type = ReferenceType.SecurityScheme
             }
         };
-        
+
         options.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
-        
-        options.AddSecurityRequirement(new OpenApiSecurityRequirement 
+
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
             {
                 jwtSecurityScheme,
                 Array.Empty<string>()
-            } 
-        }); 
-        
+            }
+        });
         });
 
         return services;
+    }
+
+    public static IApplicationBuilder UseSwaggerUI(
+        this IApplicationBuilder applicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(applicationBuilder);
+
+        applicationBuilder.UseSwaggerUI(swaggerUiOptions =>
+        {
+            var title = AppDomain.CurrentDomain.FriendlyName;
+            var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
+            swaggerUiOptions.SwaggerEndpoint($"/swagger/{version}/swagger.json", $"{title} v{version}");
+        });
+
+        return applicationBuilder;
     }
 }

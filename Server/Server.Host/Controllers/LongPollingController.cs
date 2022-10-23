@@ -1,7 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RockPaperScissors.Common;
@@ -9,8 +7,6 @@ using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
 
-[ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class LongPollingController : ControllerBase
 {
     private readonly ILongPollingService _longPollingService;
@@ -26,7 +22,7 @@ public sealed class LongPollingController : ControllerBase
     {
         return _longPollingService.GetRoomUpdateTicksAsync(roomId);
     }
-        
+
     [HttpGet(UrlTemplates.CheckRoundUpdateTicks)]
     [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
     public Task<long> CheckRoundUpdateTicksAsync(string roundId)

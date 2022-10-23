@@ -18,13 +18,6 @@ namespace Server.Bll.Services;
 
 internal sealed class RoomService : IRoomService
 {
-    private static readonly Player BotPlayer = new()
-    {
-        Id = Guid.NewGuid().ToString(),
-        AccountId = SeedingExtension.BotId,
-        IsReady = true
-    };
-    
     private readonly ServerContext _repository;
 
     public RoomService(ServerContext repository)
@@ -38,7 +31,7 @@ internal sealed class RoomService : IRoomService
         var doesRoomExist = await _repository.Rooms
             .Include(room => room.Players)
             .AnyAsync(roomPlayers => roomPlayers.Players.Any(player => player.AccountId == userId));
-        
+
         if (doesRoomExist)
         {
             return new CustomException(ExceptionTemplates.TwinkRoom);
@@ -49,11 +42,12 @@ internal sealed class RoomService : IRoomService
             new()
             {
                 Id = Guid.NewGuid().ToString(),
+                Account = await _repository.Accounts.FindAsync(userId),
                 AccountId = userId,
                 IsReady = false,
             }
         };
-        
+
         var room = new Room
         {
             Id = Guid.NewGuid().ToString(),
@@ -63,18 +57,23 @@ internal sealed class RoomService : IRoomService
             CreationTimeTicks = DateTimeOffset.UtcNow.Ticks,
             Players = players,
             UpdateTicks = DateTimeOffset.UtcNow.Ticks
-        }; 
+        };
+
+        _repository.Rooms.Add(room);
 
         if (isTraining)
         {
             room.IsFull = true;
-            room.Players.Add(BotPlayer);
+            room.Players.Add(SeedingExtension.BotPlayer);
         }
-        
-        _repository.Add(room);
-        
+
+        if (room.IsFull)
+        {
+            room.Round = RoundService.Create(room);
+        }
+
         await _repository.SaveChangesAsync();
-            
+
         return room.Adapt<RoomModel>();
     }
         
@@ -92,6 +91,7 @@ internal sealed class RoomService : IRoomService
         var newPlayer = new Player
         {
             Id = Guid.NewGuid().ToString(),
+            Account = await _repository.Accounts.FindAsync(userId),
             AccountId = userId,
             IsReady = false,
         };
@@ -99,6 +99,11 @@ internal sealed class RoomService : IRoomService
         room.Players.Add(newPlayer);
         room.UpdateTicks = DateTimeOffset.UtcNow.Ticks;
         room.IsFull = room.Players.Count is 2;
+        
+        if (room.IsFull)
+        {
+            room.Round = RoundService.Create(room);
+        }
 
         _repository.Rooms.Update(room);
         
