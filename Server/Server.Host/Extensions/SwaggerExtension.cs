@@ -70,9 +70,11 @@ public static class SwaggerExtension
 
         applicationBuilder.UseSwaggerUI(swaggerUiOptions =>
         {
-            var title = AppDomain.CurrentDomain.FriendlyName;
             var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
-            swaggerUiOptions.SwaggerEndpoint($"/swagger/{version}/swagger.json", $"{title} v{version}");
+            var title = $"{AppDomain.CurrentDomain.FriendlyName} v{version}";
+
+            swaggerUiOptions.DocumentTitle = title;
+            swaggerUiOptions.SwaggerEndpoint($"/swagger/{version}/swagger.json", title);
         });
 
         return applicationBuilder;
