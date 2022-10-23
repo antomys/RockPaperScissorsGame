@@ -59,6 +59,7 @@ internal sealed class RoomService : IRoomService
 
         if (isTraining)
         {
+            room.IsPrivate = true;
             room.IsFull = true;
             room.Players.Add(SeedingExtension.BotPlayer);
             room.Round = RoundService.Create(room);
@@ -69,7 +70,7 @@ internal sealed class RoomService : IRoomService
         return room.Adapt<RoomModel>();
     }
 
-    public async Task<OneOf<RoomModel, CustomException>> ChangeReadyStatusAsync(string userId, string roomId, bool newStatus)
+    public async Task<OneOf<RoomModel, CustomException>> ChangePlayerStatusAsync(string userId, string roomId, bool newStatus)
     {
         var room = await _repository.Rooms
             .Include(room => room.Players)
@@ -77,24 +78,24 @@ internal sealed class RoomService : IRoomService
 
         if (room is null)
         {
-            return new CustomException($"Room with id {roomId} does not exist");
+            return new CustomException($"Room with id '{roomId}' does not exist");
         }
 
-        var currentPlayer = room.Players.FirstOrDefault(player => player.Id == userId);
+        var currentPlayer = room.Players.FirstOrDefault(player => player.AccountId == userId);
         if (currentPlayer is null)
         {
-            return new CustomException($"You are not able to modify this room");
+            return new CustomException("You are not able to modify this room");
         }
 
         currentPlayer.IsReady = newStatus;
 
         _repository.Players.Update(currentPlayer);
-
-        await _repository.SaveChangesAsync();
+        _repository.Rooms.Update(room);
 
         if (room.Players.All(player => player.IsReady))
         {
             room.Round = RoundService.Create(room);
+            await _repository.SaveChangesAsync();
         }
         
         await _repository.SaveChangesAsync();

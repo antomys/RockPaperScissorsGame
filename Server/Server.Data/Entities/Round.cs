@@ -17,7 +17,7 @@ public class Round
     
     public virtual ICollection<Player> Players { get; set; }
 
-    public bool IsFinished { get; init; }
+    public bool IsFinished { get; set; }
     
     public bool IsDraw { get; init; }
     

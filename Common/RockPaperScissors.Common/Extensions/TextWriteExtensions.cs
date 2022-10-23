@@ -21,20 +21,24 @@ public static class TextWriteExtensions
         while (true)
         {
             var passwordNotConfirmed = true;
+
             Print(
                 destination is StringDestination.PassportType or StringDestination.Email
                     ? $"What is your {msg}?"
-                    : $"Try to come up with {msg}?", ConsoleColor.Yellow);
+                    : $"Try to come up with {msg}", ConsoleColor.Yellow);
+
             Console.Write($"{msg}--> ");
-                
+
             output = Console.ReadLine()
                 ?.Trim()
-                ?.Replace(" ", "");
+                .Replace(" ", "") ?? string.Empty;
+
             if (string.IsNullOrEmpty(output))
             {
                 Print("Wrong data!", ConsoleColor.Red);
                 continue;
             }
+
             switch (destination)
             {
                 case StringDestination.Password when output.Length < 6:
@@ -45,10 +49,13 @@ public static class TextWriteExtensions
                     continue;
             }
 
-            if (destination == StringDestination.Password)
+            if (destination is StringDestination.Password)
             {
                 if (isNeedConfirmation)
+                {
                     break;
+                }
+                
                 Print("You need to confirm password!", ConsoleColor.Yellow);
                 do
                 {
@@ -56,19 +63,23 @@ public static class TextWriteExtensions
                     var confirmationPassword = Console.ReadLine()
                         ?.Trim()
                         .Replace(" ", "");
+                    
                     if (string.IsNullOrEmpty(output))
                     {
                         Print("Wrong data!", ConsoleColor.Red);
                         continue;
                     }
-                    if (output == confirmationPassword)
+                    
+                    if (output != confirmationPassword)
                     {
-                        Print("Password confirmed", ConsoleColor.Green);
-                        passwordNotConfirmed = false;
+                        Print("Passwords don't match!",ConsoleColor.Red);
+                        continue;
                     }
-                    else
-                        Print("Passwords dont match!",ConsoleColor.Red);
-                } while (passwordNotConfirmed);
+                    
+                    Print("Password confirmed", ConsoleColor.Green);
+                    passwordNotConfirmed = false;
+                } 
+                while (passwordNotConfirmed);
             }
             if (destination is StringDestination.PassportType && ContainsDigits(output))
             {
@@ -77,21 +88,21 @@ public static class TextWriteExtensions
             }
             break;
         }
-        
+
         return output;
     }
-    
+
     public static bool ContainsDigits(this string str)
     {
-        var res = str.Any(character => char.IsDigit(character));
-        
+        var res = str.Any(char.IsDigit);
+
         return res;
     }
-    
+
     public static bool IsEmailValid(this string email)
     {
         var match = EmailRegex.Match(email);
-        
+
         return match.Success;
     }
 }

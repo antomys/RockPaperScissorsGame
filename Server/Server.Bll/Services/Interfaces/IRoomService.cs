@@ -14,7 +14,7 @@ public interface IRoomService
 
     Task<OneOf<RoomModel, CustomException>> GetAsync(string roomId);
 
-    Task<OneOf<RoomModel, CustomException>> ChangeReadyStatusAsync(string userId, string roomId, bool newStatus);
+    Task<OneOf<RoomModel, CustomException>> ChangePlayerStatusAsync(string userId, string roomId, bool newStatus);
 
     Task<OneOf<int, CustomException>> DeleteAsync(string userId, string roomId);
 }

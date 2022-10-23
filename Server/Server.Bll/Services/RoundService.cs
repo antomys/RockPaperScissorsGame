@@ -6,6 +6,7 @@ using Server.Data.Entities;
 using Server.Data.Extensions;
 using OneOf;
 using RockPaperScissors.Common.Enums;
+using PlayerState = Server.Data.Entities.PlayerState;
 
 namespace Server.Bll.Services;
 
@@ -30,6 +31,11 @@ internal sealed class RoundService: IRoundService
             return new CustomException($"Unable to find round with id '{roundId}'");
         }
 
+        if (round.IsFinished)
+        {
+            return new CustomException($"Round has been finished.");
+        }
+
         var updateTicks = DateTimeOffset.UtcNow.Ticks;
         ProcessMoves(round, userId, move);
 
@@ -46,8 +52,14 @@ internal sealed class RoundService: IRoundService
     private void ProcessMoves(Round round, string userId, Move move)
     {
         var players = round.Players;
-        var playingPlayer = players.First(player => player.Id == userId);
-        var otherPlayer = players.First(player => player.Id != userId);
+        var playingPlayer = players.FirstOrDefault(player => player.AccountId == userId);
+
+        if (playingPlayer is null)
+        {
+            return;
+        }
+        
+        var otherPlayer = players.First(player => player.AccountId != userId);
 
         if (otherPlayer.AccountId == SeedingExtension.BotId)
         {
@@ -68,35 +80,40 @@ internal sealed class RoundService: IRoundService
         {
             Move.Paper => otherPlayerMove switch
             {
-                Move.Rock => Data.Entities.PlayerState.Win,
-                Move.Scissors => Data.Entities.PlayerState.Lose,
-                Move.Paper => Data.Entities.PlayerState.Draw,
-                _ => Data.Entities.PlayerState.None,
+                Move.Rock => PlayerState.Win,
+                Move.Scissors => PlayerState.Lose,
+                Move.Paper => PlayerState.Draw,
+                _ => PlayerState.None,
             },
             Move.Rock => otherPlayerMove switch
             {
-                Move.Rock => Data.Entities.PlayerState.Draw,
-                Move.Scissors => Data.Entities.PlayerState.Win,
-                Move.Paper => Data.Entities.PlayerState.Lose,
-                _ => Data.Entities.PlayerState.None,
+                Move.Rock => PlayerState.Draw,
+                Move.Scissors => PlayerState.Win,
+                Move.Paper => PlayerState.Lose,
+                _ => PlayerState.None,
             },
             Move.Scissors => otherPlayerMove switch
             {
-                Move.Rock => Data.Entities.PlayerState.Lose,
-                Move.Scissors => Data.Entities.PlayerState.Draw,
-                Move.Paper => Data.Entities.PlayerState.Win,
-                _ => Data.Entities.PlayerState.None,
+                Move.Rock => PlayerState.Lose,
+                Move.Scissors => PlayerState.Draw,
+                Move.Paper => PlayerState.Win,
+                _ => PlayerState.None,
             },
-            _ => Data.Entities.PlayerState.None,
+            _ => PlayerState.None,
         };
 
         otherPlayer.PlayerState = playingPlayer.PlayerState switch
         {
-            Data.Entities.PlayerState.Win => Data.Entities.PlayerState.Lose,
-            Data.Entities.PlayerState.Lose => Data.Entities.PlayerState.Win,
-            Data.Entities.PlayerState.Draw => Data.Entities.PlayerState.Draw,
-            _ => Data.Entities.PlayerState.None,
+            PlayerState.Win => PlayerState.Lose,
+            PlayerState.Lose => PlayerState.Win,
+            PlayerState.Draw => PlayerState.Draw,
+            _ => PlayerState.None,
         };
+
+        if (playingPlayer.PlayerState is not PlayerState.None && otherPlayer.PlayerState is not PlayerState.None)
+        {
+            round.IsFinished = true;
+        }
     }
 
     public static Round Create(Room room)

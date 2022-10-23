@@ -17,7 +17,7 @@ public static class UrlTemplates
     public const string JoinPrivateRoom = "api/room/private/{roomCode}/join";
     public const string UpdateRoom = "api/room/{roomId}/update";
     public const string DeleteRoom = "api/room/{roomId}/delete";
-    public const string ChangeStatus = "api/room/{roomId}";
+    public const string ChangeStatus = "api/room/{roomId}/playerstatus";
     public const string CheckRoomUpdateTicks = "api/room/{roomId}/status";
     
     // Round-related

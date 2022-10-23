@@ -66,6 +66,18 @@ public sealed class RoomController: ControllerBase
             _ => Ok(),
             BadRequest);
     }
+    
+    [HttpPost(UrlTemplates.ChangeStatus)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ChangePlayerStatusAsync(string roomId, [FromQuery] bool newStatus)
+    {
+        var changePlayerStatus = await _roomService.ChangePlayerStatusAsync(UserId, roomId, newStatus);
+            
+        return changePlayerStatus.Match<IActionResult>(
+            Ok,
+            BadRequest);
+    }
 
     [HttpGet(UrlTemplates.CheckRoomUpdateTicks)]
     [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
