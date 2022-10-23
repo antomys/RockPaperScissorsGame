@@ -11,19 +11,17 @@ namespace Server.Host.Controllers;
 public sealed class RoundController: ControllerBase
 {
     private readonly IRoundService _roundService;
-    private readonly ILongPollingService _longPollingService;
 
-    public RoundController(IRoundService roundService, ILongPollingService longPollingService)
+    public RoundController(IRoundService roundService)
     {
         _roundService = roundService ?? throw new ArgumentNullException(nameof(roundService));
-        _longPollingService = longPollingService ?? throw new ArgumentNullException(nameof(longPollingService));
     }
 
     [HttpGet(UrlTemplates.CheckRoundUpdateTicks)]
     [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
     public Task<long> CheckUpdateTicksAsync(string roundId)
     {
-        return _longPollingService.GetRoundUpdateTicksAsync(roundId);
+        return _roundService.GetUpdateTicksAsync(roundId);
     }
     
     [HttpGet(UrlTemplates.MakeMove)]

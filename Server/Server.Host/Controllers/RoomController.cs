@@ -8,12 +8,10 @@ namespace Server.Host.Controllers;
 public sealed class RoomController: ControllerBase
 {
     private readonly IRoomService _roomService;
-    private readonly ILongPollingService _longPollingService;
 
-    public RoomController(IRoomService roomService, ILongPollingService longPollingService)
+    public RoomController(IRoomService roomService)
     {
         _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
-        _longPollingService = longPollingService ?? throw new ArgumentNullException(nameof(longPollingService));
     }
 
     [HttpPost(UrlTemplates.CreateRoom)]
@@ -83,6 +81,6 @@ public sealed class RoomController: ControllerBase
     [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
     public Task<long> CheckUpdateTicksAsync(string roomId)
     {
-        return _longPollingService.GetRoomUpdateTicksAsync(roomId);
+        return _roomService.GetUpdateTicksAsync(roomId);
     }
 }

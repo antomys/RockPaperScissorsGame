@@ -49,6 +49,14 @@ internal sealed class RoundService: IRoundService
         return true;
     }
 
+    public async Task<long> GetUpdateTicksAsync(string roundId)
+    {
+        var round = await _serverContext.Rounds
+            .FirstOrDefaultAsync(rounds => rounds.Id== roundId);
+
+        return round?.UpdateTicks ?? -1;
+    }
+
     private void ProcessMoves(Round round, string userId, Move move)
     {
         var players = round.Players;

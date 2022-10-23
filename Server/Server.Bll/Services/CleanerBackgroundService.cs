@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Server.Bll.Options;
 using Server.Bll.Services.Interfaces;
 
 namespace Server.Bll.Services;
@@ -10,15 +12,17 @@ public sealed class CleanerBackgroundService : BackgroundService
     private readonly IServiceScopeFactory _serviceProvider;
     private readonly ILogger<CleanerBackgroundService> _logger;
     private readonly PeriodicTimer _periodicTimer;
-    // todo: options of max time
+    private readonly CleanerOptions _cleanerOptions;
 
     public CleanerBackgroundService(
         ILogger<CleanerBackgroundService> logger, 
-        IServiceScopeFactory serviceProvider)
+        IServiceScopeFactory serviceProvider,
+        IOptions<CleanerOptions> cleanerOptions)
     {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _cleanerOptions = cleanerOptions?.Value ?? throw new ArgumentNullException(nameof(cleanerOptions));
+        _periodicTimer = new PeriodicTimer(_cleanerOptions.CleanPeriod);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,9 +39,8 @@ public sealed class CleanerBackgroundService : BackgroundService
     {
         using var scope = factory.CreateScope();
         var roomService = scope.ServiceProvider.GetRequiredService<IRoomService>();
-        //todo: timespan to option.
         var rooms = await roomService
-            .RemoveRangeAsync(TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(20));
+            .RemoveRangeAsync(_cleanerOptions.RoomOutDateTime, _cleanerOptions.RoundOutDateTime);
 
         if (rooms > 0)
         {
@@ -48,13 +51,14 @@ public sealed class CleanerBackgroundService : BackgroundService
     public override void Dispose()
     {
         _periodicTimer.Dispose();
+
         base.Dispose();
     }
 
     public override Task StopAsync(CancellationToken cancellationToken)
     {
         _periodicTimer.Dispose();
-        
+
         return base.StopAsync(cancellationToken);
     }
 }

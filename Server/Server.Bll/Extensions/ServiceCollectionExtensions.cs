@@ -20,7 +20,6 @@ public static class ServiceCollectionExtensions
 
         service
             .AddTransient<IStatisticsService,StatisticsService>()
-            .AddTransient<ILongPollingService,LongPollingService>()
             .AddHostedService<CleanerBackgroundService>();
 
         service.AddHttpContextAccessor();

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Server.Authentication.Extensions;
 using Server.Bll.Extensions;
+using Server.Bll.Options;
 using Server.Data.Context;
 using Server.Data.Extensions;
 using Server.Host.Extensions;
@@ -15,23 +16,26 @@ public sealed class Startup
     }
 
     private IConfiguration Configuration { get; }
-        
+
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddHealthChecks();
-        
+
+        services
+            .Configure<CleanerOptions>(Configuration.GetRequiredSection(CleanerOptions.Section));
+
         services
             .AddDatabase(Configuration)
             .AddSwagger()
             .AddAuthentications();
-        
+
         services.AddBusinessLogic();
-            
+
         services.AddControllers();
-           
+
         services.AddCors();
     }
-        
+
     public static void Configure(
         IApplicationBuilder app,
         IWebHostEnvironment env,
@@ -39,14 +43,14 @@ public sealed class Startup
     {
         serverContext.Database.Migrate();
         serverContext?.EnsureBotCreated();
-        
+
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-            
+
         app.UseCors(builder => builder.AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader()
@@ -57,7 +61,6 @@ public sealed class Startup
 
         app.UseAuthorization();
 
-        
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapHealthChecks("/health");

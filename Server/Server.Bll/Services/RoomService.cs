@@ -102,7 +102,20 @@ internal sealed class RoomService : IRoomService
         
         return room.Adapt<RoomModel>();
     }
-        
+
+    public async Task<long> GetUpdateTicksAsync(string roomId)
+    {
+        var room = await _repository.Rooms
+            .FindAsync(roomId);
+
+        if (room is null)
+        {
+            return -1;
+        }
+
+        return room.UpdateTicks;
+    }
+
     public async Task<OneOf<RoomModel, CustomException>> JoinAsync(string userId, string? roomCode)
     {
         var oneOfRoom = string.IsNullOrEmpty(roomCode) ? await GetPublicAsync(userId) : await GetPrivateAsync(userId, roomCode);

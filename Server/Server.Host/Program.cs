@@ -9,8 +9,9 @@ public static class Program
         CreateHostBuilder(args).Build().Run();
     }
 
-    private static IHostBuilder CreateHostBuilder(string[] args) => 
-        Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
+    private static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return  Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
             .ConfigureLogging(loggingBuilder =>
             {
                 loggingBuilder.ClearProviders();
@@ -19,5 +20,10 @@ public static class Program
                     .WriteTo.Console()
                     .CreateLogger());
             })
-            .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
+    }
+    
 }
