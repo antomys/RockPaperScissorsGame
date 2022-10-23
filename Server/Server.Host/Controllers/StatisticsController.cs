@@ -1,0 +1,39 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using RockPaperScissors.Common;
+using Server.Bll.Models;
+using Server.Bll.Services.Interfaces;
+
+namespace Server.Host.Controllers;
+
+public sealed class StatisticsController: ControllerBase
+{
+    private readonly IStatisticsService _statisticsService;
+
+    public StatisticsController(IStatisticsService statisticsService)
+    {
+        _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
+    }
+
+    [AllowAnonymous]
+    [HttpGet(UrlTemplates.AllStatistics)]
+    [ProducesResponseType(typeof(ShortStatisticsModel[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public Task<ShortStatisticsModel[]> GetOverallStatistics()
+    {
+        return _statisticsService.GetAllAsync();
+    }
+
+    [Authorize]
+    [HttpGet(UrlTemplates.PersonalStatistics)]
+    [ProducesResponseType(typeof(StatisticsModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CustomException), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetPersonalStatistics()
+    {
+        var result = await _statisticsService.GetAsync(UserId);
+
+        return result.Match<IActionResult>(
+            Ok,
+            BadRequest);
+    }
+}
