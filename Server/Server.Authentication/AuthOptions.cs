@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Server.Authentication;
@@ -14,8 +13,8 @@ public sealed class AuthOptions
     /// <summary>
     ///     Token issuer (producer).
     /// </summary>
-    public string Issuer { get; init; } = "Rock Paper Scissors";
-        
+    public string Issuer { get; init; } = AppDomain.CurrentDomain.FriendlyName;
+
     /// <summary>
     ///     Token audience (consumer).
     /// </summary>

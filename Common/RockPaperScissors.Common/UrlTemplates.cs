@@ -15,12 +15,14 @@ public static class UrlTemplates
     public const string CreateRoom = "api/room/create";
     public const string JoinPublicRoom = "api/room/public/join";
     public const string JoinPrivateRoom = "api/room/private/{roomCode}/join";
-    public const string UpdateRoom = "api/room/update";
-    public const string DeleteRoom = "api/room/delete";
+    public const string UpdateRoom = "api/room/{roomId}/update";
+    public const string DeleteRoom = "api/room/{roomId}/delete";
+    public const string ChangeStatus = "api/room/{roomId}";
     public const string CheckRoomUpdateTicks = "api/room/{roomId}/status";
     
     // Round-related
     public const string CreateRound = "api/round/create";
-    public const string UpdateRound = "api/round/update";
+    public const string MakeMove = "api/round/{roundId}/move/{move}";
+    public const string UpdateRound = "api/round/{roundId}/update";
     public const string CheckRoundUpdateTicks = "api/round/{roundId}/status";
 }

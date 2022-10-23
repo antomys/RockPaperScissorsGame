@@ -1,10 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Net.Mime;
+﻿using System.Net.Mime;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace Server.Host.Extensions;
 

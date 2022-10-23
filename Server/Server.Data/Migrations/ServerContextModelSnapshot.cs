@@ -47,6 +47,9 @@ namespace Server.Data.Migrations
                     b.Property<int>("Move")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("PlayerState")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("RoomId")
                         .HasColumnType("TEXT");
 
@@ -97,11 +100,11 @@ namespace Server.Data.Migrations
                     b.Property<long>("FinishTimeTicks")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsFinished")
+                    b.Property<bool>("IsDraw")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LoserId")
-                        .HasColumnType("TEXT");
+                    b.Property<bool>("IsFinished")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("RoomId")
                         .HasColumnType("TEXT");
@@ -112,17 +115,10 @@ namespace Server.Data.Migrations
                     b.Property<long>("UpdateTicks")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("WinnerId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("LoserId");
 
                     b.HasIndex("RoomId")
                         .IsUnique();
-
-                    b.HasIndex("WinnerId");
 
                     b.ToTable("Round");
                 });
@@ -189,23 +185,11 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Data.Entities.Round", b =>
                 {
-                    b.HasOne("Server.Data.Entities.Account", "Loser")
-                        .WithMany()
-                        .HasForeignKey("LoserId");
-
                     b.HasOne("Server.Data.Entities.Room", "Room")
                         .WithOne("Round")
                         .HasForeignKey("Server.Data.Entities.Round", "RoomId");
 
-                    b.HasOne("Server.Data.Entities.Account", "Winner")
-                        .WithMany()
-                        .HasForeignKey("WinnerId");
-
-                    b.Navigation("Loser");
-
                     b.Navigation("Room");
-
-                    b.Navigation("Winner");
                 });
 
             modelBuilder.Entity("Server.Data.Entities.Statistics", b =>

@@ -9,7 +9,7 @@ public sealed class AccountOutputModel
     ///     Gets or sets user token (used in header).
     /// </summary>
     public string Token { get; init; }
-    
+
     /// <summary>
     ///     Gets or sets user login.
     /// </summary>

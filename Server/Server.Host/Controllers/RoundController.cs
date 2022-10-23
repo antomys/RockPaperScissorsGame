@@ -1,12 +1,6 @@
-﻿using System;
-using System.Net;
-using System.Net.Mime;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using RockPaperScissors.Common;
-using Server.Bll.Models;
+using RockPaperScissors.Common.Enums;
 using Server.Bll.Services.Interfaces;
 
 namespace Server.Host.Controllers;
@@ -17,42 +11,27 @@ namespace Server.Host.Controllers;
 public sealed class RoundController: ControllerBase
 {
     private readonly IRoundService _roundService;
+    private readonly ILongPollingService _longPollingService;
 
-    public RoundController(IRoundService roundService)
+    public RoundController(IRoundService roundService, ILongPollingService longPollingService)
     {
         _roundService = roundService ?? throw new ArgumentNullException(nameof(roundService));
+        _longPollingService = longPollingService ?? throw new ArgumentNullException(nameof(longPollingService));
     }
 
-    /// <summary>
-    /// Creates round in room
-    /// </summary>
-    /// <param name="roomId">id of the room</param>
-    /// <returns></returns>
-    [HttpPost(UrlTemplates.CreateRound)]
-    //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> CreateRound(int roomId)
+    [HttpGet(UrlTemplates.CheckRoundUpdateTicks)]
+    [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
+    public Task<long> CheckUpdateTicksAsync(string roundId)
     {
-        throw new NotImplementedException();
-        // var result = await _roundService.CreateAsync(UserId, roomId);
-        // return result.Match<IActionResult>(
-        //     Ok,
-        //     exception => BadRequest(exception));
-    }       
-    /// <summary>
-    /// Updates current room (Patches).
-    /// </summary>
-    /// <param name="roundModel">This round model from FE or client.</param>
-    /// <returns></returns>
-    [HttpPatch(UrlTemplates.UpdateRound)]
-    //[ProducesResponseType(typeof(Round), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> UpdateCurrentRound(RoundModel roundModel)
+        return _longPollingService.GetRoundUpdateTicksAsync(roundId);
+    }
+    
+    [HttpGet(UrlTemplates.MakeMove)]
+    [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
+    public async Task<IActionResult> MakeMoveAsync(string roundId, Move move)
     {
-        throw new NotImplementedException();
-        // var updateResult = await _roundService.UpdateAsync(UserId, roundModel);
-        // return updateResult.Match<IActionResult>(
-        //     Ok,
-        //     exception => BadRequest(exception));
+        var makeMove = await _roundService.MakeMoveAsync(UserId, roundId, move);
+
+        return makeMove.Match<IActionResult>(_ => Ok(), BadRequest);
     }
 }

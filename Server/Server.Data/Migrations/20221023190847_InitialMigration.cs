@@ -71,6 +71,7 @@ namespace Server.Data.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     RoomId = table.Column<string>(type: "TEXT", nullable: true),
                     IsFinished = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsDraw = table.Column<bool>(type: "INTEGER", nullable: false),
                     StartTimeTicks = table.Column<long>(type: "INTEGER", nullable: false),
                     FinishTimeTicks = table.Column<long>(type: "INTEGER", nullable: false),
                     UpdateTicks = table.Column<long>(type: "INTEGER", nullable: false)
@@ -93,7 +94,7 @@ namespace Server.Data.Migrations
                     AccountId = table.Column<string>(type: "TEXT", nullable: true),
                     IsReady = table.Column<bool>(type: "INTEGER", nullable: false),
                     Move = table.Column<int>(type: "INTEGER", nullable: false),
-                    IsWinner = table.Column<bool>(type: "INTEGER", nullable: false),
+                    PlayerState = table.Column<int>(type: "INTEGER", nullable: false),
                     RoomId = table.Column<string>(type: "TEXT", nullable: true),
                     RoundId = table.Column<string>(type: "TEXT", nullable: true)
                 },

@@ -3,9 +3,10 @@
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <Version>0.0.2</Version>
         <TargetFramework>net6</TargetFramework>
+        <ImplicitUsings>true</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Version>0.0.2</Version>
     </PropertyGroup>
 
     <ItemGroup>

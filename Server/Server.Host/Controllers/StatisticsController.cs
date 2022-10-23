@@ -1,9 +1,4 @@
-﻿using System;
-using System.Net.Mime;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RockPaperScissors.Common;
 using Server.Bll.Models;

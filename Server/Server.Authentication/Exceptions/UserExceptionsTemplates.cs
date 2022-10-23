@@ -1,5 +1,3 @@
-using System;
-
 namespace Server.Authentication.Exceptions;
 
 /// <summary>

@@ -11,7 +11,7 @@ using Server.Data.Context;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(ServerContext))]
-    [Migration("20221023171541_InitialMigration")]
+    [Migration("20221023190847_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,10 +46,10 @@ namespace Server.Data.Migrations
                     b.Property<bool>("IsReady")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsWinner")
+                    b.Property<int>("Move")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Move")
+                    b.Property<int>("PlayerState")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("RoomId")
@@ -100,6 +100,9 @@ namespace Server.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<long>("FinishTimeTicks")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDraw")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsFinished")

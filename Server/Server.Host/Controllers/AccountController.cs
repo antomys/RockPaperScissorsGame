@@ -1,9 +1,5 @@
-﻿using System;
-using System.Net;
-using System.Net.Mime;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RockPaperScissors.Common;
 using RockPaperScissors.Common.Models;

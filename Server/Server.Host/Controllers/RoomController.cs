@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using RockPaperScissors.Common;
 using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
@@ -11,10 +8,12 @@ namespace Server.Host.Controllers;
 public sealed class RoomController: ControllerBase
 {
     private readonly IRoomService _roomService;
+    private readonly ILongPollingService _longPollingService;
 
-    public RoomController(IRoomService roomService)
+    public RoomController(IRoomService roomService, ILongPollingService longPollingService)
     {
         _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
+        _longPollingService = longPollingService ?? throw new ArgumentNullException(nameof(longPollingService));
     }
 
     [HttpPost(UrlTemplates.CreateRoom)]
@@ -55,30 +54,23 @@ public sealed class RoomController: ControllerBase
             Ok,
             BadRequest);
     }
-        
-    [HttpPost(UrlTemplates.UpdateRoom)]
+
+    [HttpPost(UrlTemplates.DeleteRoom)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateAsync([FromBody] RoomModel roomModel)
-    {
-        var updateResponse = await _roomService.UpdateAsync(roomModel);
-        
-        return updateResponse switch
-        {
-            StatusCodes.Status200OK => Ok(),
-            _ => BadRequest()
-        };
-    }
-        
-    [HttpDelete(UrlTemplates.DeleteRoom)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> DeleteAsync([FromQuery] string roomId)
+    public async Task<IActionResult> DeleteAsync(string roomId)
     {
         var deleteResponse = await _roomService.DeleteAsync(UserId, roomId);
             
         return deleteResponse.Match<IActionResult>(
             _ => Ok(),
             BadRequest);
+    }
+
+    [HttpGet(UrlTemplates.CheckRoomUpdateTicks)]
+    [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
+    public Task<long> CheckUpdateTicksAsync(string roomId)
+    {
+        return _longPollingService.GetRoomUpdateTicksAsync(roomId);
     }
 }

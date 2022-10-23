@@ -19,5 +19,5 @@ public class Player
     
     public int Move { get; set; }
     
-    public bool IsWinner { get; set; }
+    public PlayerState PlayerState { get; set; }
 }

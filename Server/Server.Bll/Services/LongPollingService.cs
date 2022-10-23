@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Server.Bll.Services.Interfaces;
 using Server.Data.Context;
@@ -17,7 +16,7 @@ internal sealed class LongPollingService : ILongPollingService
     public Task<bool> CheckRoomState(string roomId)
     {
         return _serverContext.Rooms
-            .AnyAsync(room => room.Id.Equals(roomId));
+            .AnyAsync(room => room.Id == roomId);
     }
     
     public async Task<long> GetRoomUpdateTicksAsync(string roomId)
@@ -36,7 +35,7 @@ internal sealed class LongPollingService : ILongPollingService
     public async Task<bool> CheckRoundState(string roundId)
     {
         var round = await _serverContext.Rounds
-            .FirstOrDefaultAsync(rounds => rounds.Id.Equals(roundId));
+            .FirstOrDefaultAsync(rounds => rounds.Id == roundId);
 
         return round?.IsFinished ?? false;
     }
@@ -44,7 +43,7 @@ internal sealed class LongPollingService : ILongPollingService
     public async Task<long> GetRoundUpdateTicksAsync(string roundId)
     {
         var round = await _serverContext.Rounds
-            .FirstOrDefaultAsync(rounds => rounds.Id.Equals(roundId));
+            .FirstOrDefaultAsync(rounds => rounds.Id== roundId);
 
         return round?.UpdateTicks ?? -1;
     }

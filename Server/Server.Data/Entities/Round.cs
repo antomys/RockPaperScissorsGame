@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Server.Data.Entities;
@@ -19,6 +18,8 @@ public class Round
     public virtual ICollection<Player> Players { get; set; }
 
     public bool IsFinished { get; init; }
+    
+    public bool IsDraw { get; init; }
     
     public long StartTimeTicks { get; set; }
     

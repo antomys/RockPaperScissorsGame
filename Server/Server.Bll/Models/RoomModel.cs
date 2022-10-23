@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Server.Bll.Models;
+﻿namespace Server.Bll.Models;
 
 public sealed class RoomModel
 {
@@ -8,7 +6,7 @@ public sealed class RoomModel
     /// Id of the room. Consists of 5 randomized chars
     /// </summary>
     public string Id { get; init; }
-    
+
     /// <summary>
     /// Special code to join a room
     /// </summary>
@@ -33,12 +31,12 @@ public sealed class RoomModel
     /// Flag if room is full
     /// </summary>
     public bool IsFull { get; init; }
-        
+
     /// <summary>
     /// Creation date. After 5 minutes of inactivity will be deleted
     /// </summary>
     public long CreationTimeTicks { get; init; }
-    
+
     /// <summary>
     ///     Last update time ticks.
     /// </summary>

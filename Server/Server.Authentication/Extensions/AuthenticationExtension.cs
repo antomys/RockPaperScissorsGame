@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -29,7 +28,7 @@ public static class AuthenticationExtension
                     .BuildServiceProvider()
                     .GetRequiredService<IOptions<AuthOptions>>()
                     .Value;
-                            
+
                 options.RequireHttpsMetadata = jwtOptions.RequireHttps;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {

@@ -1,8 +1,5 @@
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -52,17 +49,17 @@ internal sealed class AuthService : IAuthService
         if (string.IsNullOrWhiteSpace(login))
         {
             _logger.LogError("Login should not be 'empty'");
-            
+
             return new UserException(nameof(login).UserInvalidCredentials());
         }
-            
+
         if (string.IsNullOrEmpty(password))
         {
             _logger.LogError("Password should not be 'empty'");
-            
+
             return new UserException(nameof(password).UserInvalidCredentials());
         }
-            
+
         var release = await Semaphore.WaitAsync(100);
 
         try
@@ -70,21 +67,21 @@ internal sealed class AuthService : IAuthService
             if (await _repository.Accounts.AnyAsync(account => account.Login.Equals(login.ToLower())))
             {
                 var exceptionMessage = login.UserAlreadyExists();
-                
+
                 _logger.LogError("Error occured : {ExceptionMessage}", exceptionMessage);
-                
+
                 return new UserException(exceptionMessage);
             }
 
             var accountId = Guid.NewGuid().ToString();
-            
+
             var account = new Account
             {
                 Id = accountId,
                 Login = login,
                 Password = password.EncodeBase64(),
             };
-                
+
             _repository.Accounts.Add(account);
 
             var accountStatistics = new Statistics
@@ -92,7 +89,7 @@ internal sealed class AuthService : IAuthService
                 Id = accountId,
                 AccountId = accountId
             };
-            
+
             _repository.StatisticsEnumerable.Add(accountStatistics);
             await _repository.SaveChangesAsync();
 
@@ -101,7 +98,7 @@ internal sealed class AuthService : IAuthService
         catch
         {
             _logger.LogWarning("Unable to process account for {Login}", login);
-            
+
             return new UserException(UserExceptionsTemplates.UnknownError);
         }
         finally
@@ -112,27 +109,27 @@ internal sealed class AuthService : IAuthService
             }
         }
     }
-        
+
     /// <inheritdoc/>
     public async Task<OneOf<AccountOutputModel, UserException>> LoginAsync(string login, string password)
     {
         var userAccount = await _repository.Accounts.FirstOrDefaultAsync(account => account.Login.ToLower().Equals(login.ToLower()));
 
         string exceptionMessage;
-        
+
         if (userAccount is null)
         {
             exceptionMessage = login.UserNotFound();
             _logger.LogWarning("Error occured: {ExceptionMessage}", exceptionMessage);
-            
+
             return new UserException(exceptionMessage);
         }
-           
+
         if (login.IsCoolDown(out var coolRequestDate))
         {
             exceptionMessage = login.UserCoolDown(coolRequestDate);
             _logger.LogWarning("Error occured: {ExceptionMessage}", exceptionMessage);
-            
+
             return new UserException(exceptionMessage);
         }
 
@@ -149,7 +146,7 @@ internal sealed class AuthService : IAuthService
 
         exceptionMessage = login.UserInvalidCredentials();
         _logger.LogWarning("Error occured: {ExceptionMessage}", exceptionMessage);
-       
+
         return new UserException(exceptionMessage);
     }
 
@@ -182,7 +179,7 @@ internal sealed class AuthService : IAuthService
                 JwtBearerDefaults.AuthenticationScheme,
                 ClaimsIdentity.DefaultNameClaimType,
                 ClaimsIdentity.DefaultRoleClaimType);
-            
+
         return claimsIdentity;
     }
 }

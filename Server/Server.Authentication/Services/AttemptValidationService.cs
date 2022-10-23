@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 
 namespace Server.Authentication.Services;
@@ -18,7 +17,7 @@ internal static class AttemptValidationService
         {
             return false;
         }
-        
+
         if (FailedAttempts.TryGetValue(userId, out var failedAttempts))
         {
             if (failedAttempts >= 2)
@@ -26,12 +25,12 @@ internal static class AttemptValidationService
                 // todo: in options
                 CoolDownCollection.TryAdd(userId, DateTimeOffset.UtcNow.AddMinutes(2));
                 FailedAttempts.TryRemove(userId, out _);
-                
+
                 return true;
             }
         }
         FailedAttempts.AddOrUpdate(userId, 1, (_, i) => i + 1);
-            
+
         return true;
     }
 
@@ -41,7 +40,7 @@ internal static class AttemptValidationService
         {
             return default;
         }
-        
+
         return FailedAttempts.TryGetValue(userId, out var failedAttempts)
             ? failedAttempts
             : default;
@@ -54,17 +53,17 @@ internal static class AttemptValidationService
             coolDownDate = default;
             return false;
         }
-        
+
         if (!CoolDownCollection.TryGetValue(userId, out coolDownDate))
         {
             return false;
         }
-        
+
         if (coolDownDate >= DateTimeOffset.UtcNow)
         {
             return true;
         }
-        
+
         CoolDownCollection.TryRemove(userId, out coolDownDate);
 
         return false;

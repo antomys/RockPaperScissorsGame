@@ -1,5 +1,3 @@
-using System;
-
 namespace Server.Authentication;
 
 /// <summary>
@@ -16,6 +14,7 @@ public static class HashingBase64
     {
         var encodedDataAsBytes
             = Convert.FromBase64String(encodedData);
+
         return
             System.Text.Encoding.ASCII.GetString(encodedDataAsBytes);
     }
@@ -46,7 +45,7 @@ public static class HashingBase64
     public static bool IsHashEqual(this string base64Data, string initialData)
     {
         var baseDecoded = EncodeBase64(initialData);
-            
+
         return base64Data.Equals(baseDecoded, StringComparison.OrdinalIgnoreCase);
     }
 }

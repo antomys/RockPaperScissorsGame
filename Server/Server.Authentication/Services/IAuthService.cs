@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using OneOf;
 using Server.Authentication.Exceptions;
@@ -24,7 +23,7 @@ public interface IAuthService
     ///     <c>UserException</c> - <see cref="UserException"/> If some case of error occured. (User exists, validation error, unknown error).
     /// </returns>
     Task<OneOf<int, UserException>> RegisterAsync(string login, string password);
-    
+
     /// <summary>
     ///     Signs in client by credentials and building JWT token.
     /// </summary>

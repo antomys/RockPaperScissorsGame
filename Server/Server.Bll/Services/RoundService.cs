@@ -1,15 +1,11 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 using RockPaperScissors.Common;
-using Server.Bll.Models;
 using Server.Bll.Services.Interfaces;
-using OneOf;
-using Server.Bll.Exceptions;
 using Server.Data.Context;
 using Server.Data.Entities;
+using Server.Data.Extensions;
+using OneOf;
+using RockPaperScissors.Common.Enums;
 
 namespace Server.Bll.Services;
 
@@ -21,103 +17,86 @@ internal sealed class RoundService: IRoundService
     {
         _serverContext = serverContext ?? throw new ArgumentNullException(nameof(serverContext));
     }
-    
-    public async Task<OneOf<RoundModel, CustomException>> CreateAsync(string userId, string roomId)
+
+    public async Task<OneOf<bool, CustomException>> MakeMoveAsync(string userId, string roundId, Move move)
     {
-        var playingRoom = await _serverContext.Rooms
-            .Include(rooms => rooms.Players)
-            .FirstOrDefaultAsync(room => room.Id.Equals(roomId));
-        
-        if (playingRoom is null)
+        var round = await _serverContext.Rounds
+            .Include(round => round.Players)
+            .Include(round => round.Room)
+            .FirstOrDefaultAsync(round => round.Id == roundId);
+
+        if (round is null)
         {
-            return new CustomException(ExceptionTemplates.NotExists(nameof(Room)));
+            return new CustomException($"Unable to find round with id '{roundId}'");
         }
 
-        if (!playingRoom.IsFull)
-        {
-            return new CustomException(ExceptionTemplates.RoomNotFull);
-        }
-        
-        if (!playingRoom.Players.Any(player => player.AccountId.Equals(userId)))
-        {
-            return new CustomException(ExceptionTemplates.NotAllowed);
-        }
+        var updateTicks = DateTimeOffset.UtcNow.Ticks;
+        ProcessMoves(round, userId, move);
 
-        var updateTime = DateTimeOffset.UtcNow.Ticks;
-        var newRound = new Round
-        {
-            Id = Guid.NewGuid().ToString(),
-            RoomId = roomId,
-            Room = playingRoom,
-            StartTimeTicks = updateTime,
-            UpdateTicks = updateTime,
-            IsFinished = false
-        };
+        round.UpdateTicks = updateTicks;
+        round.Room.UpdateTicks = updateTicks;
 
-        playingRoom.UpdateTicks = updateTime;
-        
-        var players = playingRoom.Players;
-
-        newRound.Players = players;
-
-        _serverContext.Rounds.Add(newRound);
-        _serverContext.Rooms.Update(playingRoom);
+        _serverContext.Update(round);
 
         await _serverContext.SaveChangesAsync();
-       
-        return newRound.Adapt<RoundModel>();
+
+        return true;
     }
 
-    [Obsolete(message: "Not used in new version. Please use UpdateRoundAsync")]
-    public Task<RoundModel> MakeMoveAsync()
+    private void ProcessMoves(Round round, string userId, Move move)
     {
-        throw new NotImplementedException();
-    }
+        var players = round.Players;
+        var playingPlayer = players.First(player => player.Id == userId);
+        var otherPlayer = players.First(player => player.Id != userId);
 
-    public Task<OneOf<RoundModel, CustomException>> UpdateAsync(string userId, RoundModel roundModel)
-    {
-        throw new NotImplementedException();
-    }
+        if (otherPlayer.AccountId == SeedingExtension.BotId)
+        {
+            otherPlayer.Move = Random.Shared.Next(1, Enum.GetNames<Move>().Length);
+        }
 
-    public async Task<OneOf<RoundModel,CustomException>> UpdateAsync(int userId, RoundModel roundModel)
-    {
-        throw new NotImplementedException();
-        // var thisRound = await _serverContext
-        //     .Rounds
-        //     .Include(x => x.Player)
-        //     .ThenInclude(x=>x.Room)
-        //     .FirstOrDefaultAsync(x => x.Id == roundModel.Id);
-        //     
-        // if(thisRound is null)
-        // {
-        //     return new CustomException(ExceptionTemplates.RoundNotFound(roundModel.Id));
-        // }
-        //
-        // if(thisRound.Player.FirstPlayerId != userId || thisRound.Player.SecondPlayerId != userId)
-        // {
-        //     return new CustomException(ExceptionTemplates.NotAllowed);
-        // }
-        //
-        // var incomeRound = roundModel.Adapt<Round>();
-        // thisRound.FirstPlayerMove = incomeRound.FirstPlayerMove;
-        // thisRound.SecondPlayerMove = incomeRound.SecondPlayerMove;
-        // thisRound.LastMoveTicks = incomeRound.LastMoveTicks;
-        //
-        // if (thisRound.FirstPlayerMove != 0 && thisRound.SecondPlayerMove != 0)
-        // {
-        //     thisRound.IsFinished = true;
-        //     thisRound.TimeFinishedTicks = DateTimeOffset.Now.Ticks;
-        // }
-        //
-        // if (!_serverContext.Entry(thisRound).Properties.Any(x => x.IsModified))
-        // {
-        //     return new CustomException(ExceptionTemplates.NotAllowed);
-        // }
-        //     
-        // _serverContext.Update(thisRound);
-        // await _serverContext.SaveChangesAsync();
-        //
-        // return thisRound.Adapt<RoundModel>();
+        playingPlayer.Move = (int)move;
+
+        if (otherPlayer.Move is (int)Move.None)
+        {
+            return;
+        }
+
+        var playingPlayerMove = (Move)playingPlayer.Move;
+        var otherPlayerMove = (Move)otherPlayer.Move;
+
+        playingPlayer.PlayerState = playingPlayerMove switch
+        {
+            Move.Paper => otherPlayerMove switch
+            {
+                Move.Rock => Data.Entities.PlayerState.Win,
+                Move.Scissors => Data.Entities.PlayerState.Lose,
+                Move.Paper => Data.Entities.PlayerState.Draw,
+                _ => Data.Entities.PlayerState.None,
+            },
+            Move.Rock => otherPlayerMove switch
+            {
+                Move.Rock => Data.Entities.PlayerState.Draw,
+                Move.Scissors => Data.Entities.PlayerState.Win,
+                Move.Paper => Data.Entities.PlayerState.Lose,
+                _ => Data.Entities.PlayerState.None,
+            },
+            Move.Scissors => otherPlayerMove switch
+            {
+                Move.Rock => Data.Entities.PlayerState.Lose,
+                Move.Scissors => Data.Entities.PlayerState.Draw,
+                Move.Paper => Data.Entities.PlayerState.Win,
+                _ => Data.Entities.PlayerState.None,
+            },
+            _ => Data.Entities.PlayerState.None,
+        };
+
+        otherPlayer.PlayerState = playingPlayer.PlayerState switch
+        {
+            Data.Entities.PlayerState.Win => Data.Entities.PlayerState.Lose,
+            Data.Entities.PlayerState.Lose => Data.Entities.PlayerState.Win,
+            Data.Entities.PlayerState.Draw => Data.Entities.PlayerState.Draw,
+            _ => Data.Entities.PlayerState.None,
+        };
     }
 
     public static Round Create(Room room)
@@ -137,4 +116,5 @@ internal sealed class RoundService: IRoundService
 
         return newRound;
     }
+    
 }

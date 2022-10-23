@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace Server.Bll.Services.Interfaces;
 
 public interface ILongPollingService
@@ -9,7 +6,7 @@ public interface ILongPollingService
     Task<bool> CheckRoomState(string roomId);
 
     Task<long> GetRoomUpdateTicksAsync(string roomId);
-    
+
     [Obsolete]
     Task<bool> CheckRoundState(string roundId);
 

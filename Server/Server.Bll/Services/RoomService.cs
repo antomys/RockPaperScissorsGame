@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -65,15 +61,44 @@ internal sealed class RoomService : IRoomService
         {
             room.IsFull = true;
             room.Players.Add(SeedingExtension.BotPlayer);
-        }
-
-        if (room.IsFull)
-        {
             room.Round = RoundService.Create(room);
         }
 
         await _repository.SaveChangesAsync();
 
+        return room.Adapt<RoomModel>();
+    }
+
+    public async Task<OneOf<RoomModel, CustomException>> ChangeReadyStatusAsync(string userId, string roomId, bool newStatus)
+    {
+        var room = await _repository.Rooms
+            .Include(room => room.Players)
+            .FirstOrDefaultAsync(room => room.Id == roomId);
+
+        if (room is null)
+        {
+            return new CustomException($"Room with id {roomId} does not exist");
+        }
+
+        var currentPlayer = room.Players.FirstOrDefault(player => player.Id == userId);
+        if (currentPlayer is null)
+        {
+            return new CustomException($"You are not able to modify this room");
+        }
+
+        currentPlayer.IsReady = newStatus;
+
+        _repository.Players.Update(currentPlayer);
+
+        await _repository.SaveChangesAsync();
+
+        if (room.Players.All(player => player.IsReady))
+        {
+            room.Round = RoundService.Create(room);
+        }
+        
+        await _repository.SaveChangesAsync();
+        
         return room.Adapt<RoomModel>();
     }
         
@@ -87,7 +112,7 @@ internal sealed class RoomService : IRoomService
         }
 
         var room = oneOfRoom.AsT0;
-        
+
         var newPlayer = new Player
         {
             Id = Guid.NewGuid().ToString(),
@@ -95,20 +120,15 @@ internal sealed class RoomService : IRoomService
             AccountId = userId,
             IsReady = false,
         };
-        
+
         room.Players.Add(newPlayer);
         room.UpdateTicks = DateTimeOffset.UtcNow.Ticks;
         room.IsFull = room.Players.Count is 2;
-        
-        if (room.IsFull)
-        {
-            room.Round = RoundService.Create(room);
-        }
 
         _repository.Rooms.Update(room);
-        
+
         await _repository.SaveChangesAsync();
-        
+
         return room.Adapt<RoomModel>();
     }
 
@@ -122,11 +142,6 @@ internal sealed class RoomService : IRoomService
         }
 
         return room.Adapt<RoomModel>();
-    }
-
-    public Task<int?> UpdateAsync(RoomModel room)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<OneOf<int, CustomException>> DeleteAsync(string userId, string roomId)
@@ -217,7 +232,7 @@ internal sealed class RoomService : IRoomService
 
         if (room is null)
         {
-            return new CustomException("There is no available free rooms");
+            return new CustomException("There are no available free rooms");
         }
         
         return room;

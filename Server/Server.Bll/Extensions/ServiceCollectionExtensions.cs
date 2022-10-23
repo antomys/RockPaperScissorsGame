@@ -1,5 +1,4 @@
-﻿using System;
-using Mapster;
+﻿using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Bll.Models;
 using Server.Bll.Services;
@@ -18,14 +17,14 @@ public static class ServiceCollectionExtensions
             .NewConfig()
             .Map(shortStatisticsModel => shortStatisticsModel.Login, statistics => statistics.Account.Login)
             .Map(shortStatisticsModel => shortStatisticsModel.Score, statistics => statistics.Score);
-        
+
         service
             .AddTransient<IStatisticsService,StatisticsService>()
             .AddTransient<ILongPollingService,LongPollingService>()
-            .AddHostedService<CleanerHostedService>();
-        
+            .AddHostedService<CleanerBackgroundService>();
+
         service.AddHttpContextAccessor();
-        
+
         service
             .AddTransient<IRoomService, RoomService>()
             .AddTransient<IRoundService, RoundService>();

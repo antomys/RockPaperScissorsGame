@@ -8,16 +8,6 @@ namespace Server.Authentication.Exceptions;
 public sealed class UserException
 {
     /// <summary>
-    ///     Gets response code.
-    /// </summary>
-    public int Code { get; }
-    
-    /// <summary>
-    ///     Gets exception message.
-    /// </summary>
-    public string Message { get; }
-        
-    /// <summary>
     ///     Constructor.
     /// </summary>
     /// <param name="message">Exception message.</param>
@@ -26,4 +16,14 @@ public sealed class UserException
         Code = StatusCodes.Status400BadRequest;
         Message = message;
     }
+
+    /// <summary>
+    ///     Gets response code.
+    /// </summary>
+    public int Code { get; }
+
+    /// <summary>
+    ///     Gets exception message.
+    /// </summary>
+    public string Message { get; }
 }
